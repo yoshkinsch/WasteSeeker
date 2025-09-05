@@ -1,0 +1,7 @@
+﻿Content/Sedgwick_Ave_Display/SedgwickAveDisplay-Regular.ttf - SedgwickAveDisplay font created by Pedro Vergani and Kevin Burke, released on Google Fonts (https://fonts.google.com/specimen/Sedgwick+Ave+Display) under the Open Font License
+
+Content/Eyes_WasteSeeker_MainMenu.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/Gear_WasteSeeker_MainMenu.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+COntent/Bullet.png - created by Pictogrammers Team on iconarchive.com (https://www.iconarchive.com/show/material-icons-by-pictogrammers/bullet-icon.html). Is released under the Apache 2.0 License and the Pictogrammers Free License
