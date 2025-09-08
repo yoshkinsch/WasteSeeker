@@ -9,8 +9,25 @@ namespace WasteSeeker
     /// </summary>
     public class WasteSeekerGame : Game
     {
+        #region GameState Enum
+        /// <summary>
+        /// Enumeration to hold the state of the game
+        /// </summary>
+        public enum GameState
+        {
+            MainMenu,
+            Options,
+            Credits,
+            GameOver,
+            Playing,
+            Paused
+        }
+        #endregion
+
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
+
+        private GameState gameState = GameState.MainMenu;
 
         #region Menu Objects
 
@@ -102,9 +119,13 @@ namespace WasteSeeker
                 Exit();
             
             // TODO: Add your update logic here
-
-            _leftGearSprite.Update(gameTime);
-            _rightGearSprite.Update(gameTime);
+            switch (gameState)
+            {
+                case GameState.MainMenu:
+                    _leftGearSprite.Update(gameTime);
+                    _rightGearSprite.Update(gameTime);
+                    break;
+            }
 
             base.Update(gameTime);
         }
@@ -118,21 +139,26 @@ namespace WasteSeeker
             GraphicsDevice.Clear(Color.Crimson);
 
             // TODO: Add your drawing code here
+            switch (gameState)
+            {
+                case GameState.MainMenu:
+                    _spriteBatch.Begin();
 
-            _spriteBatch.Begin();
+                    // Texture2D Assets Main Menu
+                    _spriteBatch.Draw(_mainMenuEyes, new Vector2(0, 0), null, Color.White);
+                    _bulletIcon.Draw(_spriteBatch, gameTime, new Vector2(GraphicsDevice.Viewport.Width / 2 - 20, 90), new Vector2(256, 256), 0.125f);
+                    _leftGearSprite.Draw(_spriteBatch, gameTime);
+                    _rightGearSprite.Draw(_spriteBatch, gameTime);
 
-            // Texture2D Assets Main Menu
-            _spriteBatch.Draw(_mainMenuEyes, new Vector2(0, 0), null, Color.White);
-            _bulletIcon.Draw(_spriteBatch, gameTime, new Vector2(GraphicsDevice.Viewport.Width / 2 - 20, 90), new Vector2(256, 256), 0.125f);
-            _leftGearSprite.Draw(_spriteBatch, gameTime);
-            _rightGearSprite.Draw(_spriteBatch, gameTime);
+                    // Sprite Fonts
+                    _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2(GraphicsDevice.Viewport.Width / 2, 100), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker") / 2, 1, SpriteEffects.None, 1);
+                    _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 100), Color.White, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker") / 2, 1, SpriteEffects.None, 1);
+                    _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Q' or 'ESC' to EXIT", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 150), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Q' or 'ESC' to EXIT") / 2, 0.35f, SpriteEffects.None, 1);
 
-            // Sprite Fonts
-            _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2(GraphicsDevice.Viewport.Width/2 , 100), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker")/2, 1, SpriteEffects.None, 1);
-            _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2((GraphicsDevice.Viewport.Width/2 ) + 10, 100), Color.White, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker")/2, 1, SpriteEffects.None, 1);
-            _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Q' or 'ESC' to EXIT", new Vector2((GraphicsDevice.Viewport.Width/2 ) + 10, 150), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Q' or 'ESC' to EXIT") /2, 0.35f, SpriteEffects.None, 1);
+                    _spriteBatch.End();
+                    break;
+            }
             
-            _spriteBatch.End();
 
             base.Draw(gameTime);
         }
