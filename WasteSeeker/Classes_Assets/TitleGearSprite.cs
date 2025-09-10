@@ -8,12 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WasteSeeker
+namespace WasteSeeker.Classes_Assets
 {
     /// <summary>
     /// A class to represent the gear sprite icon on the Main Menu screen
     /// </summary>
-    public class GearSprite
+    public class TitleGearSprite
     {
         public enum Direction
         {
@@ -43,14 +43,6 @@ namespace WasteSeeker
         /// The position of where the Gear icon is located on the screen
         /// </summary>
         public Vector2 Position;
-
-        /// <summary>
-        /// Constructor for a Gear Sprite
-        /// </summary>
-        public GearSprite()
-        {
-            
-        }
 
         /// <summary>
         /// Loads the two animation frames needed for the gear icon to spin

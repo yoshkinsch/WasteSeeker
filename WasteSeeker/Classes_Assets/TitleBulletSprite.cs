@@ -7,12 +7,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WasteSeeker
+namespace WasteSeeker.Classes_Assets
 {
     /// <summary>
     /// The bullet sprite/icon
     /// </summary>
-    public class BulletSprite
+    public class TitleBulletSprite
     {
         private Texture2D _bullet;
 

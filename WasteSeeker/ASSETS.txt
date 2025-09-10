@@ -4,4 +4,4 @@ Content/Eyes_WasteSeeker_MainMenu.png - created by Carson Kinsch (me), released 
 
 Content/Gear_WasteSeeker_MainMenu.png - created by Carson Kinsch (me), released under the Creative Commons License
 
-COntent/Bullet.png - created by Pictogrammers Team on iconarchive.com (https://www.iconarchive.com/show/material-icons-by-pictogrammers/bullet-icon.html). Is released under the Apache 2.0 License and the Pictogrammers Free License
+Content/Bullet.png - created by Pictogrammers Team on iconarchive.com (https://www.iconarchive.com/show/material-icons-by-pictogrammers/bullet-icon.html). Is released under the Apache 2.0 License and the Pictogrammers Free License

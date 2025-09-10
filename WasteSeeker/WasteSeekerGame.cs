@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using WasteSeeker.Classes_Assets;
 
 namespace WasteSeeker
 {
@@ -37,11 +38,11 @@ namespace WasteSeeker
         // Texture2D Assets
         private Texture2D _mainMenuEyes;
 
-        private BulletSprite _bulletIcon;
+        private TitleBulletSprite _bulletIcon;
 
-        private GearSprite _leftGearSprite;
+        private TitleGearSprite _leftGearSprite;
         
-        private GearSprite _rightGearSprite; 
+        private TitleGearSprite _rightGearSprite;
 
         // Buttons
         #region Buttons
@@ -54,7 +55,7 @@ namespace WasteSeeker
          *      - Only make the quit button for now
         */
 
-        //private Rectangle _playButton;
+        private Button _playButton;
         //private Rectangle _optionsButton;
         //private Rectangle _quitButton;
         #endregion
@@ -82,10 +83,12 @@ namespace WasteSeeker
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            _leftGearSprite = new GearSprite() { Position = new Vector2(270, 100), RotationDirection = 1, GearDirection = 0 };
-            _rightGearSprite = new GearSprite() { Position = new Vector2(1020, 100), RotationDirection = -1, GearDirection = (GearSprite.Direction)1 };
-            _bulletIcon = new BulletSprite() { Graphics = _graphics };
-
+            #region Main Menu
+            _leftGearSprite = new TitleGearSprite() { Position = new Vector2(270, 100), RotationDirection = 1, GearDirection = 0 };
+            _rightGearSprite = new TitleGearSprite() { Position = new Vector2(1020, 100), RotationDirection = -1, GearDirection = (TitleGearSprite.Direction)1 };
+            _bulletIcon = new TitleBulletSprite() { Graphics = _graphics };
+            _playButton = new Button(new Vector2(640,360));
+            #endregion 
             base.Initialize();
         }
 
@@ -102,10 +105,14 @@ namespace WasteSeeker
             _sedgwickAveDisplay = Content.Load<SpriteFont>("sedgwickAveDisplay");
 
             // Main Menu Texture2D Assets
+            #region Main Menu
             _mainMenuEyes = Content.Load<Texture2D>("Eyes_WasteSeeker_MainMenu");
             _bulletIcon.LoadContent(Content);
             _leftGearSprite.LoadContent(Content);
             _rightGearSprite.LoadContent(Content);
+            #endregion 
+
+
         }
 
         /// <summary>
@@ -119,6 +126,12 @@ namespace WasteSeeker
                 Exit();
             
             // TODO: Add your update logic here
+
+            /*
+             * Game State is updated here if certain input is entered
+             * Input-Handler will handle which input is sent and will communicate that back here - can determine the game state
+            */
+
             switch (gameState)
             {
                 case GameState.MainMenu:
@@ -156,6 +169,9 @@ namespace WasteSeeker
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Q' or 'ESC' to EXIT", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 150), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Q' or 'ESC' to EXIT") / 2, 0.35f, SpriteEffects.None, 1);
 
                     _spriteBatch.End();
+                    break;
+                case GameState.Options:
+                    // Options will contain volume, display options, langauge, and potentially more
                     break;
             }
             
