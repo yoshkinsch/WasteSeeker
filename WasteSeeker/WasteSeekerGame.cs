@@ -21,7 +21,8 @@ namespace WasteSeeker
             Credits,
             GameOver,
             Playing,
-            Paused
+            Paused,
+            Cutscene
         }
         #endregion
 
