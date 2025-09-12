@@ -27,12 +27,21 @@ namespace WasteSeeker
         /// </summary>
         public bool Finished { get; private set; } = false;
 
+        /// <summary>
+        /// Cutscene constructor to initialize a Cutscene object
+        /// </summary>
+        /// <param name="frames">frames of the cut-scene</param>
+        /// <param name="durations">durations of each frame in the cut-scene</param>
         public CutScene(List<Texture2D> frames, List<float> durations)
         {
             _frames = frames;
             _frameDurations = durations;
         }
 
+        /// <summary>
+        /// Update method to update which frames should be shown
+        /// </summary>
+        /// <param name="gameTime">The game time</param>
         public void Update(GameTime gameTime)
         {
             if (Finished) return;
@@ -46,12 +55,32 @@ namespace WasteSeeker
 
                 if (_currentFrame >= _frames.Count)
                 {
-                    //TODO: Finish Update method - start a draw method and add a method to 
-                    //      make the boolean "Finished" false if a new game starts.
-                    //      ALSO - make a possible skip button so players can skip the
-                    //      cutscene.
+                    Finished = true;
+                    _currentFrame = _frames.Count - 1;
                 }
             }
+        }
+
+        /// <summary>
+        /// Draw method to draw cutscenes
+        /// </summary>
+        /// <param name="spriteBatch">Spritebatch to draw frames</param>
+        public void Draw(SpriteBatch spriteBatch)
+        {
+            if (!Finished)
+            {
+                spriteBatch.Draw(_frames[_currentFrame], Vector2.Zero, Color.White);
+            }
+        }
+
+        /// <summary>
+        /// Reset method in case a new game is started
+        /// </summary>
+        public void Reset()
+        {
+            _currentFrame = 0;
+            _timer = 0f;
+            Finished = false;
         }
     }
 }
