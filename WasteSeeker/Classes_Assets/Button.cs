@@ -16,9 +16,19 @@ namespace WasteSeeker.Classes_Assets
     /// </summary>
     public class Button
     {
-        private Texture2D _staticButtonTexture;
+        /// <summary>
+        /// Deterimnes whether 
+        /// </summary>
+        public enum ButtonState
+        {
+            Idle,
+            Hovering,
+            Transitioning
+        }
 
-        private Texture2D _buttonHoverTexture; // each frame is 200x125 pixels wide
+        private Texture2D _idleButtonTexture;  // idle button is 150x100 - not moving
+
+        private Texture2D _buttonHoverTexture; // each frame is 200x150 pixels wide/tall
 
         private BoundingRectangle _bounds;
 
@@ -29,6 +39,8 @@ namespace WasteSeeker.Classes_Assets
         private double _animationTimer;
 
         private short _animationFrame = 1;
+
+        private ButtonState _buttonState;
 
         /// <summary>
         /// The bounding "volume" for the Button
@@ -52,35 +64,61 @@ namespace WasteSeeker.Classes_Assets
         }
 
         /// <summary>
-        /// Draws the animated (or non-animated) texture(s) of the button
+        /// Updates the button state depending on where the mouse is
         /// </summary>
-        /// <param name="gameTime">The game time</param>
-        /// <param name="spriteBatch">Sprite batch to draw button</param>
-        public void Draw(GameTime gameTime, SpriteBatch spriteBatch)
+        /// <param name="gameTime"></param>
+        public void Update(GameTime gameTime)
         {
-            // Will just draw the mouse-off texture unless the mouse is hovering on the button
-            // Once the mouse hovers, the animated texture will start playing until the mouse is off
-            // or the mouse clicks the button (in which case the game-state will change).
-            
             Vector2 mousePosition = new Vector2(_mouseState.X, _mouseState.Y);
 
-            if (!_bounds.CollidesWith(mousePosition))
-            {
-                spriteBatch.Draw(_staticButtonTexture, _position, Color.White);
-            }
-            else
-            {
-                _animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
+            // Button state is idle if the mouse is not hovering on the button and the button is not transitioning
+            if (!_bounds.CollidesWith(mousePosition) && _buttonState != ButtonState.Transitioning) { _buttonState = ButtonState.Idle; }
 
-                if (_animationTimer > 0.5)
-                {
-                    _animationFrame++;
-                    if (_animationFrame > 6) { _animationFrame = 1; }
-                    _animationTimer -= 0.5;
-                }
+            // Button state is transitioning if the mouse is not on the button and the mouse is in the Hover state
+            if (!_bounds.CollidesWith(mousePosition) && _buttonState == ButtonState.Hovering) { _buttonState = ButtonState.Transitioning; }
+        }
 
-                var source = new Rectangle(_animationFrame * 200, 150, 200, 150);
-                spriteBatch.Draw(_buttonHoverTexture, _position, source, Color.White);
+        /// <summary>
+        /// Draws the animated (or non-animated) texture(s) of the button
+        /// </summary>
+        /// <param name="spriteBatch">Sprite batch to draw button</param>
+        /// <param name="gameTime">The game time</param>
+        public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        {   
+            switch (_buttonState)
+            {
+                case ButtonState.Idle:
+
+                    spriteBatch.Draw(_idleButtonTexture, _position, Color.White);
+                    break;
+
+                case ButtonState.Hovering:
+                    _animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
+
+                    if (_animationTimer > 0.5)
+                    {
+                        _animationFrame++;
+                        if (_animationFrame > 6) { _animationFrame = 1; }
+                        _animationTimer -= 0.5;
+                    }
+
+                    var source = new Rectangle(_animationFrame * 200, 150, 200, 150);
+                    spriteBatch.Draw(_buttonHoverTexture, _position, source, Color.White);
+                    break;
+
+                case ButtonState.Transitioning:
+                    _animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
+
+                    if (_animationTimer > 0.5)
+                    {
+                        _animationFrame++;
+                        if (_animationFrame > 6) { _animationFrame = 1; _buttonState = ButtonState.Idle; }
+                        _animationTimer -= 0.5;
+                    }
+
+                    source = new Rectangle(_animationFrame * 200, 0, 200, 150);
+                    spriteBatch.Draw(_buttonHoverTexture, _position, source, Color.White);
+                    break;
             }
         }
     }

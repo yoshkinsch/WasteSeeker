@@ -111,6 +111,7 @@ namespace WasteSeeker
             _bulletIcon.LoadContent(Content);
             _leftGearSprite.LoadContent(Content);
             _rightGearSprite.LoadContent(Content);
+            //_playButton.LoadContent(Content);
             #endregion 
 
 
@@ -138,6 +139,7 @@ namespace WasteSeeker
                 case GameState.MainMenu:
                     _leftGearSprite.Update(gameTime);
                     _rightGearSprite.Update(gameTime);
+                    //_playButton.Update(gameTime);
                     break;
             }
 
@@ -163,6 +165,7 @@ namespace WasteSeeker
                     _bulletIcon.Draw(_spriteBatch, gameTime, new Vector2(GraphicsDevice.Viewport.Width / 2 - 20, 90), new Vector2(256, 256), 0.125f);
                     _leftGearSprite.Draw(_spriteBatch, gameTime);
                     _rightGearSprite.Draw(_spriteBatch, gameTime);
+                    //_playButton.Draw(_spriteBatch, gameTime);
 
                     // Sprite Fonts
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2(GraphicsDevice.Viewport.Width / 2, 100), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker") / 2, 1, SpriteEffects.None, 1);
