@@ -30,6 +30,7 @@ namespace WasteSeeker
         private SpriteBatch _spriteBatch;
 
         private GameState gameState = GameState.MainMenu;
+        private InputHandler _inputHandler;
 
         #region Menu Objects
 
@@ -63,6 +64,10 @@ namespace WasteSeeker
 
         #endregion
 
+        #region Characters
+        private Player _player;
+        #endregion
+
         // Want to add a global scalar value used in the game code - Dependent on the graphics screen size of the player (will be later implemented)
         // Default Resolution => 1280 x 720
 
@@ -84,12 +89,18 @@ namespace WasteSeeker
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            _inputHandler = new InputHandler();
+
             #region Main Menu
             _leftGearSprite = new TitleGearSprite() { Position = new Vector2(270, 100), RotationDirection = 1, GearDirection = 0 };
             _rightGearSprite = new TitleGearSprite() { Position = new Vector2(1020, 100), RotationDirection = -1, GearDirection = (TitleGearSprite.Direction)1 };
             _bulletIcon = new TitleBulletSprite() { Graphics = _graphics };
             _playButton = new Button(new Vector2(640,360));
-            #endregion 
+            #endregion
+
+            #region Characters
+            _player = new Player("Kuzu", "N/A", 100, new Vector2(100, 540), _inputHandler);
+            #endregion
             base.Initialize();
         }
 
@@ -112,9 +123,11 @@ namespace WasteSeeker
             _leftGearSprite.LoadContent(Content);
             _rightGearSprite.LoadContent(Content);
             //_playButton.LoadContent(Content);
-            #endregion 
+            #endregion
 
-
+            #region Characters
+            _player.LoadContent(Content);
+            #endregion
         }
 
         /// <summary>
@@ -123,16 +136,13 @@ namespace WasteSeeker
         /// <param name="gameTime"></param>
         protected override void Update(GameTime gameTime)
         {
-            // EXIT code
-            if (Keyboard.GetState().IsKeyDown(Keys.Q) || Keyboard.GetState().IsKeyDown(Keys.Escape) || GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed )
-                Exit();
-            
-            // TODO: Add your update logic here
-
             /*
              * Game State is updated here if certain input is entered
              * Input-Handler will handle which input is sent and will communicate that back here - can determine the game state
             */
+            _inputHandler.Update(gameTime);
+
+            if (_inputHandler.Exit == true) { Exit(); }
 
             switch (gameState)
             {
@@ -140,6 +150,9 @@ namespace WasteSeeker
                     _leftGearSprite.Update(gameTime);
                     _rightGearSprite.Update(gameTime);
                     //_playButton.Update(gameTime);
+                    break;
+                case GameState.Playing:
+                    _player.Update(gameTime);
                     break;
             }
 
