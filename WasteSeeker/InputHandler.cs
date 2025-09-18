@@ -1,11 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static WasteSeeker.Classes_Assets.TitleGearSprite;
+using WasteSeeker.Classes_Assets;
 
 namespace WasteSeeker
 {
@@ -58,46 +59,10 @@ namespace WasteSeeker
             _currentMouseState = Mouse.GetState();
             #endregion
 
-            //TESTING FOR PLAYING
-            if (_currentKeyboardState.IsKeyDown(Keys.Space)) { gameState = GameState.Playing; }
-
             #region Mouse Input
 
             // Get Position from Mouse
             Vector2 _mousePosition = _currentMouseState.Position.ToVector2();
-
-            #endregion
-
-            #region Direction Input
-
-            Vector2 direction = Vector2.Zero; // Making a zero vector to help with direction input on keyboard
-
-            if (_currentKeyboardState.IsKeyDown(Keys.Left) || _currentKeyboardState.IsKeyDown(Keys.A)) { direction.X -= 1; }
-            if (_currentKeyboardState.IsKeyDown(Keys.Right) || _currentKeyboardState.IsKeyDown(Keys.D)) { direction.X += 1; }
-
-            //Direction = currentGamePadState.ThumbSticks.Right * 100 * (float)gameTime.ElapsedGameTime.TotalSeconds;
-            Direction = direction;
-
-
-            // Get Position from Keyboard - TODO: change "velocity" of sprites
-            if (_currentKeyboardState.IsKeyDown(Keys.Left) || _currentKeyboardState.IsKeyDown(Keys.A))
-            {
-                Direction += new Vector2(-100 * (float)gameTime.ElapsedGameTime.TotalSeconds, 0);
-            }
-            if (_currentKeyboardState.IsKeyDown(Keys.Right) || _currentKeyboardState.IsKeyDown(Keys.D))
-            {
-                Direction += new Vector2(100 * (float)gameTime.ElapsedGameTime.TotalSeconds, 0);
-            }
-
-            #endregion
-
-            #region RUNNING IDLE
-
-            if (_currentKeyboardState.IsKeyDown(Keys.LeftShift)) { Running = true; }
-            else { Running = false; }
-
-            if (_currentKeyboardState.GetPressedKeys().Length == 0 || (Direction.X == 0 && Direction.Y == 0)) { Idle = true; }
-            else { Idle = false; }
 
             #endregion
 
@@ -106,6 +71,52 @@ namespace WasteSeeker
             if (Keyboard.GetState().IsKeyDown(Keys.Q) || Keyboard.GetState().IsKeyDown(Keys.Escape)) { Exit = true; }
 
             #endregion
+
+            switch (gameState)
+            {
+                case GameState.MainMenu:
+
+                    //TESTING FOR PLAYING
+                    if (_currentKeyboardState.IsKeyDown(Keys.Space)) { gameState = GameState.Playing; }
+
+                    break;
+                case GameState.Playing:
+
+                    #region Direction Input
+
+                    Vector2 direction = Vector2.Zero; // Making a zero vector to help with direction input on keyboard
+
+                    if (_currentKeyboardState.IsKeyDown(Keys.Left) || _currentKeyboardState.IsKeyDown(Keys.A)) { direction.X -= 1; }
+                    if (_currentKeyboardState.IsKeyDown(Keys.Right) || _currentKeyboardState.IsKeyDown(Keys.D)) { direction.X += 1; }
+
+                    //Direction = currentGamePadState.ThumbSticks.Right * 100 * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    Direction = direction;
+
+
+                    // Get Position from Keyboard - TODO: change "velocity" of sprites
+                    if (_currentKeyboardState.IsKeyDown(Keys.Left) || _currentKeyboardState.IsKeyDown(Keys.A))
+                    {
+                        Direction += new Vector2(-100 * (float)gameTime.ElapsedGameTime.TotalSeconds, 0);
+                    }
+                    if (_currentKeyboardState.IsKeyDown(Keys.Right) || _currentKeyboardState.IsKeyDown(Keys.D))
+                    {
+                        Direction += new Vector2(100 * (float)gameTime.ElapsedGameTime.TotalSeconds, 0);
+                    }
+
+                    #endregion
+
+                    #region RUNNING IDLE
+
+                    if (_currentKeyboardState.IsKeyDown(Keys.LeftShift)) { Running = true; }
+                    else { Running = false; }
+
+                    if (_currentKeyboardState.GetPressedKeys().Length == 0 || (Direction.X == 0 && Direction.Y == 0)) { Idle = true; }
+                    else { Idle = false; }
+
+                    #endregion
+
+                    break;
+            }
         }
     }
 }

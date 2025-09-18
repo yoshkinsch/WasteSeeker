@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using System;
 using WasteSeeker.Classes_Assets;
 
 namespace WasteSeeker
@@ -48,8 +49,23 @@ namespace WasteSeeker
 
         #endregion
 
+        #region Playing Objects
+
+        private double _angryTimer = 0;
+
+        #region Objects
+        private Texture2D _worldGroundTexture;
+        private Texture2D _worldBackGroundTexture;
+
+        private Rectangle _worldGround;
+        private Rectangle _worldBackGround;
+        #endregion
+
         #region Characters
         private Player _player;
+        private NPC _soraNPC;
+        #endregion
+
         #endregion
 
         // Want to add a global scalar value used in the game code - Dependent on the graphics screen size of the player (will be later implemented)
@@ -82,8 +98,19 @@ namespace WasteSeeker
             //_playButton = new Button(new Vector2(640,360));
             #endregion
 
+            #region Playing
+
+            #region Objects
+            _worldGround = new Rectangle(0, 540, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height - 540);
+            _worldBackGround = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height - 180);
+            #endregion 
+
             #region Characters
-            _player = new Player("Kuzu", "N/A", 100, new Vector2(100, 540), _inputHandler);
+            _player = new Player("Kuzu", "TODO", 100, new Vector2(100, 480), _inputHandler);
+            _soraNPC = new NPC("Sora", "TODO", 100, new Vector2(((GraphicsDevice.Viewport.Width/2) + 250), 470));
+
+            #endregion
+
             #endregion
             base.Initialize();
         }
@@ -111,6 +138,9 @@ namespace WasteSeeker
 
             #region Characters
             _player.LoadContent(Content);
+            _soraNPC.LoadContent(Content, "Sora_Idle_Walk");
+            _worldGroundTexture = Content.Load<Texture2D>("SandGround");
+            _worldBackGroundTexture = Content.Load <Texture2D>("SandBackground");
             #endregion
         }
 
@@ -126,8 +156,6 @@ namespace WasteSeeker
             */
             _inputHandler.Update(gameTime, ref _gameState);
 
-            
-
             if (_inputHandler.Exit == true) { Exit(); }
 
             switch (_gameState)
@@ -139,6 +167,15 @@ namespace WasteSeeker
                     break;
                 case GameState.Playing:
                     _player.Update(gameTime);
+                    _soraNPC.TargetPlayer(_player.Position);
+
+                    // Teleports player to opposite end of the screen if outside the screen's bounds
+                    if (_player.Position.X <= -28) { _player.Position = new Vector2(GraphicsDevice.Viewport.Width + 25, _player.Position.Y); }
+                    else if (_player.Position.X > 1308) { _player.Position = new Vector2(GraphicsDevice.Viewport.X - 25, _player.Position.Y); }
+
+                    // Make Sora ANGRY
+                    if (_player.Bounds.CollidesWith(_soraNPC.Bounds)) { _angryTimer += gameTime.ElapsedGameTime.TotalSeconds; }
+
                     break;
             }
 
@@ -158,7 +195,7 @@ namespace WasteSeeker
             {
                 case GameState.MainMenu:
                     _spriteBatch.Begin();
-
+                    
                     // Texture2D Assets Main Menu
                     _spriteBatch.Draw(_mainMenuEyes, new Vector2(0, 0), null, Color.White);
                     _bulletIcon.Draw(_spriteBatch, gameTime, new Vector2(GraphicsDevice.Viewport.Width / 2 - 20, 90), new Vector2(256, 256), 0.125f);
@@ -179,7 +216,28 @@ namespace WasteSeeker
                     break;
                 case GameState.Playing:
                     _spriteBatch.Begin();
-                    _spriteBatch.DrawString(_sedgwickAveDisplay, "Press A, D, Left Arrow, or Right Arrow\nTo move around!", new Vector2(GraphicsDevice.Viewport.Width / 2, 100), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Press A, D, Left Arrow, or Right Arrow\nTo move around!") / 2, (float)0.5, SpriteEffects.None, 1);
+
+                    _spriteBatch.Draw(_worldGroundTexture, _worldGround, Color.White);
+                    _spriteBatch.Draw(_worldBackGroundTexture, _worldBackGround, Color.White);
+
+                    // Tutorial
+                    if (_player.Position.X <= 1280 / 2)
+                    {
+                        _spriteBatch.DrawString(_sedgwickAveDisplay, "Press A, D, Left Arrow, or Right Arrow\nto move around!", new Vector2(GraphicsDevice.Viewport.Width / 2, 300), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Press A, D, Left Arrow, or Right Arrow\nto move around!") / 2, (float)0.5, SpriteEffects.None, 1);
+                    }
+                    else
+                    {
+                        _spriteBatch.DrawString(_sedgwickAveDisplay, $"Time Angry: {TimeSpan.FromSeconds(_angryTimer):mm\\:ss\\.fff}", new Vector2(400, 200), Color.Black, 0, _sedgwickAveDisplay.MeasureString($"Time Angry: {TimeSpan.FromSeconds(_angryTimer):mm\\:ss\\.fff}") / 2, (float)0.5, SpriteEffects.None, 1);
+                        if (!_player.Bounds.CollidesWith(_soraNPC.Bounds))
+                        {
+                            _spriteBatch.DrawString(_sedgwickAveDisplay, "Run into the character to make them angry!", new Vector2(GraphicsDevice.Viewport.Width / 2, 300), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Run into the character to make them angry!") / 2, (float)0.5, SpriteEffects.None, 1);
+                        }
+                        else
+                        {
+                            _spriteBatch.DrawString(_sedgwickAveDisplay, "Watch it!", new Vector2(_soraNPC.Position.X, _soraNPC.Position.Y - 150), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Watch it!") / 2, (float)1.5, SpriteEffects.None, 1);
+                        }
+                    }
+                    _soraNPC.Draw(_spriteBatch, gameTime);
                     _player.Draw(_spriteBatch, gameTime);
                     _spriteBatch.End();
                     break;

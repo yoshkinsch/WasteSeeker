@@ -1,13 +1,12 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
+using WasteSeeker.Collisions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WasteSeeker;
 
 namespace WasteSeeker.Classes_Assets
 {
@@ -24,6 +23,8 @@ namespace WasteSeeker.Classes_Assets
             Running
         }
 
+        private float _scaleFactor = (float)2.5;
+
         private InputHandler _inputHandler;
 
         private PlayerState _playerState = PlayerState.Idle;
@@ -35,6 +36,13 @@ namespace WasteSeeker.Classes_Assets
         private short _animationFrame = 1;
 
         private SpriteEffects _directionFacing = SpriteEffects.None;
+
+        private BoundingRectangle _bounds;
+
+        /// <summary>
+        /// The bounding volume of the sprite
+        /// </summary>
+        public BoundingRectangle Bounds => _bounds;
 
         /// <summary>
         /// The name of the playable character (in this case Kuzu)
@@ -78,7 +86,6 @@ namespace WasteSeeker.Classes_Assets
         /// <param name="description">Description of the character</param>
         /// <param name="health">Character's Hitpoints</param>
         /// <param name="position">Character's Position</param>
-        /// <param name="texture">Character's texture asset</param>
         public Player(string name, string description, int health, Vector2 position, InputHandler inputHandler)
         {
             _inputHandler = inputHandler;
@@ -86,6 +93,7 @@ namespace WasteSeeker.Classes_Assets
             Description = description;
             Health = health;
             Position = position;
+            _bounds = new BoundingRectangle(position,22,80);
         }
 
         /// <summary>
@@ -106,6 +114,7 @@ namespace WasteSeeker.Classes_Assets
         {
             _previousPlayerState = _playerState;
 
+            // Updating Position of player
             if (_playerState == PlayerState.Walking)
             {
                 Position += _inputHandler.Direction * WalkSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
@@ -119,19 +128,22 @@ namespace WasteSeeker.Classes_Assets
             if (_inputHandler.Direction.X > 0) { _directionFacing = SpriteEffects.None; }
             else if (_inputHandler.Direction.X < 0) { _directionFacing = SpriteEffects.FlipHorizontally; }
 
-            //Implement attacking
-
             //See if player is holding Left Shift (running)
             if (_inputHandler.Running == true) { _playerState = PlayerState.Running; }
             else if (_inputHandler.Idle == true) { _playerState = PlayerState.Idle; }
             else { _playerState = PlayerState.Walking; }
 
-
+            // Sees if the current player state is equal to the previous one
+            // If true, then sets animation frame and timer to their default values
             if (_playerState != _previousPlayerState)
             {
                 _animationFrame = 1;
                 _animationTimer = 0;
             }
+
+            // Updating the bounds to the new position
+            _bounds.X = Position.X;
+            _bounds.Y = Position.Y;
         }
 
         /// <summary>
@@ -156,8 +168,8 @@ namespace WasteSeeker.Classes_Assets
                         if (_animationFrame > 5) { _animationFrame = 1; }
                         _animationTimer -= 0.15;
                     }
-                    source = new Rectangle(_animationFrame * 48, 80, 48, 80);
-                    spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), 2, _directionFacing, 1);
+                    source = new Rectangle(_animationFrame * 48, 81, 48, 80);
+                    spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), _scaleFactor, _directionFacing, 1);
 
                     break;
                 case PlayerState.Walking:
@@ -168,8 +180,8 @@ namespace WasteSeeker.Classes_Assets
                         if (_animationFrame > 11) { _animationFrame = 1; }
                         _animationTimer -= 0.1;
                     }
-                    source = new Rectangle(_animationFrame * 48, 1, 48, 80);
-                    spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), 2, _directionFacing, 1);
+                    source = new Rectangle(_animationFrame * 48, 2, 48, 80);
+                    spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), _scaleFactor, _directionFacing, 1);
 
                     break;
                 case PlayerState.Running:

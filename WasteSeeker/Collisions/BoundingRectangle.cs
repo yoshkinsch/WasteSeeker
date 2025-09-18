@@ -7,7 +7,7 @@ using Microsoft.Xna.Framework;
 
 namespace WasteSeeker.Collisions
 {
-    public class BoundingRectangle
+    public struct BoundingRectangle
     {
         public float X;
 
