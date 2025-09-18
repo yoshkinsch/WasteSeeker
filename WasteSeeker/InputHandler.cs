@@ -66,11 +66,7 @@ namespace WasteSeeker
 
             #endregion
 
-            #region EXIT
-
-            if (Keyboard.GetState().IsKeyDown(Keys.Q) || Keyboard.GetState().IsKeyDown(Keys.Escape)) { Exit = true; }
-
-            #endregion
+            
 
             switch (gameState)
             {
@@ -78,6 +74,12 @@ namespace WasteSeeker
 
                     //TESTING FOR PLAYING
                     if (_currentKeyboardState.IsKeyDown(Keys.Space)) { gameState = GameState.Playing; }
+
+                    #region EXIT
+
+                    if (Keyboard.GetState().IsKeyDown(Keys.Q) || Keyboard.GetState().IsKeyDown(Keys.Escape)) { Exit = true; }
+
+                    #endregion
 
                     break;
                 case GameState.Playing:
@@ -112,6 +114,12 @@ namespace WasteSeeker
 
                     if (_currentKeyboardState.GetPressedKeys().Length == 0 || (Direction.X == 0 && Direction.Y == 0)) { Idle = true; }
                     else { Idle = false; }
+
+                    #endregion
+
+                    #region TO MAIN MENU
+
+                    if (Keyboard.GetState().IsKeyDown(Keys.Back)) { gameState = GameState.MainMenu; }
 
                     #endregion
 

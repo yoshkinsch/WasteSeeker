@@ -215,10 +215,15 @@ namespace WasteSeeker
                     // Options will contain volume, display options, langauge, and potentially more
                     break;
                 case GameState.Playing:
+
+                    GraphicsDevice.Clear(Color.NavajoWhite);
+
                     _spriteBatch.Begin();
 
                     _spriteBatch.Draw(_worldGroundTexture, _worldGround, Color.White);
                     _spriteBatch.Draw(_worldBackGroundTexture, _worldBackGround, Color.White);
+                    _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Backspace' on the keyboard, to return to the Menu.", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 700), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Backspace' on the keyboard, to return to the Menu.") / 2, 0.35f, SpriteEffects.None, 1);
+
 
                     // Tutorial
                     if (_player.Position.X <= 1280 / 2)
@@ -239,6 +244,7 @@ namespace WasteSeeker
                     }
                     _soraNPC.Draw(_spriteBatch, gameTime);
                     _player.Draw(_spriteBatch, gameTime);
+                    
                     _spriteBatch.End();
                     break;
             }
