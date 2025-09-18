@@ -18,13 +18,23 @@ namespace WasteSeeker.Classes_Assets
     {
         public enum PlayerState
         {
+            Attacking,
+            Idle,
             Walking,
             Running
         }
 
         private InputHandler _inputHandler;
 
-        private PlayerState _playerState;
+        private PlayerState _playerState = PlayerState.Idle;
+
+        private PlayerState _previousPlayerState;
+
+        private double _animationTimer;
+
+        private short _animationFrame = 1;
+
+        private SpriteEffects _directionFacing = SpriteEffects.None;
 
         /// <summary>
         /// The name of the playable character (in this case Kuzu)
@@ -85,6 +95,7 @@ namespace WasteSeeker.Classes_Assets
         public void LoadContent(ContentManager content)
         {
             //Load content of the texture here "Texture = texture"
+            Texture = content.Load<Texture2D>("Kuzu_Idle_Walk");
         }
 
         /// <summary>
@@ -93,27 +104,78 @@ namespace WasteSeeker.Classes_Assets
         /// <param name="gameTime">Game Time</param>
         public void Update(GameTime gameTime)
         {
+            _previousPlayerState = _playerState;
+
             if (_playerState == PlayerState.Walking)
             {
-                Position += _inputHandler.Direction * (WalkSpeed/100f);
+                Position += _inputHandler.Direction * WalkSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
             else if (_playerState == PlayerState.Running)
             {
-                Position += _inputHandler.Direction * (RunSpeed / 100f);
+                Position += _inputHandler.Direction * RunSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
 
+            // Get the last facing direction
+            if (_inputHandler.Direction.X > 0) { _directionFacing = SpriteEffects.None; }
+            else if (_inputHandler.Direction.X < 0) { _directionFacing = SpriteEffects.FlipHorizontally; }
+
             //Implement attacking
+
+            //See if player is holding Left Shift (running)
+            if (_inputHandler.Running == true) { _playerState = PlayerState.Running; }
+            else if (_inputHandler.Idle == true) { _playerState = PlayerState.Idle; }
+            else { _playerState = PlayerState.Walking; }
+
+
+            if (_playerState != _previousPlayerState)
+            {
+                _animationFrame = 1;
+                _animationTimer = 0;
+            }
         }
 
         /// <summary>
         /// Draws the character's sprite on screen
         /// </summary>
         /// <param name="spriteBatch">Sprite batch tool to draw texture</param>
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            //spriteBatch.Begin();
+            _animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
+            Rectangle source;
 
-            //spriteBatch.End();
+            switch (_playerState)
+            {
+                case PlayerState.Attacking:
+
+                    break;
+                case PlayerState.Idle:
+
+                    if (_animationTimer > 0.15)
+                    {
+                        _animationFrame++;
+                        if (_animationFrame > 5) { _animationFrame = 1; }
+                        _animationTimer -= 0.15;
+                    }
+                    source = new Rectangle(_animationFrame * 48, 80, 48, 80);
+                    spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), 2, _directionFacing, 1);
+
+                    break;
+                case PlayerState.Walking:
+
+                    if (_animationTimer > 0.1)
+                    {
+                        _animationFrame++;
+                        if (_animationFrame > 11) { _animationFrame = 1; }
+                        _animationTimer -= 0.1;
+                    }
+                    source = new Rectangle(_animationFrame * 48, 1, 48, 80);
+                    spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), 2, _directionFacing, 1);
+
+                    break;
+                case PlayerState.Running:
+
+                    break;
+            }
         }
     }
 }

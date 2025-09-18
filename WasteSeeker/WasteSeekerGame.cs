@@ -10,26 +10,10 @@ namespace WasteSeeker
     /// </summary>
     public class WasteSeekerGame : Game
     {
-        #region GameState Enum
-        /// <summary>
-        /// Enumeration to hold the state of the game
-        /// </summary>
-        public enum GameState
-        {
-            MainMenu,
-            Options,
-            Credits,
-            GameOver,
-            Playing,
-            Paused,
-            Cutscene
-        }
-        #endregion
-
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private GameState gameState = GameState.MainMenu;
+        private GameState _gameState = GameState.MainMenu;
         private InputHandler _inputHandler;
 
         #region Menu Objects
@@ -95,7 +79,7 @@ namespace WasteSeeker
             _leftGearSprite = new TitleGearSprite() { Position = new Vector2(270, 100), RotationDirection = 1, GearDirection = 0 };
             _rightGearSprite = new TitleGearSprite() { Position = new Vector2(1020, 100), RotationDirection = -1, GearDirection = (TitleGearSprite.Direction)1 };
             _bulletIcon = new TitleBulletSprite() { Graphics = _graphics };
-            _playButton = new Button(new Vector2(640,360));
+            //_playButton = new Button(new Vector2(640,360));
             #endregion
 
             #region Characters
@@ -140,11 +124,13 @@ namespace WasteSeeker
              * Game State is updated here if certain input is entered
              * Input-Handler will handle which input is sent and will communicate that back here - can determine the game state
             */
-            _inputHandler.Update(gameTime);
+            _inputHandler.Update(gameTime, ref _gameState);
+
+            
 
             if (_inputHandler.Exit == true) { Exit(); }
 
-            switch (gameState)
+            switch (_gameState)
             {
                 case GameState.MainMenu:
                     _leftGearSprite.Update(gameTime);
@@ -168,7 +154,7 @@ namespace WasteSeeker
             GraphicsDevice.Clear(Color.Crimson);
 
             // TODO: Add your drawing code here
-            switch (gameState)
+            switch (_gameState)
             {
                 case GameState.MainMenu:
                     _spriteBatch.Begin();
@@ -184,11 +170,18 @@ namespace WasteSeeker
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2(GraphicsDevice.Viewport.Width / 2, 100), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker") / 2, 1, SpriteEffects.None, 1);
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 100), Color.White, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker") / 2, 1, SpriteEffects.None, 1);
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Q' or 'ESC' to EXIT", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 150), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Q' or 'ESC' to EXIT") / 2, 0.35f, SpriteEffects.None, 1);
+                    _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Space' to Play!", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 200), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Space' to Play!") / 2, 0.35f, SpriteEffects.None, 1);
 
                     _spriteBatch.End();
                     break;
                 case GameState.Options:
                     // Options will contain volume, display options, langauge, and potentially more
+                    break;
+                case GameState.Playing:
+                    _spriteBatch.Begin();
+                    _spriteBatch.DrawString(_sedgwickAveDisplay, "Press A, D, Left Arrow, or Right Arrow\nTo move around!", new Vector2(GraphicsDevice.Viewport.Width / 2, 100), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Press A, D, Left Arrow, or Right Arrow\nTo move around!") / 2, (float)0.5, SpriteEffects.None, 1);
+                    _player.Draw(_spriteBatch, gameTime);
+                    _spriteBatch.End();
                     break;
             }
             
