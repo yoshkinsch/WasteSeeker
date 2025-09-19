@@ -93,7 +93,7 @@ namespace WasteSeeker.Classes_Assets
             Description = description;
             Health = health;
             Position = position;
-            _bounds = new BoundingRectangle(position,22,80);
+            _bounds = new BoundingRectangle(position, 40, 80);
         }
 
         /// <summary>

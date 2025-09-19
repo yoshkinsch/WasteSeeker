@@ -89,14 +89,16 @@ namespace WasteSeeker
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
-            _inputHandler = new InputHandler();
-
             #region Main Menu
+
             _leftGearSprite = new TitleGearSprite() { Position = new Vector2(270, 100), RotationDirection = 1, GearDirection = 0 };
             _rightGearSprite = new TitleGearSprite() { Position = new Vector2(1020, 100), RotationDirection = -1, GearDirection = (TitleGearSprite.Direction)1 };
             _bulletIcon = new TitleBulletSprite() { Graphics = _graphics };
-            //_playButton = new Button(new Vector2(640,360));
+            _playButton = new Button(new Vector2(640,200));
+
             #endregion
+
+            _inputHandler = new InputHandler(_playButton.Bounds);
 
             #region Playing
 
@@ -108,10 +110,10 @@ namespace WasteSeeker
             #region Characters
             _player = new Player("Kuzu", "TODO", 100, new Vector2(100, 480), _inputHandler);
             _soraNPC = new NPC("Sora", "TODO", 100, new Vector2(((GraphicsDevice.Viewport.Width/2) + 250), 470));
-
             #endregion
 
             #endregion
+
             base.Initialize();
         }
 
@@ -133,7 +135,7 @@ namespace WasteSeeker
             _bulletIcon.LoadContent(Content);
             _leftGearSprite.LoadContent(Content);
             _rightGearSprite.LoadContent(Content);
-            //_playButton.LoadContent(Content);
+            _playButton.LoadContent(Content);
             #endregion
 
             #region Characters
@@ -163,7 +165,7 @@ namespace WasteSeeker
                 case GameState.MainMenu:
                     _leftGearSprite.Update(gameTime);
                     _rightGearSprite.Update(gameTime);
-                    //_playButton.Update(gameTime);
+                    _playButton.Update(gameTime);
                     break;
                 case GameState.Playing:
                     _player.Update(gameTime);
@@ -201,13 +203,13 @@ namespace WasteSeeker
                     _bulletIcon.Draw(_spriteBatch, gameTime, new Vector2(GraphicsDevice.Viewport.Width / 2 - 20, 90), new Vector2(256, 256), 0.125f);
                     _leftGearSprite.Draw(_spriteBatch, gameTime);
                     _rightGearSprite.Draw(_spriteBatch, gameTime);
-                    //_playButton.Draw(_spriteBatch, gameTime);
+                    _playButton.Draw(_spriteBatch, gameTime);
 
                     // Sprite Fonts
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2(GraphicsDevice.Viewport.Width / 2, 100), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker") / 2, 1, SpriteEffects.None, 1);
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 100), Color.White, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker") / 2, 1, SpriteEffects.None, 1);
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Q' or 'ESC' to EXIT", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 150), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Q' or 'ESC' to EXIT") / 2, 0.35f, SpriteEffects.None, 1);
-                    _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Space' to Play!", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 200), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Space' to Play!") / 2, 0.35f, SpriteEffects.None, 1);
+                    //_spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Space' to Play!", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 280), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Space' to Play!") / 2, 0.35f, SpriteEffects.None, 1);
 
                     _spriteBatch.End();
                     break;
@@ -226,7 +228,7 @@ namespace WasteSeeker
 
 
                     // Tutorial
-                    if (_player.Position.X <= 1280 / 2)
+                    if (_player.Position.X <= 1280 / 4)
                     {
                         _spriteBatch.DrawString(_sedgwickAveDisplay, "Press A, D, Left Arrow, or Right Arrow\nto move around!", new Vector2(GraphicsDevice.Viewport.Width / 2, 300), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Press A, D, Left Arrow, or Right Arrow\nto move around!") / 2, (float)0.5, SpriteEffects.None, 1);
                     }
@@ -249,7 +251,6 @@ namespace WasteSeeker
                     break;
             }
             
-
             base.Draw(gameTime);
         }
     }

@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WasteSeeker.Classes_Assets;
+using WasteSeeker.Collisions;
 
 namespace WasteSeeker
 {
@@ -20,6 +21,8 @@ namespace WasteSeeker
 
         private MouseState _previousMouseState;
         private MouseState _currentMouseState;
+
+        private BoundingRectangle _playButtonBounds;
 
         /// <summary>
         /// The current direction an object/sprite is facing
@@ -47,6 +50,14 @@ namespace WasteSeeker
         public bool Idle { get; private set; } = false;
 
         /// <summary>
+        /// Input Handler initialization
+        /// </summary>
+        public InputHandler(BoundingRectangle playButtonPosition)
+        {
+            _playButtonBounds = playButtonPosition;
+        }
+
+        /// <summary>
         /// Used to update the previous and current input from the keyboard/mouse
         /// </summary>
         /// <param name="gameTime"></param>
@@ -66,14 +77,20 @@ namespace WasteSeeker
 
             #endregion
 
-            
-
             switch (gameState)
             {
                 case GameState.MainMenu:
 
                     //TESTING FOR PLAYING
                     if (_currentKeyboardState.IsKeyDown(Keys.Space)) { gameState = GameState.Playing; }
+
+                    if (_playButtonBounds.CollidesWith(new Vector2(_currentMouseState.X, _currentMouseState.Y)))
+                    {
+                        if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
+                        {
+                            gameState = GameState.Playing;
+                        }
+                    }
 
                     #region EXIT
 

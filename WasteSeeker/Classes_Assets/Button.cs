@@ -16,19 +16,8 @@ namespace WasteSeeker.Classes_Assets
     /// </summary>
     public class Button
     {
-        /// <summary>
-        /// Deterimnes whether 
-        /// </summary>
-        public enum ButtonState
-        {
-            Idle,
-            Hovering,
-            Transitioning
-        }
 
-        private Texture2D _idleButtonTexture;  // idle button is 150x100 - not moving
-
-        private Texture2D _buttonHoverTexture; // each frame is 200x150 pixels wide/tall
+        private Texture2D _buttonTexture;  // Button is 200x100 pixels
 
         private BoundingRectangle _bounds;
 
@@ -36,11 +25,7 @@ namespace WasteSeeker.Classes_Assets
 
         private MouseState _mouseState;
 
-        private double _animationTimer;
-
-        private short _animationFrame = 1;
-
-        private ButtonState _buttonState;
+        private int _buttonHover; // 0 if NOT hovering, 1 otherwise - used in Draw and Update
 
         /// <summary>
         /// The bounding "volume" for the Button
@@ -50,7 +35,7 @@ namespace WasteSeeker.Classes_Assets
         public Button(Vector2 position)
         {
             _position = position;
-            _bounds = new BoundingRectangle(_position, 150, 100); // Position will usually be the origin of the button
+            _bounds = new BoundingRectangle(_position - new Vector2(100,50), 200, 100); // Position will usually be the origin of the button
         }
 
         /// <summary>
@@ -59,8 +44,7 @@ namespace WasteSeeker.Classes_Assets
         /// <param name="content"></param>
         public void LoadContent(ContentManager content)
         {
-            // Load texture of static button 
-            // Load texture of non-static button (will include transitions to and from static button)
+            _buttonTexture = content.Load<Texture2D>("PlayButton_MainMenu-Sheet");
         }
 
         /// <summary>
@@ -69,13 +53,10 @@ namespace WasteSeeker.Classes_Assets
         /// <param name="gameTime"></param>
         public void Update(GameTime gameTime)
         {
+            _mouseState = Mouse.GetState();
             Vector2 mousePosition = new Vector2(_mouseState.X, _mouseState.Y);
 
-            // Button state is idle if the mouse is not hovering on the button and the button is not transitioning
-            if (!_bounds.CollidesWith(mousePosition) && _buttonState != ButtonState.Transitioning) { _buttonState = ButtonState.Idle; }
-
-            // Button state is transitioning if the mouse is not on the button and the mouse is in the Hover state
-            if (!_bounds.CollidesWith(mousePosition) && _buttonState == ButtonState.Hovering) { _buttonState = ButtonState.Transitioning; }
+            _buttonHover = _bounds.CollidesWith(mousePosition) ? 1 : 0;
         }
 
         /// <summary>
@@ -84,42 +65,9 @@ namespace WasteSeeker.Classes_Assets
         /// <param name="spriteBatch">Sprite batch to draw button</param>
         /// <param name="gameTime">The game time</param>
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
-        {   
-            switch (_buttonState)
-            {
-                case ButtonState.Idle:
-
-                    spriteBatch.Draw(_idleButtonTexture, _position, Color.White);
-                    break;
-
-                case ButtonState.Hovering:
-                    _animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
-
-                    if (_animationTimer > 0.5)
-                    {
-                        _animationFrame++;
-                        if (_animationFrame > 6) { _animationFrame = 1; }
-                        _animationTimer -= 0.5;
-                    }
-
-                    var source = new Rectangle(_animationFrame * 200, 150, 200, 150);
-                    spriteBatch.Draw(_buttonHoverTexture, _position, source, Color.White);
-                    break;
-
-                case ButtonState.Transitioning:
-                    _animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
-
-                    if (_animationTimer > 0.5)
-                    {
-                        _animationFrame++;
-                        if (_animationFrame > 6) { _animationFrame = 1; _buttonState = ButtonState.Idle; }
-                        _animationTimer -= 0.5;
-                    }
-
-                    source = new Rectangle(_animationFrame * 200, 0, 200, 150);
-                    spriteBatch.Draw(_buttonHoverTexture, _position, source, Color.White);
-                    break;
-            }
+        {
+            var source = new Rectangle(_buttonHover * 200, 0, 200, 100);
+            spriteBatch.Draw(_buttonTexture, _position, source, Color.White, 0, new Vector2(100, 50), 1, SpriteEffects.None, 1);
         }
     }
 }
