@@ -81,9 +81,6 @@ namespace WasteSeeker
             {
                 case GameState.MainMenu:
 
-                    //TESTING FOR PLAYING
-                    if (_currentKeyboardState.IsKeyDown(Keys.Space)) { gameState = GameState.Playing; }
-
                     if (_playButtonBounds.CollidesWith(new Vector2(_currentMouseState.X, _currentMouseState.Y)))
                     {
                         if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
