@@ -32,19 +32,24 @@ namespace WasteSeeker.Classes_Assets
         /// </summary>
         public BoundingRectangle Bounds => _bounds;
 
+        /// <summary>
+        /// Public vector2 to get the button's position
+        /// </summary>
+        public Vector2 Position => _position;
+
         public Button(Vector2 position)
         {
             _position = position;
-            _bounds = new BoundingRectangle(_position - new Vector2(100,50), 200, 100); // Position will usually be the origin of the button
+            _bounds = new BoundingRectangle(_position - new Vector2(100,30), 200, 60); // Position will usually be the origin of the button
         }
 
         /// <summary>
         /// Loads the texture(s) for the button
         /// </summary>
         /// <param name="content"></param>
-        public void LoadContent(ContentManager content)
+        public void LoadContent(ContentManager content, string buttonTexture)
         {
-            _buttonTexture = content.Load<Texture2D>("PlayButton_MainMenu-Sheet");
+            _buttonTexture = content.Load<Texture2D>(buttonTexture);
         }
 
         /// <summary>

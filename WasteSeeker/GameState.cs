@@ -14,6 +14,7 @@ namespace WasteSeeker
         GameOver,
         Playing,
         Paused,
-        Cutscene
+        Cutscene,
+        Transition
     }
 }

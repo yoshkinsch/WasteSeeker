@@ -25,6 +25,18 @@
 /processorParam:TextureFormat=Color
 /build:Bullet.png
 
+#begin ExitButton_MainMenu-Sheet.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ExitButton_MainMenu-Sheet.png
+
 #begin Eyes_WasteSeeker_MainMenu.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -61,6 +73,24 @@
 /processorParam:TextureFormat=Color
 /build:Kuzu_Idle_Walk.png
 
+#begin MainMenuMusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:MainMenuMusic.mp3
+
+#begin OptionsButton_MainMenu-Sheet.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:OptionsButton_MainMenu-Sheet.png
+
 #begin PlayButton_MainMenu-Sheet.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -72,6 +102,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:PlayButton_MainMenu-Sheet.png
+
+#begin RedPixel.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:RedPixel.png
 
 #begin SandBackground.png
 /importer:TextureImporter
@@ -115,4 +157,10 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Sora_Idle_Walk.png
+
+#begin TutorialMusic.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:TutorialMusic.mp3
 

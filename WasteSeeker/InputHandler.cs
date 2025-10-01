@@ -23,6 +23,10 @@ namespace WasteSeeker
         private MouseState _currentMouseState;
 
         private BoundingRectangle _playButtonBounds;
+        private BoundingRectangle _optionsButtonBounds;
+        private BoundingRectangle _exitButtonBounds;
+
+        private GameState _previousGameState;
 
         /// <summary>
         /// The current direction an object/sprite is facing
@@ -52,9 +56,16 @@ namespace WasteSeeker
         /// <summary>
         /// Input Handler initialization
         /// </summary>
-        public InputHandler(BoundingRectangle playButtonPosition)
+        public InputHandler()
         {
-            _playButtonBounds = playButtonPosition;
+            // If needed can fill in
+        }
+
+        public void InitializeMenuButtons(BoundingRectangle play, BoundingRectangle options, BoundingRectangle exit)
+        {
+            _playButtonBounds = play;
+            _optionsButtonBounds = options;
+            _exitButtonBounds = exit;
         }
 
         /// <summary>
@@ -81,6 +92,8 @@ namespace WasteSeeker
             {
                 case GameState.MainMenu:
 
+                    #region Buttons
+                    // play button check
                     if (_playButtonBounds.CollidesWith(new Vector2(_currentMouseState.X, _currentMouseState.Y)))
                     {
                         if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
@@ -89,11 +102,30 @@ namespace WasteSeeker
                         }
                     }
 
-                    #region EXIT
+                    // options button check
+                    if (_optionsButtonBounds.CollidesWith(new Vector2(_currentMouseState.X, _currentMouseState.Y)))
+                    {
+                        if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
+                        {
+                            gameState = GameState.Options;
+                        }
+                    }
 
-                    if (Keyboard.GetState().IsKeyDown(Keys.Q) || Keyboard.GetState().IsKeyDown(Keys.Escape)) { Exit = true; }
-
+                    // exit button check
+                    if (_exitButtonBounds.CollidesWith(new Vector2(_currentMouseState.X, _currentMouseState.Y)))
+                    {
+                        if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
+                        {
+                            Exit = true;
+                        }
+                    }
                     #endregion
+
+                    break;
+                case GameState.Options:
+
+                    //TODO: Change Y to mouse state - and make it so the previous keyboard is not down (so gameplay doesn't go to menu)
+                    if (Keyboard.GetState().IsKeyDown(Keys.Y)) { gameState = _previousGameState; }
 
                     break;
                 case GameState.Playing:
@@ -135,6 +167,11 @@ namespace WasteSeeker
 
                     if (Keyboard.GetState().IsKeyDown(Keys.Back)) { gameState = GameState.MainMenu; }
 
+                    #endregion
+
+                    #region TO OPTIONS
+
+                    if (Keyboard.GetState().IsKeyDown(Keys.T)) { _previousGameState = GameState.Playing; gameState = GameState.Options; }
                     #endregion
 
                     break;

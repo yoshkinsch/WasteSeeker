@@ -1,5 +1,4 @@
-﻿Content/Sedgwick_Ave_Display/SedgwickAveDisplay-Regular.ttf - SedgwickAveDisplay font created by Pedro Vergani and Kevin Burke, released on Google Fonts (https://fonts.google.com/specimen/Sedgwick+Ave+Display) under the Open Font License
-
+﻿[[Content created by Carson Kinsch - released under CCL]]
 Content/Eyes_WasteSeeker_MainMenu.png - created by Carson Kinsch (me), released under the Creative Commons License
 
 Content/Gear_WasteSeeker_MainMenu.png - created by Carson Kinsch (me), released under the Creative Commons License
@@ -10,10 +9,27 @@ Content/SandBackground.png - created by Carson Kinsch (me), released under the C
 
 Content/PlayButton_MainMenu-Sheet.png - created by Carson Kinsch (me), released under the Creative Commons License
 
-Content/Bullet.png - created by Pictogrammers Team on iconarchive.com (https://www.iconarchive.com/show/material-icons-by-pictogrammers/bullet-icon.html). Is released under the Apache 2.0 License and the Pictogrammers Free License
+Content/OptionsButton_MainMenu-Sheet.png - created by Carson Kinsch (me), released under the Creative Commons License
 
+Content/ExitButton_MainMenu-Sheet.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/RedPixel.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+
+[[Content used from the internet - modified by Carson Kinsch]]
 Content/Kuzu_Idle_Walk.png - created by Craftpix.net (https://craftpix.net). Free assets are provided under the Craftpix Free License (https://craftpix.net/file-licenses/).
 ^ [Modified by Carson Kinsch] ^
 
-Content/Sora_Idle_Walk.png - created by Craftpix.net (https://craftpix.net). Free assets are provided udner the Craftpix Free License (https://craftpix.net/file-licenses/).
+Content/Sora_Idle_Walk.png - created by Craftpix.net (https://craftpix.net). Free assets are provided under the Craftpix Free License (https://craftpix.net/file-licenses/).
 ^ [Modified by Carson Kinsch] ^
+
+
+[[Content used from the internet - not modified]]
+Content/Bullet.png - created by Pictogrammers Team on iconarchive.com (https://www.iconarchive.com/show/material-icons-by-pictogrammers/bullet-icon.html). Is released under the Apache 2.0 License and the Pictogrammers Free License
+
+Content/Sedgwick_Ave_Display/SedgwickAveDisplay-Regular.ttf - SedgwickAveDisplay font created by Pedro Vergani and Kevin Burke, released on Google Fonts (https://fonts.google.com/specimen/Sedgwick+Ave+Display) under the Open Font License
+
+Content/MainMenuMusic.mp3 - created by Maksym_Dudchyk on pixabay (https://pixabay.com/users/maksym_dudchyk-34570439/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0. 
+
+Content/TutorialMusic.mp3 - created by nojisume  on pixabay (https://pixabay.com/users/nojisuma-23737290/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0.
+

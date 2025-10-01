@@ -24,9 +24,9 @@ namespace WasteSeeker.Classes_Assets
 
         private float _scaleFactor = (float)2.5;
 
-        private NPCState _npcState = NPCState.Idle;
+        //private NPCState _npcState = NPCState.Idle;
 
-        private NPCState _previousNPCState;
+        //private NPCState _previousNPCState;
 
         private double _animationTimer;
 

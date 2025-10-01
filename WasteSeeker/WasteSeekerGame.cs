@@ -1,8 +1,10 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Media;
 using Microsoft.Xna.Framework.Input;
 using System;
 using WasteSeeker.Classes_Assets;
+using System.Collections.Generic;
 
 namespace WasteSeeker
 {
@@ -17,7 +19,12 @@ namespace WasteSeeker
         private GameState _gameState = GameState.MainMenu;
         private InputHandler _inputHandler;
 
+        private Dictionary<GameState, Song> _songs;
+
         #region Menu Objects
+
+        // Music
+        private Song _backgroundMenuMusic;
 
         // Sprite Fonts
         private SpriteFont _sedgwickAveDisplay;
@@ -43,9 +50,17 @@ namespace WasteSeeker
         */
 
         private Button _playButton;
+        private Button _optionsButton;
+        private Button _exitButton;
         //private Rectangle _optionsButton;
         //private Rectangle _quitButton;
         #endregion
+
+        #endregion
+
+        #region Option Objects
+
+        OptionsMenu _optionsMenu;
 
         #endregion
 
@@ -64,6 +79,10 @@ namespace WasteSeeker
         #region Characters
         private Player _player;
         private NPC _soraNPC;
+        #endregion
+
+        #region Music
+        private Song _backgroundPlayingMusic;
         #endregion
 
         #endregion
@@ -95,10 +114,21 @@ namespace WasteSeeker
             _rightGearSprite = new TitleGearSprite() { Position = new Vector2(1020, 100), RotationDirection = -1, GearDirection = (TitleGearSprite.Direction)1 };
             _bulletIcon = new TitleBulletSprite() { Graphics = _graphics };
             _playButton = new Button(new Vector2(640,200));
+            _optionsButton = new Button(new Vector2(_playButton.Position.X, _playButton.Position.Y + 75));
+            _exitButton = new Button(new Vector2(_optionsButton.Position.X, _optionsButton.Position.Y + 75));
 
             #endregion
 
-            _inputHandler = new InputHandler(_playButton.Bounds);
+            #region Options Menu
+
+            _optionsMenu = new OptionsMenu();
+            _optionsMenu.Initialize();
+
+            #endregion
+
+            // Here will initial and create the input handler
+            _inputHandler = new InputHandler();
+            _inputHandler.InitializeMenuButtons(_playButton.Bounds, _optionsButton.Bounds, _exitButton.Bounds);
 
             #region Playing
 
@@ -135,7 +165,13 @@ namespace WasteSeeker
             _bulletIcon.LoadContent(Content);
             _leftGearSprite.LoadContent(Content);
             _rightGearSprite.LoadContent(Content);
-            _playButton.LoadContent(Content);
+            _playButton.LoadContent(Content, "PlayButton_MainMenu-Sheet");
+            _optionsButton.LoadContent(Content, "OptionsButton_MainMenu-Sheet");
+            _exitButton.LoadContent(Content, "ExitButton_MainMenu-Sheet");
+            #endregion
+
+            #region Options Menu
+            _optionsMenu.LoadContent(Content);
             #endregion
 
             #region Characters
@@ -144,6 +180,21 @@ namespace WasteSeeker
             _worldGroundTexture = Content.Load<Texture2D>("SandGround");
             _worldBackGroundTexture = Content.Load <Texture2D>("SandBackground");
             #endregion
+
+            #region Music
+            _backgroundMenuMusic = Content.Load<Song>("MainMenuMusic");
+            _backgroundPlayingMusic = Content.Load<Song>("TutorialMusic");
+            
+            // Loading all songs into a dictionary to determine what to play
+            // Will change "playing" music later in terms of the screen (or level) being played
+            _songs = new Dictionary<GameState, Song>()
+            {
+                {GameState.MainMenu,  _backgroundMenuMusic},
+                {GameState.Options,  _backgroundMenuMusic},
+                {GameState.Playing, _backgroundPlayingMusic }
+            };
+            #endregion
+
         }
 
         /// <summary>
@@ -156,7 +207,18 @@ namespace WasteSeeker
              * Game State is updated here if certain input is entered
              * Input-Handler will handle which input is sent and will communicate that back here - can determine the game state
             */
+            var previousSongPlayed = _songs[_gameState];
             _inputHandler.Update(gameTime, ref _gameState);
+
+            // this if statement allows the options menu to attach itself to whatever background music is being played
+            if (previousSongPlayed != null && _gameState == GameState.Options) { _songs[_gameState] = previousSongPlayed; }
+            Song songToPlay = _songs[_gameState];
+            
+            if (MediaPlayer.Queue.ActiveSong != songToPlay)
+            {
+                MediaPlayer.Play(songToPlay);
+                MediaPlayer.IsRepeating = true;
+            }
 
             if (_inputHandler.Exit == true) { Exit(); }
 
@@ -166,6 +228,11 @@ namespace WasteSeeker
                     _leftGearSprite.Update(gameTime);
                     _rightGearSprite.Update(gameTime);
                     _playButton.Update(gameTime);
+                    _optionsButton.Update(gameTime);
+                    _exitButton.Update(gameTime);
+                    break;
+                case GameState.Options:
+                    _optionsMenu.Update(gameTime);
                     break;
                 case GameState.Playing:
                     _player.Update(gameTime);
@@ -204,17 +271,19 @@ namespace WasteSeeker
                     _leftGearSprite.Draw(_spriteBatch, gameTime);
                     _rightGearSprite.Draw(_spriteBatch, gameTime);
                     _playButton.Draw(_spriteBatch, gameTime);
+                    _optionsButton.Draw(_spriteBatch, gameTime);
+                    _exitButton.Draw(_spriteBatch, gameTime);
 
                     // Sprite Fonts
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2(GraphicsDevice.Viewport.Width / 2, 100), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker") / 2, 1, SpriteEffects.None, 1);
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 100), Color.White, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker") / 2, 1, SpriteEffects.None, 1);
-                    _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Q' or 'ESC' to EXIT", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 150), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Q' or 'ESC' to EXIT") / 2, 0.35f, SpriteEffects.None, 1);
                     //_spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Space' to Play!", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 280), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Space' to Play!") / 2, 0.35f, SpriteEffects.None, 1);
 
                     _spriteBatch.End();
                     break;
                 case GameState.Options:
                     // Options will contain volume, display options, langauge, and potentially more
+                    _optionsMenu.Draw(_spriteBatch, gameTime);
                     break;
                 case GameState.Playing:
 
