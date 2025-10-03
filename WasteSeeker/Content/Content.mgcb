@@ -25,6 +25,18 @@
 /processorParam:TextureFormat=Color
 /build:Bullet.png
 
+#begin ButtonBack_OptionsMenu-Sheet.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ButtonBack_OptionsMenu-Sheet.png
+
 #begin ExitButton_MainMenu-Sheet.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -103,6 +115,12 @@
 /processorParam:TextureFormat=Color
 /build:PlayButton_MainMenu-Sheet.png
 
+#begin Popup_Sound.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:Popup_Sound.wav
+
 #begin RedPixel.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -114,6 +132,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:RedPixel.png
+
+#begin sand-walk.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:sand-walk.wav
 
 #begin SandBackground.png
 /importer:TextureImporter
@@ -157,6 +181,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Sora_Idle_Walk.png
+
+#begin Tumbleweed_Sprite.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:Tumbleweed_Sprite.png
 
 #begin TutorialMusic.mp3
 /importer:Mp3Importer

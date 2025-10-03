@@ -1,6 +1,7 @@
 ﻿using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Audio;
 using WasteSeeker.Collisions;
 using System;
 using System.Collections.Generic;
@@ -36,6 +37,10 @@ namespace WasteSeeker.Classes_Assets
         private short _animationFrame = 1;
 
         private SpriteEffects _directionFacing = SpriteEffects.None;
+
+        private SoundEffect _walkingSfx;
+
+        private SoundEffectInstance _walkingSfxInstance;
 
         private BoundingRectangle _bounds;
 
@@ -104,6 +109,10 @@ namespace WasteSeeker.Classes_Assets
         {
             //Load content of the texture here "Texture = texture"
             Texture = content.Load<Texture2D>("Kuzu_Idle_Walk");
+            _walkingSfx = content.Load<SoundEffect>("sand-walk");
+            _walkingSfxInstance = _walkingSfx.CreateInstance();
+            _walkingSfxInstance.Volume = 0.5f;
+            _walkingSfxInstance.IsLooped = true;
         }
 
         /// <summary>
@@ -118,12 +127,17 @@ namespace WasteSeeker.Classes_Assets
             if (_playerState == PlayerState.Walking)
             {
                 Position += _inputHandler.Direction * WalkSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (_walkingSfxInstance.State != SoundState.Playing)
+                    _walkingSfxInstance.Play();
             }
             else if (_playerState == PlayerState.Running)
             {
                 Position += _inputHandler.Direction * RunSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
             }
-
+            else
+            {
+                _walkingSfxInstance.Stop();
+            }
             // Get the last facing direction
             if (_inputHandler.Direction.X > 0) { _directionFacing = SpriteEffects.None; }
             else if (_inputHandler.Direction.X < 0) { _directionFacing = SpriteEffects.FlipHorizontally; }

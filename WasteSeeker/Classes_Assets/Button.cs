@@ -37,10 +37,10 @@ namespace WasteSeeker.Classes_Assets
         /// </summary>
         public Vector2 Position => _position;
 
-        public Button(Vector2 position)
+        public Button(Vector2 position, int buttonWidth)
         {
             _position = position;
-            _bounds = new BoundingRectangle(_position - new Vector2(100,30), 200, 60); // Position will usually be the origin of the button
+            _bounds = new BoundingRectangle(_position - new Vector2(100,30), buttonWidth, 60); // Position will usually be the origin of the button
         }
 
         /// <summary>

@@ -5,6 +5,7 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using WasteSeeker.Classes_Assets;
 using System.Collections.Generic;
+using Microsoft.Xna.Framework.Audio;
 
 namespace WasteSeeker
 {
@@ -16,6 +17,7 @@ namespace WasteSeeker
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
+        private GameState _previousGameState;
         private GameState _gameState = GameState.MainMenu;
         private InputHandler _inputHandler;
 
@@ -74,6 +76,8 @@ namespace WasteSeeker
 
         private Rectangle _worldGround;
         private Rectangle _worldBackGround;
+
+        private Tumbleweed _tumbleweed;
         #endregion
 
         #region Characters
@@ -113,9 +117,9 @@ namespace WasteSeeker
             _leftGearSprite = new TitleGearSprite() { Position = new Vector2(270, 100), RotationDirection = 1, GearDirection = 0 };
             _rightGearSprite = new TitleGearSprite() { Position = new Vector2(1020, 100), RotationDirection = -1, GearDirection = (TitleGearSprite.Direction)1 };
             _bulletIcon = new TitleBulletSprite() { Graphics = _graphics };
-            _playButton = new Button(new Vector2(640,200));
-            _optionsButton = new Button(new Vector2(_playButton.Position.X, _playButton.Position.Y + 75));
-            _exitButton = new Button(new Vector2(_optionsButton.Position.X, _optionsButton.Position.Y + 75));
+            _playButton = new Button(new Vector2(640,200), 200);
+            _optionsButton = new Button(new Vector2(_playButton.Position.X, _playButton.Position.Y + 75), 175);
+            _exitButton = new Button(new Vector2(_optionsButton.Position.X, _optionsButton.Position.Y + 75), 160);
 
             #endregion
 
@@ -128,13 +132,14 @@ namespace WasteSeeker
 
             // Here will initial and create the input handler
             _inputHandler = new InputHandler();
-            _inputHandler.InitializeMenuButtons(_playButton.Bounds, _optionsButton.Bounds, _exitButton.Bounds);
+            _inputHandler.InitializeMenuButtons(_playButton.Bounds, _optionsButton.Bounds, _exitButton.Bounds, _optionsMenu.BackButton.Bounds);
 
             #region Playing
 
             #region Objects
             _worldGround = new Rectangle(0, 540, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height - 540);
             _worldBackGround = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height - 180);
+            _tumbleweed = new Tumbleweed(new Vector2(GraphicsDevice.Viewport.Width + 500, 540));
             #endregion 
 
             #region Characters
@@ -174,11 +179,12 @@ namespace WasteSeeker
             _optionsMenu.LoadContent(Content);
             #endregion
 
-            #region Characters
+            #region Characters/Objects
             _player.LoadContent(Content);
             _soraNPC.LoadContent(Content, "Sora_Idle_Walk");
             _worldGroundTexture = Content.Load<Texture2D>("SandGround");
             _worldBackGroundTexture = Content.Load <Texture2D>("SandBackground");
+            _tumbleweed.LoadContent(Content);
             #endregion
 
             #region Music
@@ -208,7 +214,21 @@ namespace WasteSeeker
              * Input-Handler will handle which input is sent and will communicate that back here - can determine the game state
             */
             var previousSongPlayed = _songs[_gameState];
+            var _previousGameState = _gameState;
             _inputHandler.Update(gameTime, ref _gameState);
+
+            if (_inputHandler.Exit == true) { Exit(); }
+
+            // Checking if the options menu has popped open
+            if (_previousGameState != GameState.Options && _gameState == GameState.Options)
+            {
+                _optionsMenu.PlayNoise(true);
+            }
+            
+            if (_previousGameState == GameState.Options && _gameState != GameState.Options)
+            {
+                _optionsMenu.PlayNoise(false);
+            }
 
             // this if statement allows the options menu to attach itself to whatever background music is being played
             if (previousSongPlayed != null && _gameState == GameState.Options) { _songs[_gameState] = previousSongPlayed; }
@@ -219,9 +239,7 @@ namespace WasteSeeker
                 MediaPlayer.Play(songToPlay);
                 MediaPlayer.IsRepeating = true;
             }
-
-            if (_inputHandler.Exit == true) { Exit(); }
-
+            
             switch (_gameState)
             {
                 case GameState.MainMenu:
@@ -244,6 +262,12 @@ namespace WasteSeeker
 
                     // Make Sora ANGRY
                     if (_player.Bounds.CollidesWith(_soraNPC.Bounds)) { _angryTimer += gameTime.ElapsedGameTime.TotalSeconds; }
+
+                    _tumbleweed.Update(gameTime);
+                    if (_tumbleweed.Position.X < -200)
+                    {
+                        _tumbleweed.Position = new Vector2(RandomHelper.Next(GraphicsDevice.Viewport.Width + 200, GraphicsDevice.Viewport.Width + 800), 540);
+                    }
 
                     break;
             }
@@ -294,7 +318,7 @@ namespace WasteSeeker
                     _spriteBatch.Draw(_worldGroundTexture, _worldGround, Color.White);
                     _spriteBatch.Draw(_worldBackGroundTexture, _worldBackGround, Color.White);
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Backspace' on the keyboard, to return to the Menu.", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 700), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Backspace' on the keyboard, to return to the Menu.") / 2, 0.35f, SpriteEffects.None, 1);
-
+                    
 
                     // Tutorial
                     if (_player.Position.X <= 1280 / 4)
@@ -315,7 +339,8 @@ namespace WasteSeeker
                     }
                     _soraNPC.Draw(_spriteBatch, gameTime);
                     _player.Draw(_spriteBatch, gameTime);
-                    
+                    _tumbleweed.Draw(_spriteBatch);
+
                     _spriteBatch.End();
                     break;
             }

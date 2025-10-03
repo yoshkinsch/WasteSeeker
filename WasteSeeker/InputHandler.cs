@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
@@ -22,9 +23,15 @@ namespace WasteSeeker
         private MouseState _previousMouseState;
         private MouseState _currentMouseState;
 
+        #region Main Menu
         private BoundingRectangle _playButtonBounds;
         private BoundingRectangle _optionsButtonBounds;
         private BoundingRectangle _exitButtonBounds;
+        #endregion
+
+        #region Options Menu
+        private BoundingRectangle _backButtonBounds;
+        #endregion
 
         private GameState _previousGameState;
 
@@ -61,11 +68,12 @@ namespace WasteSeeker
             // If needed can fill in
         }
 
-        public void InitializeMenuButtons(BoundingRectangle play, BoundingRectangle options, BoundingRectangle exit)
+        public void InitializeMenuButtons(BoundingRectangle play, BoundingRectangle options, BoundingRectangle exit, BoundingRectangle back)
         {
             _playButtonBounds = play;
             _optionsButtonBounds = options;
             _exitButtonBounds = exit;
+            _backButtonBounds = back;
         }
 
         /// <summary>
@@ -107,6 +115,7 @@ namespace WasteSeeker
                     {
                         if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
                         {
+                            _previousGameState = gameState;
                             gameState = GameState.Options;
                         }
                     }
@@ -125,7 +134,15 @@ namespace WasteSeeker
                 case GameState.Options:
 
                     //TODO: Change Y to mouse state - and make it so the previous keyboard is not down (so gameplay doesn't go to menu)
-                    if (Keyboard.GetState().IsKeyDown(Keys.Y)) { gameState = _previousGameState; }
+                    //if (Keyboard.GetState().IsKeyDown(Keys.Y)) { gameState = _previousGameState; }
+
+                    if (_backButtonBounds.CollidesWith(new Vector2(_currentMouseState.X, _currentMouseState.Y)))
+                    {
+                        if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
+                        {
+                            gameState = _previousGameState;
+                        }
+                    }
 
                     break;
                 case GameState.Playing:
@@ -171,7 +188,7 @@ namespace WasteSeeker
 
                     #region TO OPTIONS
 
-                    if (Keyboard.GetState().IsKeyDown(Keys.T)) { _previousGameState = GameState.Playing; gameState = GameState.Options; }
+                    if (Keyboard.GetState().IsKeyDown(Keys.Escape)) { _previousGameState = GameState.Playing; gameState = GameState.Options; }
                     #endregion
 
                     break;
