@@ -27,7 +27,7 @@ namespace WasteSeeker.Classes_Assets
 
         private int _buttonHover; // 0 if NOT hovering, 1 otherwise - used in Draw and Update
 
-        private bool _isSelected; // true if keyboard is on button, false otherwise
+        private bool _isSelected = false; // true if keyboard is on button, false otherwise
 
         public bool ButtonSelect
         {

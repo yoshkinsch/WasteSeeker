@@ -17,7 +17,7 @@ namespace WasteSeeker
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
 
-        private GameState _previousGameState;
+        //private GameState _previousGameState;
         private GameState _gameState = GameState.MainMenu;
         private InputHandler _inputHandler;
 
@@ -188,6 +188,7 @@ namespace WasteSeeker
             };
             #endregion
 
+            #region Buttons
             // Using this section to send a list of the buttons loaded into the game to the input handler
             List<Button> mainMenuButtons = new List<Button>()
             {
@@ -203,6 +204,7 @@ namespace WasteSeeker
 
             _inputHandler.LoadButtons(GameState.MainMenu, mainMenuButtons);
             _inputHandler.LoadButtons(GameState.Options, optionsMenuButtons);
+            #endregion
         }
 
         /// <summary>
