@@ -23,14 +23,9 @@ namespace WasteSeeker
         private MouseState _previousMouseState;
         private MouseState _currentMouseState;
 
-        #region Main Menu
-        private BoundingRectangle _playButtonBounds;
-        private BoundingRectangle _optionsButtonBounds;
-        private BoundingRectangle _exitButtonBounds;
-        #endregion
-
-        #region Options Menu
-        private BoundingRectangle _backButtonBounds;
+        #region Buttons
+        private int _selectedButtonIndex = 0;
+        private Dictionary<GameState, List<Button>> _buttonsDict = new Dictionary<GameState, List<Button>>();
         #endregion
 
         private GameState _previousGameState;
@@ -68,12 +63,42 @@ namespace WasteSeeker
             // If needed can fill in
         }
 
-        public void InitializeMenuButtons(BoundingRectangle play, BoundingRectangle options, BoundingRectangle exit, BoundingRectangle back)
+        /// <summary>
+        /// Method to load in the buttons used in the game.
+        /// </summary>
+        /// <param name="buttons"></param>
+        public void LoadButtons(GameState gameState, List<Button> buttons)
         {
-            _playButtonBounds = play;
-            _optionsButtonBounds = options;
-            _exitButtonBounds = exit;
-            _backButtonBounds = back;
+            _buttonsDict[gameState] = buttons;
+        }
+
+        private int HandleButtonClick(Button button, GameState currentGameState)
+        {
+            #region MainMenu
+            if (button.GameStateLocation == GameState.MainMenu && button == _buttonsDict[currentGameState][0]) // Play Button
+            {
+                return (int)GameState.Playing;
+            }
+            if (button.GameStateLocation == GameState.MainMenu && button == _buttonsDict[currentGameState][1]) // Options Button
+            {
+                _previousGameState = currentGameState;
+                return (int)GameState.Options;
+            }
+            if (button.GameStateLocation == GameState.MainMenu && button == _buttonsDict[currentGameState][2]) // Exit Button
+            {
+                Exit = true;
+                return 0;
+            }
+            #endregion
+
+            #region Options
+            if (button.GameStateLocation == GameState.Options && button == _buttonsDict[currentGameState][0]) // Back Button
+            {
+                return (int)_previousGameState;
+            }
+            #endregion
+
+            return 0;
         }
 
         /// <summary>
@@ -100,49 +125,44 @@ namespace WasteSeeker
             {
                 case GameState.MainMenu:
 
-                    #region Buttons
-                    // play button check
-                    if (_playButtonBounds.CollidesWith(new Vector2(_currentMouseState.X, _currentMouseState.Y)))
+                    // Button iteration for main menu buttons
+                    if (_buttonsDict.ContainsKey(gameState))
                     {
-                        if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
+                        foreach (var button in _buttonsDict[gameState])
                         {
-                            gameState = GameState.Playing;
+                            // Checks the main menu buttons
+                            if (button.GameStateLocation == GameState.MainMenu && button.Bounds.CollidesWith(new Vector2(_currentMouseState.X, _currentMouseState.Y)))
+                            {
+                                if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
+                                {
+                                    int changedGameState = HandleButtonClick(button, gameState);
+                                    if (changedGameState != 0) { gameState = (GameState)changedGameState; }
+                                }
+                            }
                         }
                     }
-
-                    // options button check
-                    if (_optionsButtonBounds.CollidesWith(new Vector2(_currentMouseState.X, _currentMouseState.Y)))
-                    {
-                        if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
-                        {
-                            _previousGameState = gameState;
-                            gameState = GameState.Options;
-                        }
-                    }
-
-                    // exit button check
-                    if (_exitButtonBounds.CollidesWith(new Vector2(_currentMouseState.X, _currentMouseState.Y)))
-                    {
-                        if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
-                        {
-                            Exit = true;
-                        }
-                    }
-                    #endregion
+                    
 
                     break;
                 case GameState.Options:
 
-                    //TODO: Change Y to mouse state - and make it so the previous keyboard is not down (so gameplay doesn't go to menu)
-                    //if (Keyboard.GetState().IsKeyDown(Keys.Y)) { gameState = _previousGameState; }
-
-                    if (_backButtonBounds.CollidesWith(new Vector2(_currentMouseState.X, _currentMouseState.Y)))
+                    // Button iteration for options buttons
+                    if (_buttonsDict.ContainsKey(gameState))
                     {
-                        if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
+                        foreach (Button button in _buttonsDict[gameState])
                         {
-                            gameState = _previousGameState;
+                            // Checks the Options buttons
+                            if (button.GameStateLocation == GameState.Options && button.Bounds.CollidesWith(new Vector2(_currentMouseState.X, _currentMouseState.Y)))
+                            {
+                                if (_previousMouseState.LeftButton == ButtonState.Released && _currentMouseState.LeftButton == ButtonState.Pressed)
+                                {
+                                    int changedGameState = HandleButtonClick(button, gameState);
+                                    gameState = (GameState)changedGameState;
+                                }
+                            }
                         }
                     }
+                    
 
                     break;
                 case GameState.Playing:

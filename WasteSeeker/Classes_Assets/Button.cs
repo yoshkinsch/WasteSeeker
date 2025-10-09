@@ -27,6 +27,16 @@ namespace WasteSeeker.Classes_Assets
 
         private int _buttonHover; // 0 if NOT hovering, 1 otherwise - used in Draw and Update
 
+        private bool _isSelected; // true if keyboard is on button, false otherwise
+
+        public bool ButtonSelect
+        {
+            get { return _isSelected; }
+            set { _isSelected = value; }
+        }
+
+        public GameState GameStateLocation { get; set; }
+
         /// <summary>
         /// The bounding "volume" for the Button
         /// </summary>
@@ -61,7 +71,7 @@ namespace WasteSeeker.Classes_Assets
             _mouseState = Mouse.GetState();
             Vector2 mousePosition = new Vector2(_mouseState.X, _mouseState.Y);
 
-            _buttonHover = _bounds.CollidesWith(mousePosition) ? 1 : 0;
+            _buttonHover = (_bounds.CollidesWith(mousePosition) || _isSelected) ? 1 : 0;
         }
 
         /// <summary>

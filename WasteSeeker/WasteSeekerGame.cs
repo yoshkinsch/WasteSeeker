@@ -42,20 +42,9 @@ namespace WasteSeeker
 
         // Buttons
         #region Buttons
-        /* [TODO]
-         * > Create Button class
-         *      - BoundingRectangle class needs to be within the button class as a field
-         *      - Each button below will need to have its texture loaded (add LoadContent method)
-         *      - Each button will need an Update method to tell itself to switch the textures around
-         * > Make buttons in CSP (should have a non-hover image and a hover-image
-         *      - Only make the quit button for now
-        */
-
         private Button _playButton;
         private Button _optionsButton;
         private Button _exitButton;
-        //private Rectangle _optionsButton;
-        //private Rectangle _quitButton;
         #endregion
 
         #endregion
@@ -117,9 +106,9 @@ namespace WasteSeeker
             _leftGearSprite = new TitleGearSprite() { Position = new Vector2(270, 100), RotationDirection = 1, GearDirection = 0 };
             _rightGearSprite = new TitleGearSprite() { Position = new Vector2(1020, 100), RotationDirection = -1, GearDirection = (TitleGearSprite.Direction)1 };
             _bulletIcon = new TitleBulletSprite() { Graphics = _graphics };
-            _playButton = new Button(new Vector2(640,200), 200);
-            _optionsButton = new Button(new Vector2(_playButton.Position.X, _playButton.Position.Y + 75), 175);
-            _exitButton = new Button(new Vector2(_optionsButton.Position.X, _optionsButton.Position.Y + 75), 160);
+            _playButton = new Button(new Vector2(640,200), 200) { GameStateLocation = GameState.MainMenu };
+            _optionsButton = new Button(new Vector2(_playButton.Position.X, _playButton.Position.Y + 75), 175) { GameStateLocation = GameState.MainMenu };
+            _exitButton = new Button(new Vector2(_optionsButton.Position.X, _optionsButton.Position.Y + 75), 160) { GameStateLocation = GameState.MainMenu };
 
             #endregion
 
@@ -132,7 +121,7 @@ namespace WasteSeeker
 
             // Here will initial and create the input handler
             _inputHandler = new InputHandler();
-            _inputHandler.InitializeMenuButtons(_playButton.Bounds, _optionsButton.Bounds, _exitButton.Bounds, _optionsMenu.BackButton.Bounds);
+            //_inputHandler.InitializeMenuButtons(_playButton.Bounds, _optionsButton.Bounds, _exitButton.Bounds, _optionsMenu.BackButton.Bounds);
 
             #region Playing
 
@@ -158,8 +147,6 @@ namespace WasteSeeker
         protected override void LoadContent()
         {
             _spriteBatch = new SpriteBatch(GraphicsDevice);
-
-            // TODO: use this.Content to load your game content here
 
             // Sprite Fonts
             _sedgwickAveDisplay = Content.Load<SpriteFont>("sedgwickAveDisplay");
@@ -201,6 +188,21 @@ namespace WasteSeeker
             };
             #endregion
 
+            // Using this section to send a list of the buttons loaded into the game to the input handler
+            List<Button> mainMenuButtons = new List<Button>()
+            {
+                _playButton,
+                _optionsButton,
+                _exitButton
+            };
+
+            List<Button> optionsMenuButtons = new List<Button>()
+            {
+                _optionsMenu.BackButton
+            };
+
+            _inputHandler.LoadButtons(GameState.MainMenu, mainMenuButtons);
+            _inputHandler.LoadButtons(GameState.Options, optionsMenuButtons);
         }
 
         /// <summary>
@@ -220,6 +222,8 @@ namespace WasteSeeker
             if (_inputHandler.Exit == true) { Exit(); }
 
             // Checking if the options menu has popped open
+            // true => play noise in higher pitch
+            // false => play noise in lower pitch
             if (_previousGameState != GameState.Options && _gameState == GameState.Options)
             {
                 _optionsMenu.PlayNoise(true);

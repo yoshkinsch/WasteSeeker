@@ -35,7 +35,7 @@ namespace WasteSeeker
 
         public void Initialize()
         {
-            BackButton = new Button(new Vector2(100, 50), 160);
+            BackButton = new Button(new Vector2(100, 50), 160) { GameStateLocation = GameState.Options };
             _sliderHandle = new Rectangle(_sliderBar.X + (int)(_sliderBar.Width * _volume) - 5, _sliderBar.Y - 5, 10, 20);
             MediaPlayer.Volume = _volume;
         }
