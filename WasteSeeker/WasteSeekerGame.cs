@@ -1,11 +1,11 @@
 ﻿using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Media;
-using Microsoft.Xna.Framework.Input;
-using System;
-using WasteSeeker.Classes_Assets;
-using System.Collections.Generic;
 using Microsoft.Xna.Framework.Audio;
+using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
+using System;
+using System.Collections.Generic;
+using WasteSeeker.Classes_Assets;
 
 namespace WasteSeeker
 {
@@ -62,6 +62,9 @@ namespace WasteSeeker
         #region Objects
         private Texture2D _worldGroundTexture;
         private Texture2D _worldBackGroundTexture;
+        private Texture2D _worldFirstMidGroundTexture;
+        private Texture2D _worldSecondMidGroundTexture;
+        private Texture2D _worldForeGroundTexture;
 
         private Rectangle _worldGround;
         private Rectangle _worldBackGround;
@@ -93,6 +96,7 @@ namespace WasteSeeker
             _graphics.PreferredBackBufferHeight = 720;
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+            _graphics.GraphicsProfile = GraphicsProfile.HiDef;
         }
 
         /// <summary>
@@ -126,7 +130,7 @@ namespace WasteSeeker
             #region Playing
 
             #region Objects
-            _worldGround = new Rectangle(0, 540, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height - 540);
+            _worldGround = new Rectangle(0, 540, 14000, GraphicsDevice.Viewport.Height - 540);
             _worldBackGround = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height - 180);
             _tumbleweed = new Tumbleweed(new Vector2(GraphicsDevice.Viewport.Width + 500, 540));
             #endregion 
@@ -170,7 +174,10 @@ namespace WasteSeeker
             _player.LoadContent(Content);
             _soraNPC.LoadContent(Content, "Sora_Idle_Walk");
             _worldGroundTexture = Content.Load<Texture2D>("SandGround");
-            _worldBackGroundTexture = Content.Load <Texture2D>("SandBackground");
+            _worldBackGroundTexture = Content.Load <Texture2D>("SandBackground_BackGround");
+            _worldFirstMidGroundTexture = Content.Load<Texture2D>("SandBackground_FirstMidGround");
+            _worldSecondMidGroundTexture = Content.Load<Texture2D>("SandBackground_SecondMidGround");
+            _worldForeGroundTexture = Content.Load<Texture2D>("SandBackground_ForegroundGround");
             _tumbleweed.LoadContent(Content);
             #endregion
 
@@ -263,16 +270,19 @@ namespace WasteSeeker
                     _soraNPC.TargetPlayer(_player.Position);
 
                     // Teleports player to opposite end of the screen if outside the screen's bounds
+                    /*
                     if (_player.Position.X <= -28) { _player.Position = new Vector2(GraphicsDevice.Viewport.Width + 25, _player.Position.Y); }
                     else if (_player.Position.X > 1308) { _player.Position = new Vector2(GraphicsDevice.Viewport.X - 25, _player.Position.Y); }
+                    */
 
                     // Make Sora ANGRY
                     if (_player.Bounds.CollidesWith(_soraNPC.Bounds)) { _angryTimer += gameTime.ElapsedGameTime.TotalSeconds; }
 
                     _tumbleweed.Update(gameTime);
-                    if (_tumbleweed.Position.X < -200)
+                    if (_tumbleweed.Position.X < _player.Position.X - 500)
                     {
-                        _tumbleweed.Position = new Vector2(RandomHelper.Next(GraphicsDevice.Viewport.Width + 200, GraphicsDevice.Viewport.Width + 800), 540);
+                        _tumbleweed.UpdateScale();
+                        _tumbleweed.Position = new Vector2(_player.Position.X + GraphicsDevice.Viewport.Width + 200, 540);
                     }
 
                     break;
@@ -319,10 +329,37 @@ namespace WasteSeeker
 
                     GraphicsDevice.Clear(Color.NavajoWhite);
 
+                    // Calculate our offset vector 
+                    float playerX = MathHelper.Clamp(_player.Position.X, 300, 14000);
+                    float offsetX = 300 - playerX;
+
+                    Matrix tranform;
+
+                    //Background Textures
+                    tranform = Matrix.CreateTranslation(offsetX * 0.050f, 0, 0);
+                    _spriteBatch.Begin(transformMatrix: tranform);
+                    _spriteBatch.Draw(_worldBackGroundTexture, Vector2.Zero, Color.White);
+                    _spriteBatch.End();
+
+                    tranform = Matrix.CreateTranslation(offsetX * 0.150f, 0, 0);
+                    _spriteBatch.Begin(transformMatrix: tranform);
+                    _spriteBatch.Draw(_worldFirstMidGroundTexture, Vector2.Zero, Color.White);
+                    _spriteBatch.End();
+
+                    tranform = Matrix.CreateTranslation(offsetX * 0.250f, 0, 0);
+                    _spriteBatch.Begin(transformMatrix: tranform);
+                    _spriteBatch.Draw(_worldSecondMidGroundTexture, Vector2.Zero, Color.White);
+                    _spriteBatch.End();
+
+                    tranform = Matrix.CreateTranslation(offsetX * 0.900f, 0, 0);
+                    _spriteBatch.Begin(transformMatrix: tranform);
+                    _spriteBatch.Draw(_worldForeGroundTexture, Vector2.Zero, Color.White);
+                    _spriteBatch.Draw(_worldGroundTexture, _worldGround, Color.White);
+                    _spriteBatch.End();
+
                     _spriteBatch.Begin();
 
-                    _spriteBatch.Draw(_worldGroundTexture, _worldGround, Color.White);
-                    _spriteBatch.Draw(_worldBackGroundTexture, _worldBackGround, Color.White);
+                    
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Backspace' on the keyboard, to return to the Menu.", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 700), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Backspace' on the keyboard, to return to the Menu.") / 2, 0.35f, SpriteEffects.None, 1);
                     
 
@@ -343,10 +380,12 @@ namespace WasteSeeker
                             _spriteBatch.DrawString(_sedgwickAveDisplay, "Watch it!", new Vector2(_soraNPC.Position.X, _soraNPC.Position.Y - 150), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Watch it!") / 2, (float)1.5, SpriteEffects.None, 1);
                         }
                     }
+                    _spriteBatch.End();
+                    tranform = Matrix.CreateTranslation(offsetX, 0, 0);
+                    _spriteBatch.Begin(transformMatrix: tranform);
                     _soraNPC.Draw(_spriteBatch, gameTime);
                     _player.Draw(_spriteBatch, gameTime);
                     _tumbleweed.Draw(_spriteBatch);
-
                     _spriteBatch.End();
                     break;
             }

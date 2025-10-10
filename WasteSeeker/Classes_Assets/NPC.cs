@@ -22,7 +22,7 @@ namespace WasteSeeker.Classes_Assets
             Talking
         }
 
-        private float _scaleFactor = (float)2.5;
+        private float _scaleFactor = 2.0f;
 
         //private NPCState _npcState = NPCState.Idle;
 

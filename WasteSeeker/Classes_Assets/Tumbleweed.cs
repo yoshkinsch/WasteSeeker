@@ -22,6 +22,8 @@ namespace WasteSeeker.Classes_Assets
 
         private float _tumbleweedRotationSpeed = 3.5f;
 
+        private float _scale = 2.5f;
+
         /// <summary>
         /// Position of the tumbleweed on the screen
         /// </summary>
@@ -30,6 +32,14 @@ namespace WasteSeeker.Classes_Assets
         public Tumbleweed(Vector2 position)
         {
             Position = position;
+        }
+
+        /// <summary>
+        /// Used to update the scale of a new tumbleweed on screen
+        /// </summary>
+        public void UpdateScale()
+        {
+            _scale = RandomHelper.NextFloat(1.5f, 3.5f);
         }
 
         public void LoadContent(ContentManager content)
@@ -46,8 +56,7 @@ namespace WasteSeeker.Classes_Assets
 
         public void Draw(SpriteBatch spriteBatch)
         {
-
-            spriteBatch.Draw( _tumbleweedTexture, Position, null, Color.White, _rotation, new Vector2(20, 20), 2.5f ,SpriteEffects.None, 0f );
+            spriteBatch.Draw( _tumbleweedTexture, Position, null, Color.White, _rotation + _scale, new Vector2(20, 20), _scale ,SpriteEffects.None, 0f );
         }
     }
 }

@@ -185,7 +185,7 @@ namespace WasteSeeker
                             MoveSelectionDownwards(_buttonsDict[GameState.MainMenu]);
                         }
 
-                        if (_currentKeyboardState.IsKeyDown(Keys.Enter) && !_previousKeyboardState.IsKeyDown(Keys.Enter))
+                        if (_currentKeyboardState.IsKeyDown(Keys.Enter) && !_previousKeyboardState.IsKeyDown(Keys.Enter) || _currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
                         {
                             var selectedButton = _buttonsDict[GameState.MainMenu].FirstOrDefault(b => b.ButtonSelect);
                             if (selectedButton != null)
@@ -216,7 +216,7 @@ namespace WasteSeeker
                     break;
                 case GameState.Options:
 
-                    if (_currentKeyboardState.IsKeyDown(Keys.Enter) && !_previousKeyboardState.IsKeyDown(Keys.Enter))
+                    if (_currentKeyboardState.IsKeyDown(Keys.Enter) && !_previousKeyboardState.IsKeyDown(Keys.Enter) || _currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
                     {
                         var selectedButton = _buttonsDict[GameState.Options].FirstOrDefault(b => b.ButtonSelect);
                         if (selectedButton != null)

@@ -1,13 +1,13 @@
 ﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Content;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Audio;
-using WasteSeeker.Collisions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using WasteSeeker.Collisions;
 
 namespace WasteSeeker.Classes_Assets
 {
@@ -24,7 +24,7 @@ namespace WasteSeeker.Classes_Assets
             Running
         }
 
-        private float _scaleFactor = (float)2.5;
+        private float _scaleFactor = 2.0f;
 
         private InputHandler _inputHandler;
 
@@ -111,7 +111,7 @@ namespace WasteSeeker.Classes_Assets
             Texture = content.Load<Texture2D>("Kuzu_Idle_Walk");
             _walkingSfx = content.Load<SoundEffect>("sand-walk");
             _walkingSfxInstance = _walkingSfx.CreateInstance();
-            _walkingSfxInstance.Volume = 0.5f;
+            _walkingSfxInstance.Volume = 0.2f;
             _walkingSfxInstance.IsLooped = true;
         }
 
@@ -168,6 +168,7 @@ namespace WasteSeeker.Classes_Assets
         {
             _animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
             Rectangle source;
+
 
             switch (_playerState)
             {

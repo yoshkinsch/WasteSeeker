@@ -5,7 +5,13 @@ Content/Gear_WasteSeeker_MainMenu.png - created by Carson Kinsch (me), released 
 
 Content/SandGround.png - created by Carson Kinsch (me), released under the Creative Commons License
 
-Content/SandBackground.png - created by Carson Kinsch (me), released under the Creative Commons License
+Content/SandBackground_BackGround.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/SandBackground_FirstMidGround.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/SandBackground_SecondMidGround.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/SandBackground_ForegroundGround.png - created by Carson Kinsch (me), released under the Creative Commons License
 
 Content/PlayButton_MainMenu-Sheet.png - created by Carson Kinsch (me), released under the Creative Commons License
 
