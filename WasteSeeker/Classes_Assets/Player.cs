@@ -42,6 +42,8 @@ namespace WasteSeeker.Classes_Assets
 
         private SoundEffectInstance _walkingSfxInstance;
 
+        private SoundEffectInstance _runningSfxInstance;
+
         private BoundingRectangle _bounds;
 
         /// <summary>
@@ -110,9 +112,15 @@ namespace WasteSeeker.Classes_Assets
             //Load content of the texture here "Texture = texture"
             Texture = content.Load<Texture2D>("Kuzu_Idle_Walk");
             _walkingSfx = content.Load<SoundEffect>("sand-walk");
+            
             _walkingSfxInstance = _walkingSfx.CreateInstance();
             _walkingSfxInstance.Volume = 0.2f;
             _walkingSfxInstance.IsLooped = true;
+
+            _runningSfxInstance = _walkingSfx.CreateInstance();
+            _runningSfxInstance.Volume = 0.2f;
+            _runningSfxInstance.Pitch = 0.5f;
+            _runningSfxInstance.IsLooped = true;
         }
 
         /// <summary>
@@ -122,21 +130,30 @@ namespace WasteSeeker.Classes_Assets
         public void Update(GameTime gameTime)
         {
             _previousPlayerState = _playerState;
-
+            
             // Updating Position of player
             if (_playerState == PlayerState.Walking)
             {
                 Position += _inputHandler.Direction * WalkSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if (_walkingSfxInstance.State != SoundState.Playing)
+                {
+                    _runningSfxInstance.Stop();
                     _walkingSfxInstance.Play();
+                }
             }
             else if (_playerState == PlayerState.Running)
             {
                 Position += _inputHandler.Direction * RunSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (_runningSfxInstance.State != SoundState.Playing)
+                {
+                    _walkingSfxInstance.Stop();
+                    _runningSfxInstance.Play();
+                }
             }
             else
             {
                 _walkingSfxInstance.Stop();
+                _runningSfxInstance.Stop();
             }
             // Get the last facing direction
             if (_inputHandler.Direction.X > 0) { _directionFacing = SpriteEffects.None; }
