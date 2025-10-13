@@ -23,6 +23,8 @@ Content/ButtonBack_OptionsMenu-Sheet.png - created by Carson Kinsch (me), releas
 
 Content/RedPixel.png - created by Carson Kinsch (me), released under the Creative Commons License
 
+Content/sand_pixel.png - created by Carson Kinsch (me), released under the Creative Commons License
+
 
 [[Content used from the internet - modified by Carson Kinsch]]
 Content/Kuzu_Idle_Walk.png - created by Craftpix.net (https://craftpix.net). Free assets are provided under the Craftpix Free License (https://craftpix.net/file-licenses/).

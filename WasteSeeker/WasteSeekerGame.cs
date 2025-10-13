@@ -67,7 +67,8 @@ namespace WasteSeeker
         private Texture2D _worldForeGroundTexture;
 
         private Rectangle _worldGround;
-        private Rectangle _worldBackGround;
+
+        private SandParticleSystem _sandParticleSystem;
 
         private Tumbleweed _tumbleweed;
         #endregion
@@ -131,8 +132,8 @@ namespace WasteSeeker
 
             #region Objects
             _worldGround = new Rectangle(0, 540, 14000, GraphicsDevice.Viewport.Height - 540);
-            _worldBackGround = new Rectangle(0, 0, GraphicsDevice.Viewport.Width, GraphicsDevice.Viewport.Height - 180);
             _tumbleweed = new Tumbleweed(new Vector2(GraphicsDevice.Viewport.Width + 500, 540));
+            
             #endregion 
 
             #region Characters
@@ -252,7 +253,14 @@ namespace WasteSeeker
                 MediaPlayer.Play(songToPlay);
                 MediaPlayer.IsRepeating = true;
             }
-            
+
+            // Sand Particle System - "turn off switch"
+            if (_sandParticleSystem != null && _gameState != GameState.Playing)
+            {
+                _sandParticleSystem.Enabled = false;
+                _sandParticleSystem.Visible = false;
+            }
+
             switch (_gameState)
             {
                 case GameState.MainMenu:
@@ -266,15 +274,25 @@ namespace WasteSeeker
                     _optionsMenu.Update(gameTime);
                     break;
                 case GameState.Playing:
+
+                    if (_sandParticleSystem == null)
+                    {
+                        _sandParticleSystem = new SandParticleSystem(this, new Rectangle(GraphicsDevice.Viewport.Width + 20, 0, 10, GraphicsDevice.Viewport.Height - 100));
+                        Components.Add(_sandParticleSystem);
+                    }
+
+                    if (_sandParticleSystem.Enabled == false || _sandParticleSystem.Visible == false)
+                    {
+                        _sandParticleSystem.Enabled = true;
+                        _sandParticleSystem.Visible = true;
+                    }
+
                     _player.Update(gameTime);
                     _soraNPC.TargetPlayer(_player.Position);
 
-                    // Teleports player to opposite end of the screen if outside the screen's bounds
-                    /*
-                    if (_player.Position.X <= -28) { _player.Position = new Vector2(GraphicsDevice.Viewport.Width + 25, _player.Position.Y); }
-                    else if (_player.Position.X > 1308) { _player.Position = new Vector2(GraphicsDevice.Viewport.X - 25, _player.Position.Y); }
-                    */
-
+                    if (_player.Position.X <= -10) { _player.Position = new Vector2(GraphicsDevice.Viewport.X - 10, _player.Position.Y); }
+                    else if (_player.Position.X > 14000) { _player.Position = new Vector2(14000, _player.Position.Y); }
+                    
                     // Make Sora ANGRY
                     if (_player.Bounds.CollidesWith(_soraNPC.Bounds)) { _angryTimer += gameTime.ElapsedGameTime.TotalSeconds; }
 
@@ -336,7 +354,7 @@ namespace WasteSeeker
                     Matrix tranform;
 
                     //Background Textures
-                    tranform = Matrix.CreateTranslation(offsetX * 0.050f, 0, 0);
+                    tranform = Matrix.CreateTranslation(offsetX * 0.100f, 0, 0);
                     _spriteBatch.Begin(transformMatrix: tranform);
                     _spriteBatch.Draw(_worldBackGroundTexture, Vector2.Zero, Color.White);
                     _spriteBatch.End();
@@ -351,7 +369,7 @@ namespace WasteSeeker
                     _spriteBatch.Draw(_worldSecondMidGroundTexture, Vector2.Zero, Color.White);
                     _spriteBatch.End();
 
-                    tranform = Matrix.CreateTranslation(offsetX * 0.900f, 0, 0);
+                    tranform = Matrix.CreateTranslation(offsetX * 0.600f, 0, 0);
                     _spriteBatch.Begin(transformMatrix: tranform);
                     _spriteBatch.Draw(_worldForeGroundTexture, Vector2.Zero, Color.White);
                     _spriteBatch.Draw(_worldGroundTexture, _worldGround, Color.White);
