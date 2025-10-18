@@ -103,6 +103,10 @@ namespace WasteSeeker
                 {
                     return _previousGameState;
                 }
+                if (button.GameStateLocation == GameState.Options && button == _buttonsDict[currentGameState][1]) // Exit Button
+                {
+                    return GameState.MainMenu;
+                }
             }
             #endregion
 
@@ -215,6 +219,26 @@ namespace WasteSeeker
                     }
                     break;
                 case GameState.Options:
+
+                    if (_buttonsDict[GameState.Options][1].ButtonActivated)
+                    {
+                        // Handling keybaord selection on Main Menu
+                        if (_currentKeyboardState.IsKeyDown(Keys.Up) && !_previousKeyboardState.IsKeyDown(Keys.Up)
+                            || _currentKeyboardState.IsKeyDown(Keys.W) && !_previousKeyboardState.IsKeyDown(Keys.W))
+                        {
+                            MoveSelectionUpwards(_buttonsDict[GameState.Options]);
+                        }
+
+                        if (_currentKeyboardState.IsKeyDown(Keys.Down) && !_previousKeyboardState.IsKeyDown(Keys.Down)
+                            || _currentKeyboardState.IsKeyDown(Keys.S) && !_previousKeyboardState.IsKeyDown(Keys.S))
+                        {
+                            MoveSelectionDownwards(_buttonsDict[GameState.Options]);
+                        }
+                    }
+                    else
+                    {
+                        _buttonsDict[GameState.Options][0].ButtonSelect = true;
+                    }
 
                     if (_currentKeyboardState.IsKeyDown(Keys.Enter) && !_previousKeyboardState.IsKeyDown(Keys.Enter) || _currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
                     {

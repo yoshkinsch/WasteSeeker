@@ -26,7 +26,7 @@ namespace WasteSeeker.Classes_Assets
 
         private NPCState _npcState = NPCState.Idle;
 
-        private NPCState _previousNPCState;
+        //private NPCState _previousNPCState;
 
         private double _animationTimer;
 

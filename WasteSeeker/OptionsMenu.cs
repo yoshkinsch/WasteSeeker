@@ -29,13 +29,24 @@ namespace WasteSeeker
         private SoundEffectInstance _popupInstance;
 
         /// <summary>
+        /// Public bool to indicate that the game was paused
+        /// </summary>
+        public bool GameWasPaused { get; set; }
+
+        /// <summary>
         /// Public button to tell the inputhandler it's bounds
         /// </summary>
         public Button BackButton { get; private set; }
 
+        /// <summary>
+        /// Public button to exit back to the main menu
+        /// </summary>
+        public Button ExitButton { get; private set; }
+
         public void Initialize()
         {
             BackButton = new Button(new Vector2(100, 50), 160) { GameStateLocation = GameState.Options };
+            ExitButton = new Button(new Vector2(100, 125), 160) { GameStateLocation = GameState.Options, ButtonActivated = false };
             _sliderHandle = new Rectangle(_sliderBar.X + (int)(_sliderBar.Width * _volume) - 5, _sliderBar.Y - 5, 10, 20);
             MediaPlayer.Volume = _volume;
         }
@@ -45,6 +56,7 @@ namespace WasteSeeker
             _volumePixelTexture = content.Load<Texture2D>("RedPixel");
             _sedgwickAveDisplay = content.Load<SpriteFont>("sedgwickAveDisplay");
             BackButton.LoadContent(content, "ButtonBack_OptionsMenu-Sheet");
+            ExitButton.LoadContent(content, "ExitButton_MainMenu-Sheet");
             _popup = content.Load<SoundEffect>("Popup_Sound");
             _popupInstance = _popup.CreateInstance();
             _popupInstance.Volume = 0.25f;
@@ -55,6 +67,8 @@ namespace WasteSeeker
             MouseState mouse = Mouse.GetState();
 
             BackButton.Update(gameTime);
+            if (GameWasPaused) { ExitButton.ButtonActivated = true; ExitButton.Update(gameTime); }
+            else { ExitButton.ButtonActivated = false; }
 
             if (mouse.LeftButton == ButtonState.Pressed && _sliderHandle.Contains(mouse.Position))
             {
@@ -83,6 +97,7 @@ namespace WasteSeeker
         {
             spriteBatch.Begin();
             BackButton.Draw(spriteBatch, gameTime);
+            if (GameWasPaused) { ExitButton.Draw(spriteBatch, gameTime); }
             spriteBatch.DrawString(_sedgwickAveDisplay, "Options", new Vector2(650, 50), Color.White, 0, _sedgwickAveDisplay.MeasureString("Options") / 2, 1f, SpriteEffects.None, 1);
 
             #region BGM volume
@@ -94,7 +109,7 @@ namespace WasteSeeker
 
             spriteBatch.End();
         }
-
+        
         /// <summary>
         /// Helper method to play the menu's popup sound
         /// </summary>

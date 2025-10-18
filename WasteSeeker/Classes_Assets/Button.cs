@@ -25,6 +25,8 @@ namespace WasteSeeker.Classes_Assets
 
         private MouseState _mouseState;
 
+        private bool _isButtonActivated;
+
         private int _buttonHover; // 0 if NOT hovering, 1 otherwise - used in Draw and Update
 
         private bool _isSelected = false; // true if keyboard is on button, false otherwise
@@ -36,6 +38,12 @@ namespace WasteSeeker.Classes_Assets
         }
 
         public GameState GameStateLocation { get; set; }
+
+        public bool ButtonActivated
+        {
+            get { return _isButtonActivated; }
+            set { _isButtonActivated = value; }
+        }
 
         /// <summary>
         /// The bounding "volume" for the Button

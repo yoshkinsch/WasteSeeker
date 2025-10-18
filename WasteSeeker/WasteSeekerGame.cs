@@ -57,8 +57,6 @@ namespace WasteSeeker
 
         #region Playing Objects
 
-        private double _angryTimer = 0;
-
         #region Objects
         private Texture2D _worldGroundTexture;
         private Texture2D _worldBackGroundTexture;
@@ -207,7 +205,8 @@ namespace WasteSeeker
 
             List<Button> optionsMenuButtons = new List<Button>()
             {
-                _optionsMenu.BackButton
+                _optionsMenu.BackButton,
+                _optionsMenu.ExitButton
             };
 
             _inputHandler.LoadButtons(GameState.MainMenu, mainMenuButtons);
@@ -232,8 +231,8 @@ namespace WasteSeeker
             if (_inputHandler.Exit == true) { Exit(); }
 
             // Checking if the options menu has popped open
-            // true => play noise in higher pitch
-            // false => play noise in lower pitch
+            // opened => play noise in higher pitch
+            // closed => play noise in lower pitch
             if (_previousGameState != GameState.Options && _gameState == GameState.Options)
             {
                 _optionsMenu.PlayNoise(true);
@@ -241,6 +240,7 @@ namespace WasteSeeker
             
             if (_previousGameState == GameState.Options && _gameState != GameState.Options)
             {
+                _optionsMenu.GameWasPaused = false;
                 _optionsMenu.PlayNoise(false);
             }
 
@@ -271,6 +271,10 @@ namespace WasteSeeker
                     _exitButton.Update(gameTime);
                     break;
                 case GameState.Options:
+                    if (_previousGameState == GameState.Playing)
+                    {
+                        _optionsMenu.GameWasPaused = true;
+                    }
                     _optionsMenu.Update(gameTime);
                     break;
                 case GameState.Playing:
