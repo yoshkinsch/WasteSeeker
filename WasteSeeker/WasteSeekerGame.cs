@@ -138,7 +138,7 @@ namespace WasteSeeker
 
             #region Characters
             _player = new Player("Kuzu", "TODO", 100, new Vector2(100, 480), _inputHandler);
-            _soraNPC = new NPC("Sora", "TODO", 100, new Vector2(((GraphicsDevice.Viewport.Width/2) + 250), 470));
+            _soraNPC = new NPC("Sora", "TODO", 100, new Vector2(((GraphicsDevice.Viewport.Width/2) + 250), 470), false);
             #endregion
 
             #endregion
@@ -289,20 +289,26 @@ namespace WasteSeeker
 
                     _player.Update(gameTime);
                     _soraNPC.TargetPlayer(_player.Position);
+                    _soraNPC.Update(gameTime, _player.Position);
 
-                    if (_player.Position.X <= -10) { _player.Position = new Vector2(GraphicsDevice.Viewport.X - 10, _player.Position.Y); }
-                    else if (_player.Position.X > 14000) { _player.Position = new Vector2(14000, _player.Position.Y); }
-                    
-                    // Make Sora ANGRY
-                    if (_player.Bounds.CollidesWith(_soraNPC.Bounds)) { _angryTimer += gameTime.ElapsedGameTime.TotalSeconds; }
+                    if (_player.Position.X >= _soraNPC.Position.X && !_soraNPC.IsFollowingPlayer)
+                    {
+                        _soraNPC.IsFollowingPlayer = true;
+                    }
 
+                    // TumbleWeed
                     _tumbleweed.Update(gameTime);
                     if (_tumbleweed.Position.X < _player.Position.X - 500)
                     {
                         _tumbleweed.UpdateScale();
                         _tumbleweed.Position = new Vector2(_player.Position.X + GraphicsDevice.Viewport.Width + 200, 540);
                     }
-
+                    // Player bounds on screen
+                    if (_player.Position.X <= -10) { _player.Position = new Vector2(GraphicsDevice.Viewport.X - 10, _player.Position.Y); }
+                    else if (_player.Position.X > 14000) { _player.Position = new Vector2(14000, _player.Position.Y); }
+                    
+                    // Make Sora ANGRY
+                    //if (_player.Bounds.CollidesWith(_soraNPC.Bounds)) { _angryTimer += gameTime.ElapsedGameTime.TotalSeconds; }
                     break;
             }
 
@@ -348,8 +354,8 @@ namespace WasteSeeker
                     GraphicsDevice.Clear(Color.NavajoWhite);
 
                     // Calculate our offset vector 
-                    float playerX = MathHelper.Clamp(_player.Position.X, 300, 14000);
-                    float offsetX = 300 - playerX;
+                    float playerX = MathHelper.Clamp(_player.Position.X, 500, 14000);
+                    float offsetX = 500 - playerX;
 
                     Matrix tranform;
 
@@ -376,27 +382,22 @@ namespace WasteSeeker
                     _spriteBatch.End();
 
                     _spriteBatch.Begin();
-
-                    
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Backspace' on the keyboard, to return to the Menu.", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 700), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Backspace' on the keyboard, to return to the Menu.") / 2, 0.35f, SpriteEffects.None, 1);
                     
 
                     // Tutorial
-                    if (_player.Position.X <= 1280 / 4)
+                    if (_player.Position.X <= 1280)
                     {
                         _spriteBatch.DrawString(_sedgwickAveDisplay, "Press A, D, Left Arrow, or Right Arrow\nto move around!", new Vector2(GraphicsDevice.Viewport.Width / 2, 300), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Press A, D, Left Arrow, or Right Arrow\nto move around!") / 2, (float)0.5, SpriteEffects.None, 1);
                     }
-                    else
+                    else if (_player.Position.X <= 1600)
                     {
-                        _spriteBatch.DrawString(_sedgwickAveDisplay, $"Time Angry: {TimeSpan.FromSeconds(_angryTimer):mm\\:ss\\.fff}", new Vector2(400, 200), Color.Black, 0, _sedgwickAveDisplay.MeasureString($"Time Angry: {TimeSpan.FromSeconds(_angryTimer):mm\\:ss\\.fff}") / 2, (float)0.5, SpriteEffects.None, 1);
-                        if (!_player.Bounds.CollidesWith(_soraNPC.Bounds))
-                        {
-                            _spriteBatch.DrawString(_sedgwickAveDisplay, "Run into the character to make them angry!", new Vector2(GraphicsDevice.Viewport.Width / 2, 300), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Run into the character to make them angry!") / 2, (float)0.5, SpriteEffects.None, 1);
-                        }
-                        else
-                        {
-                            _spriteBatch.DrawString(_sedgwickAveDisplay, "Watch it!", new Vector2(_soraNPC.Position.X, _soraNPC.Position.Y - 150), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Watch it!") / 2, (float)1.5, SpriteEffects.None, 1);
-                        }
+                        //_spriteBatch.DrawString(_sedgwickAveDisplay, $"Time Angry: {TimeSpan.FromSeconds(_angryTimer):mm\\:ss\\.fff}", new Vector2(400, 200), Color.Black, 0, _sedgwickAveDisplay.MeasureString($"Time Angry: {TimeSpan.FromSeconds(_angryTimer):mm\\:ss\\.fff}") / 2, (float)0.5, SpriteEffects.None, 1);
+                        _spriteBatch.DrawString(_sedgwickAveDisplay, "Certain NPCs may follow you\n after crossing paths with them!", new Vector2(GraphicsDevice.Viewport.Width / 2, 300), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Certain NPCs may follow you\n after crossing paths with them!") / 2, (float)0.5, SpriteEffects.None, 1);
+                    }
+                    else 
+                    {
+                        _spriteBatch.DrawString(_sedgwickAveDisplay, "Gameplay coming soon!", new Vector2(GraphicsDevice.Viewport.Width / 2, 300), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Gameplay coming soon!") / 2, (float)0.5, SpriteEffects.None, 1);
                     }
                     _spriteBatch.End();
                     tranform = Matrix.CreateTranslation(offsetX, 0, 0);

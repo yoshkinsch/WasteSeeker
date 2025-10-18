@@ -10,6 +10,7 @@ namespace WasteSeeker
     {
         MainMenu,
         Options,
+        InGameOptions,
         Credits,
         GameOver,
         Playing,

@@ -24,9 +24,9 @@ namespace WasteSeeker.Classes_Assets
 
         private float _scaleFactor = 2.0f;
 
-        //private NPCState _npcState = NPCState.Idle;
+        private NPCState _npcState = NPCState.Idle;
 
-        //private NPCState _previousNPCState;
+        private NPCState _previousNPCState;
 
         private double _animationTimer;
 
@@ -36,10 +36,21 @@ namespace WasteSeeker.Classes_Assets
 
         private BoundingRectangle _bounds;
 
+        private bool _isFollowingPlayer = false;
+
         /// <summary>
         /// The bounding volume of the sprite
         /// </summary>
         public BoundingRectangle Bounds => _bounds;
+
+        /// <summary>
+        /// Sets if the NPC is following the player
+        /// </summary>
+        public bool IsFollowingPlayer
+        {
+            get { return _isFollowingPlayer; }
+            set { _isFollowingPlayer = value; }
+        }
 
         /// <summary>
         /// Name of the NPC
@@ -59,7 +70,7 @@ namespace WasteSeeker.Classes_Assets
         /// <summary>
         /// The NPC's walk speed
         /// </summary>
-        public float WalkSpeed { get; set; }
+        public float WalkSpeed { get; set; } = 220;
 
         /// <summary>
         /// The NPC's Run Speed
@@ -83,13 +94,14 @@ namespace WasteSeeker.Classes_Assets
         /// <param name="description">Description of the character</param>
         /// <param name="health">Character's Hitpoints</param>
         /// <param name="position">Character's Position</param>
-        public NPC(string name, string description, int health, Vector2 position)
+        public NPC(string name, string description, int health, Vector2 position, bool isFollowingPlayer)
         {
             Name = name;
             Description = description;
             Health = health;
             Position = position;
             _bounds = new BoundingRectangle(position, 40, 80);
+            _isFollowingPlayer = isFollowingPlayer;
         }
 
         /// <summary>
@@ -103,12 +115,35 @@ namespace WasteSeeker.Classes_Assets
         }
 
         /// <summary>
+        /// Base Update Method in-case we only want to update what is happening to the NPC
+        /// </summary>
+        /// <param name="gameTime"></param>
+        public void Update(GameTime gameTime)
+        {
+            // TODO: Implementation
+        }
+
+        /// <summary>
         /// Updates the NPC in the game
         /// </summary>
         /// <param name="gameTime">Game Time</param>
-        public void Update(GameTime gameTime)
+        public void Update(GameTime gameTime, Vector2 playerPosition)
         {
-            
+            int movementDirection = 0;
+            TargetPlayer(playerPosition);
+            if (_isFollowingPlayer) { movementDirection = FollowPlayer(playerPosition); }
+
+            switch (_npcState)
+            {
+                case NPCState.Walking:
+
+                    Position += new Vector2(movementDirection * WalkSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds, 0);
+
+                    break;
+            }
+
+            _bounds.X = Position.X;
+            _bounds.Y = Position.Y;
         }
 
         /// <summary>
@@ -121,14 +156,35 @@ namespace WasteSeeker.Classes_Assets
             _animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
             Rectangle source;
 
-            if (_animationTimer > 0.2)
+            switch (_npcState)
             {
-                _animationFrame++;
-                if (_animationFrame > 5) { _animationFrame = 1; }
-                _animationTimer -= 0.2;
+                case NPCState.Idle:
+
+                    if (_animationTimer > 0.2)
+                    {
+                        _animationFrame++;
+                        if (_animationFrame > 5) { _animationFrame = 1; }
+                        _animationTimer -= 0.2;
+                    }
+                    source = new Rectangle(_animationFrame * 48, 81, 48, 80);
+                    spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), _scaleFactor, _directionFacing, 1);
+
+                    break;
+
+                case NPCState.Walking:
+
+                    if (_animationTimer > 0.1)
+                    {
+                        _animationFrame++;
+                        if (_animationFrame > 10) { _animationFrame = 1; }
+                        _animationTimer -= 0.1;
+                    }
+                    source = new Rectangle(_animationFrame * 48, 2, 48, 80);
+                    spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), _scaleFactor, _directionFacing, 1);
+
+                    break;
             }
-            source = new Rectangle(_animationFrame * 48, 81, 48, 80);
-            spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), _scaleFactor, _directionFacing, 1);
+            
         }
 
         /// <summary>
@@ -139,6 +195,31 @@ namespace WasteSeeker.Classes_Assets
         {
             if (playerPosition.X < Position.X) { _directionFacing = SpriteEffects.FlipHorizontally; }
             else {  _directionFacing = SpriteEffects.None; }
+        }
+
+        /// <summary>
+        /// Method to update 
+        /// </summary>
+        /// <param name="playerPosition"></param>
+        public int FollowPlayer(Vector2 playerPosition)
+        {
+            if (Position.X <= playerPosition.X && Position.X <= playerPosition.X - 150) // NPC is moving right towards player
+            {
+                _npcState = NPCState.Walking;
+                return 1;
+
+            }
+            if (Position.X >= playerPosition.X - 150 && Position.X <= playerPosition.X + 150) // NPC is within "150" pixels of player, so we switch to idle
+            {
+                _npcState = NPCState.Idle;
+                return 0;
+            }
+            if (Position.X >= playerPosition.X && Position.X >= playerPosition.X + 150) // NPC is moving left towards the player
+            {
+                _npcState = NPCState.Walking;
+                return -1;
+            }
+            return 0;
         }
     }
 }
