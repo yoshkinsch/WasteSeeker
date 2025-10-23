@@ -211,6 +211,13 @@
 /processorParam:TextureFormat=Color
 /build:SandGround.png
 
+#begin schoolBell-.spritefont
+/importer:FontDescriptionImporter
+/processor:FontDescriptionProcessor
+/processorParam:PremultiplyAlpha=True
+/processorParam:TextureFormat=Compressed
+/build:schoolBell-.spritefont
+
 #begin sedgwickAveDisplay.spritefont
 /importer:FontDescriptionImporter
 /processor:LocalizedFontProcessor

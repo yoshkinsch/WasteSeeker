@@ -26,7 +26,7 @@ namespace WasteSeeker.Classes_Assets
 
         private NPCState _npcState = NPCState.Idle;
 
-        //private NPCState _previousNPCState;
+        private NPCState _previousNPCState;
 
         private double _animationTimer;
 
@@ -70,7 +70,7 @@ namespace WasteSeeker.Classes_Assets
         /// <summary>
         /// The NPC's walk speed
         /// </summary>
-        public float WalkSpeed { get; set; } = 220;
+        public float WalkSpeed { get; set; } = 230f;
 
         /// <summary>
         /// The NPC's Run Speed
@@ -133,6 +133,8 @@ namespace WasteSeeker.Classes_Assets
             TargetPlayer(playerPosition);
             if (_isFollowingPlayer) { movementDirection = FollowPlayer(playerPosition); }
 
+            if (_previousNPCState != _npcState) { _animationFrame = 1; _animationTimer = 0; }
+
             switch (_npcState)
             {
                 case NPCState.Walking:
@@ -144,6 +146,7 @@ namespace WasteSeeker.Classes_Assets
 
             _bounds.X = Position.X;
             _bounds.Y = Position.Y;
+            _previousNPCState = _npcState;
         }
 
         /// <summary>
@@ -160,11 +163,11 @@ namespace WasteSeeker.Classes_Assets
             {
                 case NPCState.Idle:
 
-                    if (_animationTimer > 0.2)
+                    if (_animationTimer > 0.15)
                     {
                         _animationFrame++;
                         if (_animationFrame > 5) { _animationFrame = 1; }
-                        _animationTimer -= 0.2;
+                        _animationTimer -= 0.15;
                     }
                     source = new Rectangle(_animationFrame * 48, 81, 48, 80);
                     spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), _scaleFactor, _directionFacing, 1);
@@ -176,7 +179,7 @@ namespace WasteSeeker.Classes_Assets
                     if (_animationTimer > 0.1)
                     {
                         _animationFrame++;
-                        if (_animationFrame > 10) { _animationFrame = 1; }
+                        if (_animationFrame > 11) { _animationFrame = 1; }
                         _animationTimer -= 0.1;
                     }
                     source = new Rectangle(_animationFrame * 48, 2, 48, 80);

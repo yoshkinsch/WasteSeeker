@@ -41,6 +41,10 @@ Content/sand-walk.mp3 - created by freesound_community on pixabay (https://pixab
 Content/Bullet.png - created by Pictogrammers Team on iconarchive.com (https://www.iconarchive.com/show/material-icons-by-pictogrammers/bullet-icon.html). Is released under the Apache 2.0 License and the Pictogrammers Free License
 
 Content/Sedgwick_Ave_Display/SedgwickAveDisplay-Regular.ttf - SedgwickAveDisplay font created by Pedro Vergani and Kevin Burke, released on Google Fonts (https://fonts.google.com/specimen/Sedgwick+Ave+Display) under the Open Font License
+^ This applies to the "sedgwickAveDisplay.spritefont" under Content as well
+
+Content/Schoolbell/Schoolbell-Regular.ttf - Schoolbell font created by "Font Diner", released on Google Fonts (https://fonts.google.com/specimen/Sedgwick+Ave+Display) under the Apache License
+^ This applies to the "schoolBell-.spritefont" under Content as well
 
 Content/MainMenuMusic.mp3 - created by Maksym_Dudchyk on pixabay (https://pixabay.com/users/maksym_dudchyk-34570439/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0. 
 
