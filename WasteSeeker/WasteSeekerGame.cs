@@ -23,6 +23,8 @@ namespace WasteSeeker
 
         private Dictionary<GameState, Song> _songs;
 
+        private BattleSequence _battleSequence;
+
         #region Menu Objects
 
         // Music
@@ -82,6 +84,12 @@ namespace WasteSeeker
 
         #endregion
 
+        #region BattleSequence Objects
+
+        private BattleSequence _battleSequenceHandler;
+
+        #endregion
+
         // Want to add a global scalar value used in the game code - Dependent on the graphics screen size of the player (will be later implemented)
         // Default Resolution => 1280 x 720
 
@@ -124,8 +132,7 @@ namespace WasteSeeker
 
             // Here will initial and create the input handler
             _inputHandler = new InputHandler();
-            //_inputHandler.InitializeMenuButtons(_playButton.Bounds, _optionsButton.Bounds, _exitButton.Bounds, _optionsMenu.BackButton.Bounds);
-
+            
             #region Playing
 
             #region Objects
@@ -140,6 +147,9 @@ namespace WasteSeeker
             #endregion
 
             #endregion
+
+            _battleSequence = new BattleSequence();
+            
 
             base.Initialize();
         }
@@ -212,6 +222,8 @@ namespace WasteSeeker
             _inputHandler.LoadButtons(GameState.MainMenu, mainMenuButtons);
             _inputHandler.LoadButtons(GameState.Options, optionsMenuButtons);
             #endregion
+
+            _battleSequence.LoadContent(Content);
         }
 
         /// <summary>
@@ -311,8 +323,11 @@ namespace WasteSeeker
                     if (_player.Position.X <= -10) { _player.Position = new Vector2(GraphicsDevice.Viewport.X - 10, _player.Position.Y); }
                     else if (_player.Position.X > 14000) { _player.Position = new Vector2(14000, _player.Position.Y); }
                     
-                    // Make Sora ANGRY
-                    //if (_player.Bounds.CollidesWith(_soraNPC.Bounds)) { _angryTimer += gameTime.ElapsedGameTime.TotalSeconds; }
+                    break;
+                case GameState.BattleSequence:
+
+
+
                     break;
             }
 
@@ -396,7 +411,6 @@ namespace WasteSeeker
                     }
                     else if (_player.Position.X <= 1600)
                     {
-                        //_spriteBatch.DrawString(_sedgwickAveDisplay, $"Time Angry: {TimeSpan.FromSeconds(_angryTimer):mm\\:ss\\.fff}", new Vector2(400, 200), Color.Black, 0, _sedgwickAveDisplay.MeasureString($"Time Angry: {TimeSpan.FromSeconds(_angryTimer):mm\\:ss\\.fff}") / 2, (float)0.5, SpriteEffects.None, 1);
                         _spriteBatch.DrawString(_sedgwickAveDisplay, "Certain NPCs may follow you\n after crossing paths with them!", new Vector2(GraphicsDevice.Viewport.Width / 2, 300), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Certain NPCs may follow you\n after crossing paths with them!") / 2, (float)0.5, SpriteEffects.None, 1);
                     }
                     else 
@@ -409,6 +423,11 @@ namespace WasteSeeker
                     _soraNPC.Draw(_spriteBatch, gameTime);
                     _player.Draw(_spriteBatch, gameTime);
                     _tumbleweed.Draw(_spriteBatch);
+                    _spriteBatch.End();
+                    break;
+                case GameState.BattleSequence:
+                    _spriteBatch.Begin();
+                    _battleSequence.Draw(_spriteBatch, gameTime);
                     _spriteBatch.End();
                     break;
             }

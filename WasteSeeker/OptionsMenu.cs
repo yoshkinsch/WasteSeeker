@@ -57,7 +57,7 @@ namespace WasteSeeker
             _sedgwickAveDisplay = content.Load<SpriteFont>("sedgwickAveDisplay");
             BackButton.LoadContent(content, "ButtonBack_OptionsMenu-Sheet");
             ExitButton.LoadContent(content, "ExitButton_MainMenu-Sheet");
-            _popup = content.Load<SoundEffect>("Popup_Sound");
+            _popup = content.Load<SoundEffect>("gunshot_sfx");
             _popupInstance = _popup.CreateInstance();
             _popupInstance.Volume = 0.25f;
         }
@@ -115,8 +115,7 @@ namespace WasteSeeker
         /// </summary>
         public void PlayNoise(bool isHighPitch)
         {
-            _popupInstance.Stop();
-            _popupInstance.Pitch = isHighPitch ? 1.0f : 0.5f;
+            _popupInstance.Pitch = isHighPitch ? 1.0f : 0.75f;
             _popupInstance.Play();
         }
     }

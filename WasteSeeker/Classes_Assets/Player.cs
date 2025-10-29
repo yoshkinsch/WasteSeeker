@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WasteSeeker.Collisions;
+using WasteSeeker.Importers_Processors;
 
 namespace WasteSeeker.Classes_Assets
 {
@@ -16,27 +17,13 @@ namespace WasteSeeker.Classes_Assets
     /// </summary>
     public class Player : Interfaces.ICharacter
     {
-        public enum PlayerState
-        {
-            Attacking,
-            Idle,
-            Walking,
-            Running
-        }
-
         private float _scaleFactor = 2.0f;
 
         private InputHandler _inputHandler;
 
-        private PlayerState _playerState = PlayerState.Idle;
+        private CharacterState _playerState = CharacterState.Idle;
 
-        private PlayerState _previousPlayerState;
-
-        private double _animationTimer;
-
-        private short _animationFrame = 1;
-
-        private SpriteEffects _directionFacing = SpriteEffects.None;
+        private CharacterState _previousPlayerState;
 
         private SoundEffect _walkingSfx;
 
@@ -45,6 +32,8 @@ namespace WasteSeeker.Classes_Assets
         private SoundEffectInstance _runningSfxInstance;
 
         private BoundingRectangle _bounds;
+
+        private AnimatedSprite _animatedSprite; // Custom processor to process sprite sheets
 
         /// <summary>
         /// The bounding volume of the sprite
@@ -67,6 +56,16 @@ namespace WasteSeeker.Classes_Assets
         public int Health { get; set; }
 
         /// <summary>
+        /// Attack damage of the player
+        /// </summary>
+        public float AttackPower { get; set; }
+
+        /// <summary>
+        /// Ability of the player
+        /// </summary>
+        public Ability Ability { get; set; }
+
+        /// <summary>
         /// Walk speed of the character
         /// </summary>
         public float WalkSpeed { get; set; } = 100f;
@@ -85,6 +84,11 @@ namespace WasteSeeker.Classes_Assets
         /// Texture in which the character will use
         /// </summary>
         public Texture2D Texture { get; set; }
+
+        /// <summary>
+        /// The battle texture used in a battle sequence
+        /// </summary>
+        public Texture2D BattleTexture { get; set; }
 
         /// <summary>
         /// Constructor for a playable character
@@ -121,6 +125,9 @@ namespace WasteSeeker.Classes_Assets
             _runningSfxInstance.Volume = 0.2f;
             _runningSfxInstance.Pitch = 0.5f;
             _runningSfxInstance.IsLooped = true;
+
+            _animatedSprite = new AnimatedSprite(Texture, Position, 48, 80, SpriteEffects.None, _scaleFactor, 0.15f, 0.1f, 5, 11);
+            _animatedSprite.CharacterState = _playerState;
         }
 
         /// <summary>
@@ -132,18 +139,20 @@ namespace WasteSeeker.Classes_Assets
             _previousPlayerState = _playerState;
             
             // Updating Position of player
-            if (_playerState == PlayerState.Walking)
+            if (_playerState == CharacterState.Walking)
             {
                 Position += _inputHandler.Direction * WalkSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                _animatedSprite.Position = Position;
                 if (_walkingSfxInstance.State != SoundState.Playing)
                 {
                     _runningSfxInstance.Stop();
                     _walkingSfxInstance.Play();
                 }
             }
-            else if (_playerState == PlayerState.Running)
+            else if (_playerState == CharacterState.Running)
             {
                 Position += _inputHandler.Direction * RunSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                _animatedSprite.Position = Position;
                 if (_runningSfxInstance.State != SoundState.Playing)
                 {
                     _walkingSfxInstance.Stop();
@@ -156,20 +165,21 @@ namespace WasteSeeker.Classes_Assets
                 _runningSfxInstance.Stop();
             }
             // Get the last facing direction
-            if (_inputHandler.Direction.X > 0) { _directionFacing = SpriteEffects.None; }
-            else if (_inputHandler.Direction.X < 0) { _directionFacing = SpriteEffects.FlipHorizontally; }
+            if (_inputHandler.Direction.X > 0) { _animatedSprite.DirectionFacing = SpriteEffects.None; }
+            else if (_inputHandler.Direction.X < 0) { _animatedSprite.DirectionFacing = SpriteEffects.FlipHorizontally; }
 
             //See if player is holding Left Shift (running)
-            if (_inputHandler.Running == true) { _playerState = PlayerState.Running; }
-            else if (_inputHandler.Idle == true) { _playerState = PlayerState.Idle; }
-            else { _playerState = PlayerState.Walking; }
+            if (_inputHandler.Running == true) { _playerState = CharacterState.Running; }
+            else if (_inputHandler.Idle == true) { _playerState = CharacterState.Idle; }
+            else { _playerState = CharacterState.Walking; }
 
-            // Sees if the current player state is equal to the previous one
+            _animatedSprite.CharacterState = _playerState; //setting the animated sprite's character state to reflect player
+
+            // Sees if the current player state is not equal to the previous one
             // If true, then sets animation frame and timer to their default values
             if (_playerState != _previousPlayerState)
             {
-                _animationFrame = 1;
-                _animationTimer = 0;
+                _animatedSprite.UpdateAnimationVariables(0, 1); // 0 = animation timer & 1 = animation frame
             }
 
             // Updating the bounds to the new position
@@ -183,43 +193,12 @@ namespace WasteSeeker.Classes_Assets
         /// <param name="spriteBatch">Sprite batch tool to draw texture</param>
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            _animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
-            Rectangle source;
-
-
-            switch (_playerState)
-            {
-                case PlayerState.Attacking:
-
-                    break;
-                case PlayerState.Idle:
-
-                    if (_animationTimer > 0.15)
-                    {
-                        _animationFrame++;
-                        if (_animationFrame > 5) { _animationFrame = 1; }
-                        _animationTimer -= 0.15;
-                    }
-                    source = new Rectangle(_animationFrame * 48, 81, 48, 80);
-                    spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), _scaleFactor, _directionFacing, 1);
-
-                    break;
-                case PlayerState.Walking:
-
-                    if (_animationTimer > 0.1)
-                    {
-                        _animationFrame++;
-                        if (_animationFrame > 11) { _animationFrame = 1; }
-                        _animationTimer -= 0.1;
-                    }
-                    source = new Rectangle(_animationFrame * 48, 2, 48, 80);
-                    spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), _scaleFactor, _directionFacing, 1);
-
-                    break;
-                case PlayerState.Running:
-
-                    break;
-            }
+            /*
+             * This method will call animatedSprite to draw the sprite, 
+             * if there is anything else other than the sprite to draw
+             * it will be called here as well.
+             */
+            _animatedSprite.Draw(spriteBatch, gameTime);
         }
     }
 }

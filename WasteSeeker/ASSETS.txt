@@ -25,6 +25,8 @@ Content/RedPixel.png - created by Carson Kinsch (me), released under the Creativ
 
 Content/sand_pixel.png - created by Carson Kinsch (me), released under the Creative Commons License
 
+Content/BattleTileset.png - created by Carson Kinsch (me), released udner the Creative Commons License
+
 
 [[Content used from the internet - modified by Carson Kinsch]]
 Content/Kuzu_Idle_Walk.png - created by Craftpix.net (https://craftpix.net). Free assets are provided under the Craftpix Free License (https://craftpix.net/file-licenses/).
@@ -49,4 +51,6 @@ Content/Schoolbell/Schoolbell-Regular.ttf - Schoolbell font created by "Font Din
 Content/MainMenuMusic.mp3 - created by Maksym_Dudchyk on pixabay (https://pixabay.com/users/maksym_dudchyk-34570439/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0. 
 
 Content/TutorialMusic.mp3 - created by nojisume on pixabay (https://pixabay.com/users/nojisuma-23737290/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0.
+
+Content/gunshot_sfx.wav - created by Universfield on pixabay (https://pixabay.com/sound-effects/gunshot-352466/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0.
 

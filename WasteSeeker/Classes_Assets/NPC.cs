@@ -5,38 +5,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using WasteSeeker.Collisions;
-using static WasteSeeker.Classes_Assets.Player;
+using WasteSeeker.Importers_Processors;
 
 namespace WasteSeeker.Classes_Assets
 {
     public class NPC : Interfaces.ICharacter
     {
-        public enum NPCState
-        {
-            Attacking,
-            Idle,
-            Walking,
-            Running,
-            Talking
-        }
 
         private float _scaleFactor = 2.0f;
 
-        private NPCState _npcState = NPCState.Idle;
+        private CharacterState _npcState = CharacterState.Idle;
 
-        private NPCState _previousNPCState;
-
-        private double _animationTimer;
-
-        private short _animationFrame = 1;
-
-        private SpriteEffects _directionFacing = SpriteEffects.None;
+        private CharacterState _previousNPCState;
 
         private BoundingRectangle _bounds;
 
         private bool _isFollowingPlayer = false;
+
+        private AnimatedSprite _animatedSprite;
 
         /// <summary>
         /// The bounding volume of the sprite
@@ -68,6 +55,16 @@ namespace WasteSeeker.Classes_Assets
         public int Health { get; set; }
 
         /// <summary>
+        /// Attack damage of the player
+        /// </summary>
+        public float AttackPower { get; set; }
+
+        /// <summary>
+        /// Ability of the player
+        /// </summary>
+        public Ability Ability { get; set; }
+
+        /// <summary>
         /// The NPC's walk speed
         /// </summary>
         public float WalkSpeed { get; set; } = 230f;
@@ -86,6 +83,11 @@ namespace WasteSeeker.Classes_Assets
         /// The NPC's texture
         /// </summary>
         public Texture2D Texture { get; set; }
+
+        /// <summary>
+        /// The NPC's battle texture for when a battle sequence happens
+        /// </summary>
+        public Texture2D BattleTexture { get; set; }
 
         /// <summary>
         /// Constructor for a playable character
@@ -112,12 +114,16 @@ namespace WasteSeeker.Classes_Assets
         {
             //Load content of the texture here "Texture = texture"
             Texture = content.Load<Texture2D>(texture);
+
+            _animatedSprite = new AnimatedSprite(Texture, Position, 48, 80, SpriteEffects.None, _scaleFactor, 0.15f, 0.1f, 5, 11);
+            _animatedSprite.CharacterState = _npcState;
         }
 
         /// <summary>
         /// Base Update Method in-case we only want to update what is happening to the NPC
+        /// (required for interface)
         /// </summary>
-        /// <param name="gameTime"></param>
+        /// <param name="gameTime">Game time</param>
         public void Update(GameTime gameTime)
         {
             // TODO: Implementation
@@ -133,13 +139,14 @@ namespace WasteSeeker.Classes_Assets
             TargetPlayer(playerPosition);
             if (_isFollowingPlayer) { movementDirection = FollowPlayer(playerPosition); }
 
-            if (_previousNPCState != _npcState) { _animationFrame = 1; _animationTimer = 0; }
+            if (_previousNPCState != _npcState) { _animatedSprite.UpdateAnimationVariables(0, 1); }
 
             switch (_npcState)
             {
-                case NPCState.Walking:
+                case CharacterState.Walking:
 
                     Position += new Vector2(movementDirection * WalkSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds, 0);
+                    _animatedSprite.Position = Position;
 
                     break;
             }
@@ -156,38 +163,7 @@ namespace WasteSeeker.Classes_Assets
         /// <param name="gameTime">Game Time</param>
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            _animationTimer += gameTime.ElapsedGameTime.TotalSeconds;
-            Rectangle source;
-
-            switch (_npcState)
-            {
-                case NPCState.Idle:
-
-                    if (_animationTimer > 0.15)
-                    {
-                        _animationFrame++;
-                        if (_animationFrame > 5) { _animationFrame = 1; }
-                        _animationTimer -= 0.15;
-                    }
-                    source = new Rectangle(_animationFrame * 48, 81, 48, 80);
-                    spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), _scaleFactor, _directionFacing, 1);
-
-                    break;
-
-                case NPCState.Walking:
-
-                    if (_animationTimer > 0.1)
-                    {
-                        _animationFrame++;
-                        if (_animationFrame > 11) { _animationFrame = 1; }
-                        _animationTimer -= 0.1;
-                    }
-                    source = new Rectangle(_animationFrame * 48, 2, 48, 80);
-                    spriteBatch.Draw(Texture, Position, source, Color.White, 0, new Vector2(24, 40), _scaleFactor, _directionFacing, 1);
-
-                    break;
-            }
-            
+            _animatedSprite.Draw(spriteBatch, gameTime);
         }
 
         /// <summary>
@@ -196,8 +172,8 @@ namespace WasteSeeker.Classes_Assets
         /// <param name="playerPosition">The player's position</param>
         public void TargetPlayer(Vector2 playerPosition)
         {
-            if (playerPosition.X < Position.X) { _directionFacing = SpriteEffects.FlipHorizontally; }
-            else {  _directionFacing = SpriteEffects.None; }
+            if (playerPosition.X < Position.X) { _animatedSprite.DirectionFacing = SpriteEffects.FlipHorizontally; }
+            else { _animatedSprite.DirectionFacing = SpriteEffects.None; }
         }
 
         /// <summary>
@@ -208,18 +184,21 @@ namespace WasteSeeker.Classes_Assets
         {
             if (Position.X <= playerPosition.X && Position.X <= playerPosition.X - 150) // NPC is moving right towards player
             {
-                _npcState = NPCState.Walking;
+                _npcState = CharacterState.Walking;
+                _animatedSprite.CharacterState = CharacterState.Walking;
                 return 1;
 
             }
             if (Position.X >= playerPosition.X - 150 && Position.X <= playerPosition.X + 150) // NPC is within "150" pixels of player, so we switch to idle
             {
-                _npcState = NPCState.Idle;
+                _npcState = CharacterState.Idle;
+                _animatedSprite.CharacterState = CharacterState.Idle;
                 return 0;
             }
             if (Position.X >= playerPosition.X && Position.X >= playerPosition.X + 150) // NPC is moving left towards the player
             {
-                _npcState = NPCState.Walking;
+                _npcState = CharacterState.Walking;
+                _animatedSprite.CharacterState = CharacterState.Walking;
                 return -1;
             }
             return 0;

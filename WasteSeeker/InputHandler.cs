@@ -322,6 +322,12 @@ namespace WasteSeeker
                     #endregion
 
                     break;
+
+                case GameState.BattleSequence:
+                    // Handles input on the "BattleSequence" Screen
+
+
+                    break;
             }
         }
     }

@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Content;
+using Microsoft.Xna.Framework.Graphics;
+using SharpDX.Direct3D9;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
+using WasteSeeker.Importers_Processors;
 
 namespace WasteSeeker.Classes_Assets
 {
@@ -70,25 +73,36 @@ namespace WasteSeeker.Classes_Assets
         #region character/enemy info
         private int _numAllies;
 
-        private string _playerName;
-
-        private float _playerHealth;
+        private Player _player;
 #nullable enable
-        private string? _npcName1;
-
-        private string? _npcName2;
-
-        private string? _npcName3;
-
-        private float? _npcHealth1;
-
-        private float? _npcHealth2;
-
-        private float? _npcHealth3;
+        private NPC? _npc1;
+        private NPC? _npc2;
+        private NPC? _npc3;
 #nullable disable
-        private string _enemyName;
+        private Enemy _enemy;
 
+        // Statistical information of player, npcs, and enemy
+        private float _playerHealth;
+        private float _npcHealth1;
+        private float _npcHealth2;
+        private float _npcHealth3;
         private float _enemyHealth;
+
+        private float _playerMana;
+        private float _npcMana1;
+        private float _npcMana2;
+        private float _npcMana3;
+
+        private float _playerAttack;
+        private float _npcAttack1;
+        private float _npcAttack2;
+        private float _npcAttack3;
+        private float _enemyAttack;
+
+        private Ability _playerAbility;
+        private Ability _npcAbility1;
+        private Ability _npcAbility2;
+        private Ability _npcAbility3;
         #endregion
 
         #region Texture2Ds
@@ -126,16 +140,48 @@ namespace WasteSeeker.Classes_Assets
         private Button _backButton;
         #endregion
 
+        private Tilemap _tilemap;
 
+        #region Tilemap
+
+        /// <summary>
+        /// - The tilemap here will have a size of 20x11 (to cover all facets of the screen
+        /// The tiles present in "BattleTileset" are 13 tiles - meaning that tiles 14-16 are un-used(could be later)
+        /// </summary>
+        public Tilemap Tilemap
+        {
+            set { _tilemap = value; }
+        }
+        #endregion
+
+        /// <summary>
+        /// For testing purposes
+        /// </summary>
+        public BattleSequence()
+        {
+            _tilemap = new Tilemap("battle.txt");
+        }
+
+        public void LoadContent(ContentManager content)
+        {
+            _tilemap.LoadContent(content);
+        }
+
+        /// <summary>
+        /// Constructor for setting up a new Battle sequence
+        /// </summary>
+        /// <param name="fightButton">The fight button</param>
+        /// <param name="switchButton">The switch button</param>
+        /// <param name="runButton">The run button</param>
+        /// <param name="attack">The attack button</param>
+        /// <param name="ability">The ability button</param>
+        /// <param name="heal">The heal button</param>
+        /// <param name="back">The back button</param>
         public BattleSequence(
-            string playerName, int playerHealth, Texture2D playerProfile,
             Button fightButton, Button switchButton, Button runButton,
             Button attack, Button ability, Button heal, Button back
             )
         {
-            _playerName = playerName;
-            _playerHealth = playerHealth;
-            _playerProfile = playerProfile;
             _fightButton = fightButton;
             _switchButton = switchButton;
             _runButton = runButton;
@@ -145,26 +191,50 @@ namespace WasteSeeker.Classes_Assets
             _backButton = back;
         }
 
-        public void Battle(
-            int numAllies,
-            string npcName1, float npcHealth1, Texture2D npcProfile1,
-            string npcName2, float npcHealth2, Texture2D npcProfile2,
-            string npcName3, float npcHealth3, Texture2D npcProfile3,
-            string enemyName, float enemyHealth, Texture2D enemyProfile
-            )
+        public void Battle(int numAllies, Player player, NPC npc1, NPC npc2, NPC npc3, Enemy enemy, Texture2D battleBackgroundTexture)
         {
-            // Initialize all needed variables (npc names, textures, etc.)
-            _npcName1 = npcName1;
-            _npcHealth1 = npcHealth1;
-            _npcName2 = npcName2;
-            _npcHealth2 = npcHealth2;
-            _npcName3 = npcName3;
-            _npcHealth3 = npcHealth3;
+            // Initialize all needed variables (player info, npc info, world texture, etc.)
+            _numAllies = numAllies;
+            _player = player;
+            _npc1 = npc1;
+            _npc2 = npc2;
+            _npc3 = npc3;
+            _enemy = enemy;
+            _battleBackground = battleBackgroundTexture;
 
-            _npcProfile1 = npcProfile1;
-            _npcProfile2 = npcProfile2;
-            _npcProfile3 = npcProfile3;
+            LoadBattleInformation(); // Used to load names, textures, etc. of players and npcs
 
+
+        }
+
+        /// <summary>
+        /// Used to load information received from the player and npc info
+        /// </summary>
+        public void LoadBattleInformation()
+        {
+            _playerProfile = _player.BattleTexture;
+            _npcProfile1 = _npc1.BattleTexture;
+            _npcProfile2 = _npc2.BattleTexture;
+            _npcProfile3 = _npc3.BattleTexture;
+            
+        }
+
+        /// <summary>
+        /// Used to update what is happening in the battle
+        /// </summary>
+        public void UpdateBattle(GameTime gameTime)
+        {
+            
+        }
+
+        /// <summary>
+        /// Draw method to update and draw the battle sequence of what is happening
+        /// </summary>
+        /// <param name="spriteBatch"></param>
+        /// <param name="gameTime"></param>
+        public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
+        {
+            _tilemap.Draw(gameTime, spriteBatch);
         }
     }
 }
