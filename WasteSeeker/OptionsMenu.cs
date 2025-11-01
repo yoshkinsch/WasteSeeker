@@ -15,9 +15,10 @@ namespace WasteSeeker
 {
     public class OptionsMenu
     {
-        private Rectangle _sliderBar = new Rectangle(360, 200, 600, 20); 
+        private Rectangle _sliderBar = new Rectangle(360, 300, 600, 20); 
         private Rectangle _sliderHandle;
 
+        private double _gameTimeCount = 0f;
         private float _volume = 0.1f; 
         private bool _isDragging = false;
 
@@ -34,9 +35,19 @@ namespace WasteSeeker
         public bool GameWasPaused { get; set; }
 
         /// <summary>
+        /// Public bool to indicate that the game was saved
+        /// </summary>
+        public bool GameWasSaved { get; set; }
+
+        /// <summary>
         /// Public button to tell the inputhandler it's bounds
         /// </summary>
         public Button BackButton { get; private set; }
+
+        /// <summary>
+        /// Public button to tell the inputhandler it's bounds
+        /// </summary>
+        public Button SaveButton { get; private set; }
 
         /// <summary>
         /// Public button to exit back to the main menu
@@ -47,6 +58,7 @@ namespace WasteSeeker
         {
             BackButton = new Button(new Vector2(100, 50), 160) { GameStateLocation = GameState.Options };
             ExitButton = new Button(new Vector2(100, 125), 160) { GameStateLocation = GameState.Options, ButtonActivated = false };
+            SaveButton = new Button(new Vector2(100, 200), 160) { GameStateLocation = GameState.Options };
             _sliderHandle = new Rectangle(_sliderBar.X + (int)(_sliderBar.Width * _volume) - 5, _sliderBar.Y - 5, 10, 20);
             MediaPlayer.Volume = _volume;
         }
@@ -56,6 +68,7 @@ namespace WasteSeeker
             _volumePixelTexture = content.Load<Texture2D>("RedPixel");
             _sedgwickAveDisplay = content.Load<SpriteFont>("sedgwickAveDisplay");
             BackButton.LoadContent(content, "ButtonBack_OptionsMenu-Sheet");
+            SaveButton.LoadContent(content, "ButtonSave_OptionsMenu-Sheet");
             ExitButton.LoadContent(content, "ExitButton_MainMenu-Sheet");
             _popup = content.Load<SoundEffect>("gunshot_sfx");
             _popupInstance = _popup.CreateInstance();
@@ -65,9 +78,11 @@ namespace WasteSeeker
         public void Update(GameTime gameTime)
         {
             MouseState mouse = Mouse.GetState();
+            _gameTimeCount += gameTime.ElapsedGameTime.TotalSeconds;
+            if (_gameTimeCount > 1) { _gameTimeCount = 0; GameWasSaved = false; }
 
             BackButton.Update(gameTime);
-            if (GameWasPaused) { ExitButton.ButtonActivated = true; ExitButton.Update(gameTime); }
+            if (GameWasPaused) { ExitButton.ButtonActivated = true; ExitButton.Update(gameTime); SaveButton.Update(gameTime); }
             else { ExitButton.ButtonActivated = false; }
 
             if (mouse.LeftButton == ButtonState.Pressed && _sliderHandle.Contains(mouse.Position))
@@ -97,7 +112,8 @@ namespace WasteSeeker
         {
             spriteBatch.Begin();
             BackButton.Draw(spriteBatch, gameTime);
-            if (GameWasPaused) { ExitButton.Draw(spriteBatch, gameTime); }
+            if (GameWasPaused) { ExitButton.Draw(spriteBatch, gameTime); SaveButton.Draw(spriteBatch, gameTime); }
+            if (GameWasSaved) { spriteBatch.DrawString(_sedgwickAveDisplay, "Game Saved!", new Vector2(640, 360), Color.White, 0, _sedgwickAveDisplay.MeasureString("Game Saved!") / 2, 1f, SpriteEffects.None, 1); }
             spriteBatch.DrawString(_sedgwickAveDisplay, "Options", new Vector2(650, 50), Color.White, 0, _sedgwickAveDisplay.MeasureString("Options") / 2, 1f, SpriteEffects.None, 1);
 
             #region BGM volume

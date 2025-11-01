@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using WasteSeeker.Collisions;
-using WasteSeeker.Importers_Processors;
+using WasteSeeker.Animation_Classes;
 
 namespace WasteSeeker.Classes_Assets
 {

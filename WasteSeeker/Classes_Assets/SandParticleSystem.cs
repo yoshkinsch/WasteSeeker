@@ -27,7 +27,7 @@ namespace WasteSeeker.Classes_Assets
 
         protected override void InitializeParticle(ref Particle p, Vector2 where)
         {
-            p.Initialize(where, Vector2.UnitX * -260, Vector2.Zero, Color.Beige, scale: RandomHelper.NextFloat(0.1f, 0.5f), lifetime: 5, rotation: 20, angularVelocity: 180);
+            p.Initialize(where, Vector2.UnitX * -500, Vector2.Zero, Color.Beige, scale: RandomHelper.NextFloat(0.1f, 0.5f), lifetime: 5, rotation: 20, angularVelocity: 180);
         }
 
         public override void Update(GameTime gameTime)

@@ -16,6 +16,7 @@ namespace WasteSeeker.Classes_Assets
     /// </summary>
     public class Button
     {
+        private float _scale = 1;
 
         private Texture2D _buttonTexture;  // Button is 200x100 pixels
 
@@ -43,6 +44,15 @@ namespace WasteSeeker.Classes_Assets
         {
             get { return _isButtonActivated; }
             set { _isButtonActivated = value; }
+        }
+
+        public float Scale
+        {
+            get { return _scale; }
+            set
+            {
+                _scale = value;
+            }
         }
 
         /// <summary>
@@ -90,7 +100,7 @@ namespace WasteSeeker.Classes_Assets
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             var source = new Rectangle(_buttonHover * 200, 0, 200, 100);
-            spriteBatch.Draw(_buttonTexture, _position, source, Color.White, 0, new Vector2(100, 50), 1, SpriteEffects.None, 1);
+            spriteBatch.Draw(_buttonTexture, _position, source, Color.White, 0, new Vector2(100, 50), _scale, SpriteEffects.None, 1);
         }
     }
 }

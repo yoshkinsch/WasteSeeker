@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WasteSeeker.Collisions;
-using WasteSeeker.Importers_Processors;
+using WasteSeeker.Animation_Classes;
 
 namespace WasteSeeker.Classes_Assets
 {
@@ -185,6 +185,15 @@ namespace WasteSeeker.Classes_Assets
             // Updating the bounds to the new position
             _bounds.X = Position.X;
             _bounds.Y = Position.Y;
+        }
+        /// <summary>
+        /// A method to stop any and all sfx coming from the player class
+        /// Is used when game is paused or changes state in game loop
+        /// </summary>
+        public void StopSFX()
+        {
+            _walkingSfxInstance.Stop();
+            _runningSfxInstance.Stop();
         }
 
         /// <summary>

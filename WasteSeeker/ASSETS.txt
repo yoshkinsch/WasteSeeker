@@ -19,6 +19,8 @@ Content/OptionsButton_MainMenu-Sheet.png - created by Carson Kinsch (me), releas
 
 Content/ExitButton_MainMenu-Sheet.png - created by Carson Kinsch (me), released under the Creative Commons License
 
+Content/ButtonSave_OptionsMenu-Sheet.png - created by Carson Kinsch (me), released under the Creative Commons License
+
 Content/ButtonBack_OptionsMenu-Sheet.png - created by Carson Kinsch (me), released under the Creative Commons License
 
 Content/RedPixel.png - created by Carson Kinsch (me), released under the Creative Commons License
@@ -51,6 +53,8 @@ Content/Schoolbell/Schoolbell-Regular.ttf - Schoolbell font created by "Font Din
 Content/MainMenuMusic.mp3 - created by Maksym_Dudchyk on pixabay (https://pixabay.com/users/maksym_dudchyk-34570439/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0. 
 
 Content/TutorialMusic.mp3 - created by nojisume on pixabay (https://pixabay.com/users/nojisuma-23737290/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0.
+
+Content/BattleMusic.mp3 - created by Junipersona from Pixabay (https://pixabay.com/users/junipersona-35113928/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0.
 
 Content/gunshot_sfx.wav - created by Universfield on pixabay (https://pixabay.com/sound-effects/gunshot-352466/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0.
 

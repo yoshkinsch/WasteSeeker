@@ -46,6 +46,16 @@ namespace WasteSeeker
         public bool Exit { get; private set; } = false;
 
         /// <summary>
+        /// This is used whenever the player will want to save the game (in the options screen)
+        /// </summary>
+        public bool Save { get; set; } = false;
+
+        /// <summary>
+        /// This is used whenever the player will want to load the game (in the main menu screen)
+        /// </summary>
+        public bool Load { get; set; } = false;
+
+        /// <summary>
         /// Whether or not the player is wanting to run in the game (players holds shift)
         /// </summary>
         public bool Running { get; private set; } = false;
@@ -90,6 +100,11 @@ namespace WasteSeeker
                 }
                 if (button.GameStateLocation == GameState.MainMenu && button == _buttonsDict[currentGameState][2]) // Exit Button
                 {
+                    Load = true;
+                    return GameState.MainMenu;
+                }
+                if (button.GameStateLocation == GameState.MainMenu && button == _buttonsDict[currentGameState][3]) // Exit Button
+                {
                     Exit = true;
                     return null;
                 }
@@ -107,6 +122,11 @@ namespace WasteSeeker
                 {
                     return GameState.MainMenu;
                 }
+                if (button.GameStateLocation == GameState.Options && button == _buttonsDict[currentGameState][2]) // Save Button
+                {
+                    Save = true;
+                    return GameState.Options;
+                }
             }
             #endregion
 
@@ -120,6 +140,7 @@ namespace WasteSeeker
         private void MoveSelectionUpwards(List<Button> buttons)
         {
             _selectedButtonIndex = buttons.FindIndex(button => button.ButtonSelect);
+            if (_selectedButtonIndex == -1) _selectedButtonIndex = 0;
 
             if (_selectedButtonIndex > 0)
             {
@@ -140,6 +161,7 @@ namespace WasteSeeker
         private void MoveSelectionDownwards(List<Button> buttons)
         {
             _selectedButtonIndex = buttons.FindIndex(button => button.ButtonSelect);
+            if (_selectedButtonIndex == -1) _selectedButtonIndex = 0;
 
             if (_selectedButtonIndex < buttons.Count - 1)
             {
@@ -240,19 +262,6 @@ namespace WasteSeeker
                         _buttonsDict[GameState.Options][0].ButtonSelect = true;
                     }
 
-                    if (_currentKeyboardState.IsKeyDown(Keys.Enter) && !_previousKeyboardState.IsKeyDown(Keys.Enter) || _currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
-                    {
-                        var selectedButton = _buttonsDict[GameState.Options].FirstOrDefault(b => b.ButtonSelect);
-                        if (selectedButton != null)
-                        {
-                            GameState? changedGameState = HandleButtonClick(selectedButton, GameState.Options);
-                            if (changedGameState != null)
-                            {
-                                gameState = (GameState)changedGameState;
-                            }
-                        }
-                    }
-
                     // Button iteration for options buttons - Mouse Iterations
                     if (_buttonsDict.ContainsKey(GameState.Options))
                     {
@@ -272,7 +281,19 @@ namespace WasteSeeker
                             }
                         }
                     }
-                    
+
+                    if (_currentKeyboardState.IsKeyDown(Keys.Enter) && !_previousKeyboardState.IsKeyDown(Keys.Enter) || _currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
+                    {
+                        var selectedButton = _buttonsDict[GameState.Options].FirstOrDefault(b => b.ButtonSelect);
+                        if (selectedButton != null)
+                        {
+                            GameState? changedGameState = HandleButtonClick(selectedButton, GameState.Options);
+                            if (changedGameState != null)
+                            {
+                                gameState = (GameState)changedGameState;
+                            }
+                        }
+                    }
 
                     break;
                 case GameState.Playing:
@@ -310,6 +331,11 @@ namespace WasteSeeker
 
                     #endregion
 
+                    // Temporary for testing and showing off tilemap
+                    #region TO BATTLESEQUENCE
+                    if (Keyboard.GetState().IsKeyDown(Keys.T)) { _previousGameState = GameState.Playing; gameState = GameState.BattleSequence; }
+                    #endregion
+
                     #region TO MAIN MENU
 
                     if (Keyboard.GetState().IsKeyDown(Keys.Back)) { gameState = GameState.MainMenu; }
@@ -326,7 +352,11 @@ namespace WasteSeeker
                 case GameState.BattleSequence:
                     // Handles input on the "BattleSequence" Screen
 
+                    if (Keyboard.GetState().IsKeyDown(Keys.F)) { _previousGameState = GameState.BattleSequence; gameState = GameState.Playing; }
 
+                    #region TO OPTIONS
+                    if (Keyboard.GetState().IsKeyDown(Keys.Escape)) { _previousGameState = GameState.BattleSequence; gameState = GameState.Options; }
+                    #endregion
                     break;
             }
         }

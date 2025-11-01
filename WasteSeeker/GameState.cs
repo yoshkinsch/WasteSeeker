@@ -17,6 +17,7 @@ namespace WasteSeeker
         Paused,
         Cutscene,
         Transition,
-        BattleSequence
+        BattleSequence,
+        Controls
     }
 }
