@@ -403,21 +403,25 @@ namespace WasteSeeker
                     _loadGameTime += gameTime.ElapsedGameTime.TotalSeconds;
 
                     _spriteBatch.Begin();
-                    
-                    if (_loadGameTime < 1 && _gameFailedToLoad)
+                    if (_gameFailedToLoad || _gameLoaded)
                     {
-                        _spriteBatch.DrawString(_sedgwickAveDisplay, "Game Failed to Load.", new Vector2(GraphicsDevice.Viewport.Width / 2, 400), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Game Failed to Load.") / 2, 1, SpriteEffects.None, 1);
-                    }
+                        if (_loadGameTime < 1 && _gameFailedToLoad)
+                        {
+                            _spriteBatch.DrawString(_sedgwickAveDisplay, "Game Failed to Load.", new Vector2(GraphicsDevice.Viewport.Width / 2, 400), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Game Failed to Load.") / 2, 1, SpriteEffects.None, 1);
+                        }
 
-                    if (_loadGameTime < 1 && _gameLoaded)
-                    {
-                        _spriteBatch.DrawString(_sedgwickAveDisplay, "Game Loaded!", new Vector2(GraphicsDevice.Viewport.Width / 2, 400), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Game Loaded!") / 2, 1, SpriteEffects.None, 1);
+                        if (_loadGameTime < 1 && _gameLoaded)
+                        {
+                            _spriteBatch.DrawString(_sedgwickAveDisplay, "Game Loaded!", new Vector2(GraphicsDevice.Viewport.Width / 2, 400), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Game Loaded!") / 2, 1, SpriteEffects.None, 1);
+                        }
                     }
                     else
                     {
-                        _gameLoaded = false;
                         _loadGameTime = 0;
+                        _gameFailedToLoad = false;
+                        _gameLoaded = false;
                     }
+
 
                     // Texture2D Assets Main Menu
                     _spriteBatch.Draw(_mainMenuEyes, new Vector2(0, 0), null, Color.White);
