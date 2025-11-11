@@ -65,7 +65,7 @@ namespace WasteSeeker
             BackButton = new Button(new Vector2(100, 50), 160) { GameStateLocation = GameState.Options };
             ExitButton = new Button(new Vector2(100, 125), 160) { GameStateLocation = GameState.Options, ButtonActivated = false };
             SaveButton = new Button(new Vector2(100, 200), 160) { GameStateLocation = GameState.Options };
-            LoadButton = new Button(new Vector2(100, 200), 160) { GameStateLocation = GameState.Options };
+            LoadButton = new Button(new Vector2(100, 125), 160) { GameStateLocation = GameState.Options };
             _sliderHandle = new Rectangle(_sliderBar.X + (int)(_sliderBar.Width * _volume) - 5, _sliderBar.Y - 5, 10, 20);
             MediaPlayer.Volume = _volume;
         }

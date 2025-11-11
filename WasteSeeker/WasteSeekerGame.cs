@@ -8,6 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
 using WasteSeeker.Classes_Assets;
+using WasteSeeker.Collisions;
 using WasteSeeker.Data;
 
 namespace WasteSeeker
@@ -75,15 +76,19 @@ namespace WasteSeeker
         private Texture2D _worldFirstMidGroundTexture;
         private Texture2D _worldSecondMidGroundTexture;
         private Texture2D _worldForeGroundTexture;
-        private Texture2D _rewardThumbsUp; // Will most likely definitely remove
+        //private Texture2D _rewardThumbsUp; // Will most likely definitely remove
 
         private Rectangle _worldGround;
 
         private SandParticleSystem _sandParticleSystem;
 
+        private Reward _rewardOne;
+
         private Tumbleweed _tumbleweed;
 
         private bool _playerWasHit = false;
+
+        private bool _rewardGot;
         #endregion
 
         #region Characters
@@ -181,7 +186,7 @@ namespace WasteSeeker
             #region Objects
             _worldGround = new Rectangle(0, 540, 14000, GraphicsDevice.Viewport.Height - 540);
             _tumbleweed = new Tumbleweed(new Vector2(GraphicsDevice.Viewport.Width + 500, 540));
-            
+            _rewardOne = new Reward(new Vector2(14000, 300));
             #endregion 
 
             #region Characters
@@ -238,7 +243,8 @@ namespace WasteSeeker
             _worldForeGroundTexture = Content.Load<Texture2D>("SandBackground_ForegroundGround");
             _tumbleweed.LoadContent(Content);
             _kuzuDeadTexture = Content.Load<Texture2D>("KuzuDead_Chibi");
-            _rewardThumbsUp = Content.Load<Texture2D>("ThumbsUP");
+            _rewardOne.LoadContent(Content, "ThumbsUP");
+            //_rewardThumbsUp = Content.Load<Texture2D>("ThumbsUP");
             #endregion
 
             #region Music
@@ -460,6 +466,13 @@ namespace WasteSeeker
                                 _tumbleweed.IsEnabled = true;
                             }
 
+                            if (_rewardOne.Bounds.CollidesWith(_player.Bounds))
+                            {
+                                _rewardGot = true;
+                                _gameState = GameState.MainMenu;
+                                ResetVariables(gameTime);
+                            }
+
                             // Player bounds on screen
                             if (_player.Position.X <= -10) { _player.Position = new Vector2(GraphicsDevice.Viewport.X - 10, _player.Position.Y); }
                             else if (_player.Position.X > 14000) { _player.Position = new Vector2(14000, _player.Position.Y); }
@@ -522,6 +535,11 @@ namespace WasteSeeker
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2(GraphicsDevice.Viewport.Width / 2, 100), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker") / 2, 1, SpriteEffects.None, 1);
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 100), Color.White, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker") / 2, 1, SpriteEffects.None, 1);
                     //_spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Space' to Play!", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 280), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Space' to Play!") / 2, 0.35f, SpriteEffects.None, 1);
+                    
+                    if (_rewardGot)
+                    {
+                        _spriteBatch.Draw(_rewardOne.Texture, new Vector2(GraphicsDevice.Viewport.Width / 2 + 200, 175), Color.White);
+                    }
 
                     _spriteBatch.End();
                     break;
@@ -591,7 +609,6 @@ namespace WasteSeeker
                             _spriteBatch.Begin();
                             _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Backspace' on the keyboard, to return to the Menu.", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 700), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Backspace' on the keyboard, to return to the Menu.") / 2, 0.35f, SpriteEffects.None, 1);
 
-
                             // Tutorial
                             if (_player.Position.X <= 1280)
                             {
@@ -640,7 +657,7 @@ namespace WasteSeeker
                                 _spriteBatch.DrawString(
                                     _sedgwickAveDisplay,
                                     "REWARD",
-                                    new Vector2(GraphicsDevice.Viewport.Width / 2, 300),
+                                    new Vector2((GraphicsDevice.Viewport.Width / 2) + 200, 300),
                                     Color.Black,
                                     0,
                                     _sedgwickAveDisplay.MeasureString("REWARD") / 2,
@@ -649,7 +666,7 @@ namespace WasteSeeker
                                     1
                                 );
 
-                                _spriteBatch.Draw(_rewardThumbsUp, new Vector2(500, 300), Color.White);
+                                //_rewardOne.Draw(_spriteBatch);
                             }
                             _spriteBatch.DrawString(
                                     _sedgwickAveDisplay,
@@ -681,6 +698,12 @@ namespace WasteSeeker
                             _soraNPC.Draw(_spriteBatch, gameTime);
                             _player.Draw(_spriteBatch, gameTime);
                             _tumbleweed.Draw(_spriteBatch);
+
+                            if (_player.Position.X >= 13500)
+                            {
+                                _rewardOne.Draw(_spriteBatch);
+                            }
+
                             _spriteBatch.End();
                             break;
                     } // END LevelState

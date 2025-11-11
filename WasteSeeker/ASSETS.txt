@@ -33,6 +33,8 @@ Content/BattleTileset.png - created by Carson Kinsch (me), released under the Cr
 
 Content/KuzuDead_Chibi.png - created by Carson Kinsch (me), released under the Creative Commons License
 
+Content/ThumbsUP.png - created by Carson Kinsch (me), released under the Creative Commons License
+
 [[Content used from the internet - modified by Carson Kinsch]]
 Content/Kuzu_Idle_Walk.png - created by Craftpix.net (https://craftpix.net). Free assets are provided under the Craftpix Free License (https://craftpix.net/file-licenses/).
 ^ [Modified by Carson Kinsch] ^
