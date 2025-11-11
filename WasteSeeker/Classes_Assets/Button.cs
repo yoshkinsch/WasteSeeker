@@ -26,11 +26,19 @@ namespace WasteSeeker.Classes_Assets
 
         private MouseState _mouseState;
 
-        private bool _isButtonActivated;
+        private bool _isButtonActivated = true;
 
         private int _buttonHover; // 0 if NOT hovering, 1 otherwise - used in Draw and Update
 
         private bool _isSelected = false; // true if keyboard is on button, false otherwise
+
+        private bool _isAnimated = true;
+
+        public bool Animated
+        {
+            get { return _isAnimated; }
+            set { _isAnimated = value; }
+        }
 
         public bool ButtonSelect
         {
@@ -99,8 +107,16 @@ namespace WasteSeeker.Classes_Assets
         /// <param name="gameTime">The game time</param>
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
-            var source = new Rectangle(_buttonHover * 200, 0, 200, 100);
-            spriteBatch.Draw(_buttonTexture, _position, source, Color.White, 0, new Vector2(100, 50), _scale, SpriteEffects.None, 1);
+            if (Animated)
+            {
+                var source = new Rectangle(_buttonHover * 200, 0, 200, 100);
+                spriteBatch.Draw(_buttonTexture, _position, source, Color.White, 0, new Vector2(100, 50), _scale, SpriteEffects.None, 1);
+            }
+            else
+            {
+                var source = new Rectangle(0 * 200, 0, 200, 100);
+                spriteBatch.Draw(_buttonTexture, _position, source, Color.White, 0, new Vector2(100, 50), _scale, SpriteEffects.None, 1);
+            }
         }
     }
 }

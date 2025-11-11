@@ -19,7 +19,7 @@ namespace WasteSeeker
     {
         private GraphicsDeviceManager _graphics;
         private SpriteBatch _spriteBatch;
-
+        
         //private GameState _previousGameState;
         private GameState _gameState = GameState.MainMenu;
         private LevelState _levelState = LevelState.LevelOne;
@@ -40,6 +40,7 @@ namespace WasteSeeker
 
         // Sprite Fonts
         private SpriteFont _sedgwickAveDisplay;
+        private SpriteFont _schoolBell;
 
         // Texture2D Assets
         private Texture2D _mainMenuEyes;
@@ -54,7 +55,7 @@ namespace WasteSeeker
         #region Buttons
         private Button _playButton;
         private Button _optionsButton;
-        private Button _loadButton;
+        private Button _controlsButton;
         private Button _exitButton;
         #endregion
 
@@ -74,12 +75,15 @@ namespace WasteSeeker
         private Texture2D _worldFirstMidGroundTexture;
         private Texture2D _worldSecondMidGroundTexture;
         private Texture2D _worldForeGroundTexture;
+        private Texture2D _rewardThumbsUp; // Will most likely definitely remove
 
         private Rectangle _worldGround;
 
         private SandParticleSystem _sandParticleSystem;
 
         private Tumbleweed _tumbleweed;
+
+        private bool _playerWasHit = false;
         #endregion
 
         #region Characters
@@ -98,6 +102,29 @@ namespace WasteSeeker
 
         private BattleSequence _battleSequenceHandler;
 
+        #endregion
+
+        #region GameOver
+
+        private bool _gameOver = false;
+
+        #region Textures
+        private Texture2D _kuzuDeadTexture;
+        #endregion
+
+        #region songs
+        private Song _gameOverMusic;
+        
+        #endregion
+        #endregion
+
+        #region Cutscene
+        // This region tailors to cutscenes in the game
+        private VideoPlayer _videoPlayer = new VideoPlayer();
+        private Texture2D _videoFrame;
+        private Video _videoOne;
+        private bool _videoOnePlayed;
+        
         #endregion
 
         // Want to add a global scalar value used in the game code - Dependent on the graphics screen size of the player (will be later implemented)
@@ -127,10 +154,10 @@ namespace WasteSeeker
             _leftGearSprite = new TitleGearSprite() { Position = new Vector2(270, 100), RotationDirection = 1, GearDirection = 0 };
             _rightGearSprite = new TitleGearSprite() { Position = new Vector2(1020, 100), RotationDirection = -1, GearDirection = (TitleGearSprite.Direction)1 };
             _bulletIcon = new TitleBulletSprite() { Graphics = _graphics };
-            _playButton = new Button(new Vector2(640,200), 200) { Scale = 1.25f, GameStateLocation = GameState.MainMenu };
+            _playButton = new Button(new Vector2(640, 200), 200) { Scale = 1.25f, GameStateLocation = GameState.MainMenu };
             _optionsButton = new Button(new Vector2(_playButton.Position.X, _playButton.Position.Y + 80), 175) { GameStateLocation = GameState.MainMenu };
-            _loadButton = new Button(new Vector2(_optionsButton.Position.X, _optionsButton.Position.Y + 75), 160) { GameStateLocation = GameState.MainMenu };
-            _exitButton = new Button(new Vector2(_loadButton.Position.X, _loadButton.Position.Y + 65), 145) { Scale = 0.65f, GameStateLocation = GameState.MainMenu };
+            _controlsButton = new Button(new Vector2(_optionsButton.Position.X, _optionsButton.Position.Y + 75), 160) { GameStateLocation = GameState.MainMenu };
+            _exitButton = new Button(new Vector2(_controlsButton.Position.X, _controlsButton.Position.Y + 65), 145) { Scale = 0.65f, GameStateLocation = GameState.MainMenu };
 
             _sandParticleSystem = new SandParticleSystem(this, new Rectangle(GraphicsDevice.Viewport.Width + 20, 0, 10, GraphicsDevice.Viewport.Height - 100));
             Components.Add(_sandParticleSystem);
@@ -162,10 +189,14 @@ namespace WasteSeeker
             _soraNPC = new NPC("Sora", "TODO", 100, new Vector2(((GraphicsDevice.Viewport.Width/2) + 250), 470), false);
             #endregion
 
+            _battleSequence = new BattleSequence();
             #endregion
 
-            _battleSequence = new BattleSequence();
-            
+            #region GameOver
+            // In case there is anything needed to be added here.
+            #endregion
+
+
 
             base.Initialize();
         }
@@ -179,6 +210,7 @@ namespace WasteSeeker
 
             // Sprite Fonts
             _sedgwickAveDisplay = Content.Load<SpriteFont>("sedgwickAveDisplay");
+            _schoolBell = Content.Load<SpriteFont>("schoolBell-");
 
             // Main Menu Texture2D Assets
             #region Main Menu
@@ -188,7 +220,7 @@ namespace WasteSeeker
             _rightGearSprite.LoadContent(Content);
             _playButton.LoadContent(Content, "PlayButton_MainMenu-Sheet");
             _optionsButton.LoadContent(Content, "OptionsButton_MainMenu-Sheet");
-            _loadButton.LoadContent(Content, "ButtonLoad_MainMenu-Sheet");
+            _controlsButton.LoadContent(Content, "ControlsButton_MainMenu-Sheet");
             _exitButton.LoadContent(Content, "ExitButton_MainMenu-Sheet");
             #endregion
 
@@ -205,12 +237,15 @@ namespace WasteSeeker
             _worldSecondMidGroundTexture = Content.Load<Texture2D>("SandBackground_SecondMidGround");
             _worldForeGroundTexture = Content.Load<Texture2D>("SandBackground_ForegroundGround");
             _tumbleweed.LoadContent(Content);
+            _kuzuDeadTexture = Content.Load<Texture2D>("KuzuDead_Chibi");
+            _rewardThumbsUp = Content.Load<Texture2D>("ThumbsUP");
             #endregion
 
             #region Music
             _backgroundMenuMusic = Content.Load<Song>("MainMenuMusic");
             _backgroundPlayingMusic = Content.Load<Song>("TutorialMusic");
             _battleMusic = Content.Load<Song>("BattleMusic");
+            _gameOverMusic = Content.Load<Song>("gameover");
 
             // Loading all songs into a dictionary to determine what to play
             // Will change "playing" music later in terms of the screen (or level) being played
@@ -218,9 +253,15 @@ namespace WasteSeeker
             {
                 {GameState.MainMenu,  _backgroundMenuMusic},
                 {GameState.Options,  _backgroundMenuMusic},
-                {GameState.Playing, _backgroundPlayingMusic },
-                {GameState.BattleSequence, _battleMusic }
+                {GameState.Playing, _backgroundPlayingMusic},
+                {GameState.BattleSequence, _battleMusic},
+                {GameState.Controls, _backgroundMenuMusic},
+                {GameState.GameOver,  _gameOverMusic}
             };
+            #endregion
+
+            #region Videos
+            //_videoOne = Content.Load<Video>("WasteSeeker_OP");
             #endregion
 
             #region Buttons
@@ -229,7 +270,7 @@ namespace WasteSeeker
             {
                 _playButton,
                 _optionsButton,
-                _loadButton,
+                _controlsButton,
                 _exitButton
             };
 
@@ -237,8 +278,10 @@ namespace WasteSeeker
             {
                 _optionsMenu.BackButton,
                 _optionsMenu.ExitButton,
-                _optionsMenu.SaveButton
+                _optionsMenu.SaveButton,
+                _optionsMenu.LoadButton
             };
+
 
             _inputHandler.LoadButtons(GameState.MainMenu, mainMenuButtons);
             _inputHandler.LoadButtons(GameState.Options, optionsMenuButtons);
@@ -280,6 +323,8 @@ namespace WasteSeeker
                 _inputHandler.Load = false;
             }
 
+            
+
             // Checking if the options menu has popped open
             // opened => play noise in higher pitch
             // closed => play noise in lower pitch
@@ -288,6 +333,7 @@ namespace WasteSeeker
                 _optionsMenu.PlayNoise(true);
             }
             
+            // Selecting and De-Selecting Buttons
             if (_previousGameState == GameState.Options && _gameState != GameState.Options)
             {
                 _optionsMenu.ExitButton.ButtonSelect = false;
@@ -306,7 +352,7 @@ namespace WasteSeeker
             if (previousSongPlayed != null && _gameState == GameState.Options) { _songs[GameState.Options] = previousSongPlayed; }
             Song songToPlay = _songs[_gameState]; // Could contain a song that is not on
 
-            if (MediaPlayer.Queue.ActiveSong != songToPlay)
+            if (songToPlay != null && MediaPlayer.Queue.ActiveSong != songToPlay)
             {
                 MediaPlayer.Play(songToPlay);
                 MediaPlayer.IsRepeating = true;
@@ -326,14 +372,24 @@ namespace WasteSeeker
                     _rightGearSprite.Update(gameTime);
                     _playButton.Update(gameTime);
                     _optionsButton.Update(gameTime);
-                    _loadButton.Update(gameTime);
+                    _controlsButton.Update(gameTime);
                     _exitButton.Update(gameTime);
                     break;
                 case GameState.Options:
 
                     if (_previousGameState == GameState.Playing || _previousGameState == GameState.BattleSequence)
                     {
+
+                        _optionsMenu.LoadButton.ButtonActivated = false;
+                        _optionsMenu.SaveButton.ButtonActivated = true;
+                        _optionsMenu.ExitButton.ButtonActivated = true;
                         _optionsMenu.GameWasPaused = true;
+                    }
+                    else if (_previousGameState == GameState.MainMenu)
+                    {
+                        _optionsMenu.LoadButton.ButtonActivated = true;
+                        _optionsMenu.SaveButton.ButtonActivated = false;
+                        _optionsMenu.ExitButton.ButtonActivated = false;
                     }
 
 
@@ -361,18 +417,61 @@ namespace WasteSeeker
                             }
 
                             // TumbleWeed
-                            _tumbleweed.Update(gameTime);
-                            if (_tumbleweed.Position.X < _player.Position.X - 500)
+                            if (_tumbleweed.IsEnabled)
                             {
-                                _tumbleweed.UpdateScale();
-                                _tumbleweed.Position = new Vector2(_player.Position.X + GraphicsDevice.Viewport.Width + 200, 540);
+                                _tumbleweed.Update(gameTime);
+
+                                if (_tumbleweed.Bounds.CollidesWith(_player.Bounds) && !_playerWasHit)
+                                {
+                                    _playerWasHit = true;
+                                    _player.Health -= 25;
+                                    if (_player.Health <= 0)
+                                    {
+                                        _gameOver = true;
+                                        _gameState = GameState.GameOver;
+                                    }
+                                }
+
+                                if (!_tumbleweed.Bounds.CollidesWith(_player.Bounds) && _playerWasHit)
+                                {
+                                    _playerWasHit = false;
+                                }
+
+                                if (_tumbleweed.Position.X < _player.Position.X - 750)
+                                {
+                                    _tumbleweed.UpdateSpeed();
+                                    _tumbleweed.UpdateScale();
+                                    _tumbleweed.Position = new Vector2(_player.Position.X + GraphicsDevice.Viewport.Width + 200, 540);
+                                    _tumbleweed.TumbleweedPassings++;
+                                }
                             }
+
+                            // Player has reached end of level
+                            if (_player.Position.X >= 12500)
+                            {
+                                if (_tumbleweed.Position.X <= _player.Position.X - 600)
+                                {
+                                    _tumbleweed.IsEnabled = false;
+                                    _tumbleweed.Position = new Vector2(_player.Position.X + GraphicsDevice.Viewport.Width + 200, 540);
+                                }
+                            }
+                            else
+                            {
+                                _tumbleweed.IsEnabled = true;
+                            }
+
                             // Player bounds on screen
                             if (_player.Position.X <= -10) { _player.Position = new Vector2(GraphicsDevice.Viewport.X - 10, _player.Position.Y); }
                             else if (_player.Position.X > 14000) { _player.Position = new Vector2(14000, _player.Position.Y); }
 
                             break;
                     }
+                    break;
+
+                case GameState.GameOver:
+
+                    if (_gameOver) { ResetVariables(gameTime); }
+
                     break;
                 case GameState.BattleSequence:
 
@@ -381,6 +480,14 @@ namespace WasteSeeker
                         case LevelState.LevelOne:
 
                             break;
+                    }
+                    break;
+                case GameState.Cutscene:
+                    
+                    if (!_videoOnePlayed)
+                    {
+                        // Update the frames and get texture from video
+                        // Once video is ended, then we can go ahead and set _videoOnePlayed to true
                     }
                     break;
             }
@@ -400,29 +507,7 @@ namespace WasteSeeker
             switch (_gameState)
             {
                 case GameState.MainMenu:
-                    _loadGameTime += gameTime.ElapsedGameTime.TotalSeconds;
-
                     _spriteBatch.Begin();
-                    if (_gameFailedToLoad || _gameLoaded)
-                    {
-                        if (_loadGameTime < 1 && _gameFailedToLoad)
-                        {
-                            _spriteBatch.DrawString(_sedgwickAveDisplay, "Game Failed to Load.", new Vector2(GraphicsDevice.Viewport.Width / 2, 400), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Game Failed to Load.") / 2, 1, SpriteEffects.None, 1);
-                        }
-
-                        if (_loadGameTime < 1 && _gameLoaded)
-                        {
-                            _spriteBatch.DrawString(_sedgwickAveDisplay, "Game Loaded!", new Vector2(GraphicsDevice.Viewport.Width / 2, 400), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Game Loaded!") / 2, 1, SpriteEffects.None, 1);
-                        }
-                    }
-                    else
-                    {
-                        _loadGameTime = 0;
-                        _gameFailedToLoad = false;
-                        _gameLoaded = false;
-                    }
-
-
                     // Texture2D Assets Main Menu
                     _spriteBatch.Draw(_mainMenuEyes, new Vector2(0, 0), null, Color.White);
                     _bulletIcon.Draw(_spriteBatch, gameTime, new Vector2(GraphicsDevice.Viewport.Width / 2 - 20, 90), new Vector2(256, 256), 0.125f);
@@ -430,7 +515,7 @@ namespace WasteSeeker
                     _rightGearSprite.Draw(_spriteBatch, gameTime);
                     _playButton.Draw(_spriteBatch, gameTime);
                     _optionsButton.Draw(_spriteBatch, gameTime);
-                    _loadButton.Draw(_spriteBatch, gameTime);
+                    _controlsButton.Draw(_spriteBatch, gameTime);
                     _exitButton.Draw(_spriteBatch, gameTime);
 
                     // Sprite Fonts
@@ -442,6 +527,28 @@ namespace WasteSeeker
                     break;
                 case GameState.Options:
                     // Options will contain volume, display options, langauge, and potentially more
+                    _loadGameTime += gameTime.ElapsedGameTime.TotalSeconds;
+
+                    _spriteBatch.Begin();
+                    if (_gameFailedToLoad || _gameLoaded && _loadGameTime < 1)
+                    {
+                        if (_gameFailedToLoad)
+                        {
+                            _spriteBatch.DrawString(_sedgwickAveDisplay, "Game Failed to Load.", new Vector2(GraphicsDevice.Viewport.Width / 2, 600), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Game Failed to Load.") / 2, 1, SpriteEffects.None, 1);
+                        }
+
+                        if (_gameLoaded)
+                        {
+                            _spriteBatch.DrawString(_sedgwickAveDisplay, "Game Loaded!", new Vector2(GraphicsDevice.Viewport.Width / 2, 600), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Game Loaded!") / 2, 1, SpriteEffects.None, 1);
+                        }
+                    }
+                    else
+                    {
+                        _loadGameTime = 0;
+                        _gameFailedToLoad = false;
+                        _gameLoaded = false;
+                    }
+                    _spriteBatch.End();
                     _optionsMenu.Draw(_spriteBatch, gameTime);
                     break;
                 case GameState.Playing:
@@ -453,29 +560,30 @@ namespace WasteSeeker
                             GraphicsDevice.Clear(Color.NavajoWhite);
 
                             // Calculate our offset vector 
-                            float playerX = MathHelper.Clamp(_player.Position.X, 500, 14000);
-                            float offsetX = 500 - playerX;
 
-                            Matrix tranform;
+                            float cameraCenterX = GraphicsDevice.Viewport.Width / 2 - 100;
+                            float playerX = MathHelper.Clamp(_player.Position.X, cameraCenterX, 14000 - cameraCenterX);
+                            float offsetX = cameraCenterX - playerX;
 
-                            //Background Textures
-                            tranform = Matrix.CreateTranslation(offsetX * 0.100f, 0, 0);
-                            _spriteBatch.Begin(transformMatrix: tranform);
+                            Matrix transform;
+
+                            transform = Matrix.CreateTranslation(offsetX * 0.100f, 0, 0);
+                            _spriteBatch.Begin(transformMatrix: transform);
                             _spriteBatch.Draw(_worldBackGroundTexture, Vector2.Zero, Color.White);
                             _spriteBatch.End();
 
-                            tranform = Matrix.CreateTranslation(offsetX * 0.150f, 0, 0);
-                            _spriteBatch.Begin(transformMatrix: tranform);
+                            transform = Matrix.CreateTranslation(offsetX * 0.150f, 0, 0);
+                            _spriteBatch.Begin(transformMatrix: transform);
                             _spriteBatch.Draw(_worldFirstMidGroundTexture, Vector2.Zero, Color.White);
                             _spriteBatch.End();
 
-                            tranform = Matrix.CreateTranslation(offsetX * 0.250f, 0, 0);
-                            _spriteBatch.Begin(transformMatrix: tranform);
+                            transform = Matrix.CreateTranslation(offsetX * 0.250f, 0, 0);
+                            _spriteBatch.Begin(transformMatrix: transform);
                             _spriteBatch.Draw(_worldSecondMidGroundTexture, Vector2.Zero, Color.White);
                             _spriteBatch.End();
 
-                            tranform = Matrix.CreateTranslation(offsetX * 0.600f, 0, 0);
-                            _spriteBatch.Begin(transformMatrix: tranform);
+                            transform = Matrix.CreateTranslation(offsetX * 0.600f, 0, 0);
+                            _spriteBatch.Begin(transformMatrix: transform);
                             _spriteBatch.Draw(_worldForeGroundTexture, Vector2.Zero, Color.White);
                             _spriteBatch.Draw(_worldGroundTexture, _worldGround, Color.White);
                             _spriteBatch.End();
@@ -487,25 +595,127 @@ namespace WasteSeeker
                             // Tutorial
                             if (_player.Position.X <= 1280)
                             {
-                                _spriteBatch.DrawString(_sedgwickAveDisplay, "Press A, D, Left Arrow, or Right Arrow\nto move around!", new Vector2(GraphicsDevice.Viewport.Width / 2, 300), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Press A, D, Left Arrow, or Right Arrow\nto move around!") / 2, (float)0.5, SpriteEffects.None, 1);
+                                _spriteBatch.DrawString(
+                                    _sedgwickAveDisplay,
+                                    "Dodge the tumbleweeds! \n(Press 'T' to view the Tilemap)",
+                                    new Vector2(GraphicsDevice.Viewport.Width / 2, 300),
+                                    Color.Black,
+                                    0,
+                                    _sedgwickAveDisplay.MeasureString("Dodge the tumbleweeds! \n(Press 'T' to view the Tilemap)") / 2,
+                                    (float)0.5,
+                                    SpriteEffects.None,
+                                    1
+                                );
                             }
-                            else if (_player.Position.X <= 1600)
+                            else if (_player.Position.X >= 1000 && _player.Position.X <= 2280)
                             {
-                                _spriteBatch.DrawString(_sedgwickAveDisplay, "Certain NPCs may follow you\n after crossing paths with them!", new Vector2(GraphicsDevice.Viewport.Width / 2, 300), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Certain NPCs may follow you\n after crossing paths with them!") / 2, (float)0.5, SpriteEffects.None, 1);
+                                _spriteBatch.DrawString(
+                                    _sedgwickAveDisplay, 
+                                    "Certain NPCs may follow you\n after crossing paths with them!", 
+                                    new Vector2(GraphicsDevice.Viewport.Width / 2, 300), 
+                                    Color.Black, 
+                                    0, 
+                                    _sedgwickAveDisplay.MeasureString("Certain NPCs may follow you\n after crossing paths with them!") / 2, 
+                                    (float)0.5, 
+                                    SpriteEffects.None, 
+                                    1
+                                );
                             }
-                            else
+                            else if (_player.Position.X <= 3280)
                             {
-                                _spriteBatch.DrawString(_sedgwickAveDisplay, "Gameplay coming soon! \nPress 'T' to view the Tilemap!", new Vector2(GraphicsDevice.Viewport.Width / 2, 300), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Gameplay coming soon! \nPress 'T' to view the Tilemap!") / 2, (float)0.5, SpriteEffects.None, 1);
+                                _spriteBatch.DrawString(
+                                    _sedgwickAveDisplay,
+                                    "(Reach the end of level one for a reward)",
+                                    new Vector2(GraphicsDevice.Viewport.Width / 2, 300),
+                                    Color.Black,
+                                    0,
+                                    _sedgwickAveDisplay.MeasureString("(Reach the end of level one for a reward)") / 2,
+                                    (float)0.5,
+                                    SpriteEffects.None,
+                                    1
+                                );
                             }
+                            else if (_player.Position.X >= 13500)
+                            {
+                                _spriteBatch.DrawString(
+                                    _sedgwickAveDisplay,
+                                    "REWARD",
+                                    new Vector2(GraphicsDevice.Viewport.Width / 2, 300),
+                                    Color.Black,
+                                    0,
+                                    _sedgwickAveDisplay.MeasureString("REWARD") / 2,
+                                    (float)0.5,
+                                    SpriteEffects.None,
+                                    1
+                                );
+
+                                _spriteBatch.Draw(_rewardThumbsUp, new Vector2(500, 300), Color.White);
+                            }
+                            _spriteBatch.DrawString(
+                                    _sedgwickAveDisplay,
+                                    "Health: " + _player.Health,
+                                    new Vector2(GraphicsDevice.Viewport.Width / 7 - 50, 650),
+                                    Color.Black,
+                                    0,
+                                    _sedgwickAveDisplay.MeasureString("Health: " + _player.Health) / 2,
+                                    (float)0.5,
+                                    SpriteEffects.None,
+                                    1
+                                );
+                            /* //Player position testing
+                            _spriteBatch.DrawString(
+                                    _sedgwickAveDisplay,
+                                    "Player Position: " + _player.Position.X,
+                                    new Vector2(GraphicsDevice.Viewport.Width / 2, 600),
+                                    Color.Black,
+                                    0,
+                                    _sedgwickAveDisplay.MeasureString("Player Position: " + _player.Position.X) / 2,
+                                    (float)0.5,
+                                    SpriteEffects.None,
+                                    1
+                                    );
+                            */
                             _spriteBatch.End();
-                            tranform = Matrix.CreateTranslation(offsetX, 0, 0);
-                            _spriteBatch.Begin(transformMatrix: tranform);
+                            transform = Matrix.CreateTranslation(offsetX, 0, 0);
+                            _spriteBatch.Begin(transformMatrix: transform);
                             _soraNPC.Draw(_spriteBatch, gameTime);
                             _player.Draw(_spriteBatch, gameTime);
                             _tumbleweed.Draw(_spriteBatch);
                             _spriteBatch.End();
                             break;
                     } // END LevelState
+                    break;
+                case GameState.GameOver:
+                    _spriteBatch.Begin();
+
+                    _spriteBatch.DrawString(
+                        _sedgwickAveDisplay,
+                        "GAME OVER",
+                        new Vector2(GraphicsDevice.Viewport.Width / 2 + 225, 150),
+                        Color.Black,
+                        0,
+                        _sedgwickAveDisplay.MeasureString("GAME OVER"),
+                        (float)1,
+                        SpriteEffects.None,
+                        1
+                    );
+
+                    _spriteBatch.Draw(_kuzuDeadTexture, new Vector2(500, 200), Color.White);
+
+                    _spriteBatch.DrawString(
+                        _sedgwickAveDisplay,
+                        "Press \"ENTER\" or \"SPACE\" to return to the main menu.",
+                        new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, 200),
+                        Color.Black,
+                        0,
+                        _sedgwickAveDisplay.MeasureString("Press \"ENTER\" or \"SPACE\" to return to the main menu.") / 3,
+                        (float)0.33,
+                        SpriteEffects.None,
+                        1
+                    );
+
+                    _spriteBatch.End();
+
                     break;
                 case GameState.BattleSequence:
                     GraphicsDevice.Clear(Color.NavajoWhite);
@@ -515,9 +725,113 @@ namespace WasteSeeker
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'F' to return to Overworld (or 'ESC' for options)", new Vector2(GraphicsDevice.Viewport.Width / 2, 300), Color.Black, 0, _sedgwickAveDisplay.MeasureString("Press 'F' to return to Overworld (or 'ESC' for options)") / 2, (float)0.5, SpriteEffects.None, 1);
                     _spriteBatch.End();
                     break;
+                case GameState.Controls:
+                    _spriteBatch.Begin();
+
+                    _spriteBatch.DrawString(
+                        _schoolBell,
+                        "**Press BackSpace to go back to the main menu**",
+                        new Vector2(GraphicsDevice.Viewport.Width / 3 + 70, 50),
+                        Color.Black,
+                        0,
+                        _schoolBell.MeasureString("**Press BackSpace to go back to the main menu**") * (float)0.75,
+                        (float)0.75,
+                        SpriteEffects.None,
+                        1
+                    );
+
+                    #region controls
+                    _spriteBatch.DrawString(
+                        _schoolBell,
+                        "A / D (Left Arrow / Right Arrow) - Move character left / right",
+                        new Vector2(GraphicsDevice.Viewport.Width - 200, 250),
+                        Color.Black,
+                        0,
+                        _schoolBell.MeasureString("A / D (Left Arrow / Right Arrow) - Move character left / right") * (float)1,
+                        (float)1,
+                        SpriteEffects.None,
+                        1
+                    );
+                    _spriteBatch.DrawString(
+                        _schoolBell,
+                        "SPACEBAR - Make character jump",
+                        new Vector2(GraphicsDevice.Viewport.Width/2 - 65, 350),
+                        Color.Black,
+                        0,
+                        _schoolBell.MeasureString("SPACEBAR - Make character jump") * (float)1,
+                        (float)1,
+                        SpriteEffects.None,
+                        1
+                    );
+                    _spriteBatch.DrawString(
+                        _schoolBell,
+                        "SHIFT - Make character 'speedup' (run)",
+                        new Vector2(GraphicsDevice.Viewport.Width / 2 + 35, 450),
+                        Color.Black,
+                        0,
+                        _schoolBell.MeasureString("SHIFT - Make character 'speedup' (run)") * (float)1,
+                        (float)1,
+                        SpriteEffects.None,
+                        1
+                    );
+                    #endregion
+                    _spriteBatch.End();
+                    
+                    break;
+                /*
+                case GameState.Cutscene:
+                    GraphicsDevice.Clear(Color.NavajoWhite);
+
+                    // Should probably get the _videoFrame in Update method
+                    if (_videoPlayer.State != MediaState.Stopped)
+                    {
+                        _videoFrame = _videoPlayer.GetTexture();
+                        if (_videoFrame != null)
+                        {
+                            _spriteBatch.Begin();
+                            _spriteBatch.Draw(_videoFrame, GraphicsDevice.Viewport.Bounds, Color.White);
+                            _spriteBatch.End();
+                        }
+                    }
+                    
+                    break;
+                */
             } // END GameState
             
             base.Draw(gameTime);
+        }
+
+        /// <summary>
+        /// This method is used when a game is over and
+        /// all variables must be reset.
+        /// </summary>
+        public void ResetVariables(GameTime gameTime)
+        {
+            // Player
+            _player.Position = new Vector2(100, 480);
+            _inputHandler.UpdateDirection(1);
+            _player.Health = 100;
+            _playerWasHit = false;  
+            _player.StopSFX();  
+
+            // NPC
+            _soraNPC.Position = new Vector2((GraphicsDevice.Viewport.Width / 2) + 250, 470);
+            _soraNPC.NPCState = CharacterState.Idle;
+            _soraNPC.Health = 100;  
+            _soraNPC.IsFollowingPlayer = false;
+
+            _soraNPC.ResetAnimation();
+
+            // Tumbleweed / Objects
+            _tumbleweed.Position = new Vector2(GraphicsDevice.Viewport.Width + 500, 540);  
+            _tumbleweed.IsEnabled = true;  
+            _sandParticleSystem.Enabled = true;  
+            _sandParticleSystem.Visible = true;  
+
+            // Level State
+            _levelState = LevelState.LevelOne;
+
+            _gameOver = false;
         }
 
         /// <summary>

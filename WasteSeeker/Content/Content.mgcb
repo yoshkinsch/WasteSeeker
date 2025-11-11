@@ -10,7 +10,6 @@
 
 #-------------------------------- References --------------------------------#
 
-/reference:..\..\WasteSeekerContent\bin\Debug\net8.0\WasteSeekerContent.dll
 
 #---------------------------------- Content ---------------------------------#
 
@@ -80,6 +79,18 @@
 /processorParam:TextureFormat=Color
 /build:ButtonSave_OptionsMenu-Sheet.png
 
+#begin ControlsButton_MainMenu-Sheet.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ControlsButton_MainMenu-Sheet.png
+
 #begin ExitButton_MainMenu-Sheet.png
 /importer:TextureImporter
 /processor:TextureProcessor
@@ -103,6 +114,12 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Eyes_WasteSeeker_MainMenu.png
+
+#begin gameover.mp3
+/importer:Mp3Importer
+/processor:SongProcessor
+/processorParam:Quality=Best
+/build:gameover.mp3
 
 #begin Gear_WasteSeeker_MainMenu.png
 /importer:TextureImporter
@@ -133,6 +150,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Kuzu_Idle_Walk.png
+
+#begin KuzuDead_Chibi.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:KuzuDead_Chibi.png
 
 #begin MainMenuMusic.mp3
 /importer:Mp3Importer
@@ -279,6 +308,18 @@
 /processorParam:MakeSquare=False
 /processorParam:TextureFormat=Color
 /build:Sora_Idle_Walk.png
+
+#begin ThumbsUP.png
+/importer:TextureImporter
+/processor:TextureProcessor
+/processorParam:ColorKeyColor=255,0,255,255
+/processorParam:ColorKeyEnabled=True
+/processorParam:GenerateMipmaps=False
+/processorParam:PremultiplyAlpha=True
+/processorParam:ResizeToPowerOfTwo=False
+/processorParam:MakeSquare=False
+/processorParam:TextureFormat=Color
+/build:ThumbsUP.png
 
 #begin Tumbleweed_Sprite.png
 /importer:TextureImporter

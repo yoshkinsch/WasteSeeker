@@ -67,7 +67,7 @@ namespace WasteSeeker.Classes_Assets
         /// <summary>
         /// The NPC's walk speed
         /// </summary>
-        public float WalkSpeed { get; set; } = 230f;
+        public float WalkSpeed { get; set; } = 245f;
 
         /// <summary>
         /// The NPC's Run Speed
@@ -88,6 +88,12 @@ namespace WasteSeeker.Classes_Assets
         /// The NPC's battle texture for when a battle sequence happens
         /// </summary>
         public Texture2D BattleTexture { get; set; }
+
+        public CharacterState NPCState
+        {
+            get { return _npcState; }
+            set { _npcState = value; }
+        }
 
         /// <summary>
         /// Constructor for a playable character
@@ -115,7 +121,7 @@ namespace WasteSeeker.Classes_Assets
             //Load content of the texture here "Texture = texture"
             Texture = content.Load<Texture2D>(texture);
 
-            _animatedSprite = new AnimatedSprite(Texture, Position, 48, 80, SpriteEffects.None, _scaleFactor, 0.15f, 0.1f, 5, 11);
+            _animatedSprite = new AnimatedSprite(Texture, Position, 48, 80, SpriteEffects.None, _scaleFactor, 0.15f, 0.1f, 0.05f, 5, 11);
             _animatedSprite.CharacterState = _npcState;
         }
 
@@ -174,6 +180,14 @@ namespace WasteSeeker.Classes_Assets
         {
             if (playerPosition.X < Position.X) { _animatedSprite.DirectionFacing = SpriteEffects.FlipHorizontally; }
             else { _animatedSprite.DirectionFacing = SpriteEffects.None; }
+        }
+
+        /// <summary>
+        /// Used to reset animation's variables
+        /// </summary>
+        public void ResetAnimation()
+        {
+            _animatedSprite.ResetAllAnimationVariables(Position);
         }
 
         /// <summary>

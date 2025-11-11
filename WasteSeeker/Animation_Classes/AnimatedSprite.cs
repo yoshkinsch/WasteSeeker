@@ -24,9 +24,11 @@ namespace WasteSeeker.Animation_Classes
 
         private int _spriteHeight;
 
-        float _idleFrameStep;
+        private float _idleFrameStep;
 
-        float _walkFrameStep;
+        private float _walkFrameStep;
+
+        //private float _runFrameStep;
 
         private float _scaleFactor;
 
@@ -73,6 +75,7 @@ namespace WasteSeeker.Animation_Classes
             float scaleFactor,
             float idleFrameStep,
             float walkFrameStep,
+            float runFrameStep,
             int idleMaxFrames,
             int walkMaxFrames
             )
@@ -97,6 +100,14 @@ namespace WasteSeeker.Animation_Classes
         {
             _animationTimer = updatedTimer;
             _animationFrame = animationFrame;
+        }
+
+        public void ResetAllAnimationVariables(Vector2 position)
+        {
+            _animationTimer = 0;
+            _animationFrame = 0;
+            _spriteState = CharacterState.Idle;
+            _position = position;
         }
 
         /// <summary>
@@ -139,6 +150,15 @@ namespace WasteSeeker.Animation_Classes
 
                     break;
                 case CharacterState.Running:
+                    // Will definitely need to change later to account for running frames
+                    if (_animationTimer > _walkFrameStep) // usually 0.1
+                    {
+                        _animationFrame++;
+                        if (_animationFrame > _walkMaxFrames) { _animationFrame = 1; } //if  _animationFrame > 11
+                        _animationTimer -= _walkFrameStep;
+                    }
+                    source = new Rectangle(_animationFrame * _spriteWidth, 2, _spriteWidth, _spriteHeight);
+                    spriteBatch.Draw(_spriteSheet, _position, source, Color.White, 0, new Vector2(_spriteWidth / 2, _spriteHeight / 2), _scaleFactor, _directionFacing, 1);
 
                     break;
             }

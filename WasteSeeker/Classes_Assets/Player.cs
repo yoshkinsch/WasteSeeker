@@ -35,6 +35,20 @@ namespace WasteSeeker.Classes_Assets
 
         private AnimatedSprite _animatedSprite; // Custom processor to process sprite sheets
 
+        private Vector2 _velocity;
+
+        #region Jumping
+
+        private bool _onGround = true;
+
+        private float _jumpPower = -500f;
+
+        private float _gravity = 900;
+
+        #endregion
+
+        private Vector2 _position;
+
         /// <summary>
         /// The bounding volume of the sprite
         /// </summary>
@@ -68,17 +82,21 @@ namespace WasteSeeker.Classes_Assets
         /// <summary>
         /// Walk speed of the character
         /// </summary>
-        public float WalkSpeed { get; set; } = 100f;
+        public float WalkSpeed { get; set; } = 250f;
 
         /// <summary>
         /// Running speed of the character
         /// </summary>
-        public float RunSpeed { get; set; } = 200f;
+        public float RunSpeed { get; set; } = 450f;
 
         /// <summary>
         /// Position in which the character is located on the screen
         /// </summary>
-        public Vector2 Position { get; set; }
+        public Vector2 Position
+        {
+            get { return _position; }
+            set { _position = value; }
+        }
 
         /// <summary>
         /// Texture in which the character will use
@@ -126,7 +144,7 @@ namespace WasteSeeker.Classes_Assets
             _runningSfxInstance.Pitch = 0.5f;
             _runningSfxInstance.IsLooped = true;
 
-            _animatedSprite = new AnimatedSprite(Texture, Position, 48, 80, SpriteEffects.None, _scaleFactor, 0.15f, 0.1f, 5, 11);
+            _animatedSprite = new AnimatedSprite(Texture, Position, 48, 80, SpriteEffects.None, _scaleFactor, 0.15f, 0.1f, 0.05f, 5, 11);
             _animatedSprite.CharacterState = _playerState;
         }
 
@@ -136,14 +154,35 @@ namespace WasteSeeker.Classes_Assets
         /// <param name="gameTime">Game Time</param>
         public void Update(GameTime gameTime)
         {
-            _previousPlayerState = _playerState;
-            
+            if (_onGround)
+            {
+                if (_inputHandler.JumpPressed)
+                {
+                    _velocity.Y = _jumpPower;
+                    _onGround = false;
+                }
+            }
+            else
+            {
+                _velocity.Y += _gravity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                _walkingSfxInstance.Stop();
+                _runningSfxInstance.Stop();
+            }
+
+            _position += _velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+
+            if (_position.Y >= 480) // Assuming _groundLevel is the y-coordinate of the ground
+            {
+                _position.Y = 480;
+                _velocity.Y = 0;
+                _onGround = true;
+            }
+
             // Updating Position of player
             if (_playerState == CharacterState.Walking)
             {
-                Position += _inputHandler.Direction * WalkSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                _animatedSprite.Position = Position;
-                if (_walkingSfxInstance.State != SoundState.Playing)
+                _position += _inputHandler.Direction * WalkSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (_walkingSfxInstance.State != SoundState.Playing && _onGround)
                 {
                     _runningSfxInstance.Stop();
                     _walkingSfxInstance.Play();
@@ -151,9 +190,8 @@ namespace WasteSeeker.Classes_Assets
             }
             else if (_playerState == CharacterState.Running)
             {
-                Position += _inputHandler.Direction * RunSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                _animatedSprite.Position = Position;
-                if (_runningSfxInstance.State != SoundState.Playing)
+                _position += _inputHandler.Direction * RunSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                if (_runningSfxInstance.State != SoundState.Playing && _onGround)
                 {
                     _walkingSfxInstance.Stop();
                     _runningSfxInstance.Play();
@@ -164,6 +202,10 @@ namespace WasteSeeker.Classes_Assets
                 _walkingSfxInstance.Stop();
                 _runningSfxInstance.Stop();
             }
+
+
+            _animatedSprite.Position = Position;
+
             // Get the last facing direction
             if (_inputHandler.Direction.X > 0) { _animatedSprite.DirectionFacing = SpriteEffects.None; }
             else if (_inputHandler.Direction.X < 0) { _animatedSprite.DirectionFacing = SpriteEffects.FlipHorizontally; }
@@ -177,14 +219,21 @@ namespace WasteSeeker.Classes_Assets
 
             // Sees if the current player state is not equal to the previous one
             // If true, then sets animation frame and timer to their default values
+            if (_playerState == CharacterState.Idle && _previousPlayerState != CharacterState.Idle)
+            {
+                _animatedSprite.UpdateAnimationVariables(0, 1); // 0 = animation timer & 1 = animation frame
+            }
+            /*
             if (_playerState != _previousPlayerState)
             {
                 _animatedSprite.UpdateAnimationVariables(0, 1); // 0 = animation timer & 1 = animation frame
             }
-
+            */
             // Updating the bounds to the new position
-            _bounds.X = Position.X;
-            _bounds.Y = Position.Y;
+            _bounds.X = _position.X;
+            _bounds.Y = _position.Y;
+
+            _previousPlayerState = _playerState;
         }
         /// <summary>
         /// A method to stop any and all sfx coming from the player class
