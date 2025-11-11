@@ -460,7 +460,7 @@ namespace WasteSeeker
 
                     if (_currentKeyboardState.IsKeyDown(Keys.Enter) && !_previousKeyboardState.IsKeyDown(Keys.Enter) || _currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
                     {
-                        gameState = GameState.Playing;
+                        gameState = GameState.MainMenu;
                     }
 
                    break;
