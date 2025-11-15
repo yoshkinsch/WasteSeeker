@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using System.Threading.Tasks;
 using WasteSeeker.Classes_Assets;
 using WasteSeeker.Collisions;
 using WasteSeeker.Data;
@@ -76,6 +77,9 @@ namespace WasteSeeker
         private Texture2D _worldFirstMidGroundTexture;
         private Texture2D _worldSecondMidGroundTexture;
         private Texture2D _worldForeGroundTexture;
+        //private Model _model;
+        private _3DBullet _bulletModel;
+        private CirclingCamera _camera;
         //private Texture2D _rewardThumbsUp; // Will most likely definitely remove
 
         private Rectangle _worldGround;
@@ -154,6 +158,8 @@ namespace WasteSeeker
         protected override void Initialize()
         {
             // TODO: Add your initialization logic here
+            _bulletModel = new _3DBullet(this, Matrix.Identity);
+
             #region Main Menu
 
             _leftGearSprite = new TitleGearSprite() { Position = new Vector2(270, 100), RotationDirection = 1, GearDirection = 0 };
@@ -217,6 +223,8 @@ namespace WasteSeeker
             _sedgwickAveDisplay = Content.Load<SpriteFont>("sedgwickAveDisplay");
             _schoolBell = Content.Load<SpriteFont>("schoolBell-");
 
+            //_model = Content.Load<Model>("3DBullet");
+            _camera = new CirclingCamera(this);
             // Main Menu Texture2D Assets
             #region Main Menu
             _mainMenuEyes = Content.Load<Texture2D>("Eyes_WasteSeeker_MainMenu");
@@ -232,7 +240,7 @@ namespace WasteSeeker
             #region Options Menu
             _optionsMenu.LoadContent(Content);
             #endregion
-
+            
             #region Characters/Objects
             _player.LoadContent(Content);
             _soraNPC.LoadContent(Content, "Sora_Idle_Walk");
@@ -309,6 +317,7 @@ namespace WasteSeeker
             var previousSongPlayed = _songs[_gameState];
             var _previousGameState = _gameState;
             _inputHandler.Update(gameTime, ref _gameState);
+            _camera.Update(gameTime);
 
             if (_inputHandler.Exit == true) { Exit(); }
 
@@ -521,6 +530,8 @@ namespace WasteSeeker
             {
                 case GameState.MainMenu:
                     _spriteBatch.Begin();
+                    //_model.Draw(worldMatrix, _camera.View, _camera.Projection);
+                    //_bulletModel.Draw(_camera);
                     // Texture2D Assets Main Menu
                     _spriteBatch.Draw(_mainMenuEyes, new Vector2(0, 0), null, Color.White);
                     _bulletIcon.Draw(_spriteBatch, gameTime, new Vector2(GraphicsDevice.Viewport.Width / 2 - 20, 90), new Vector2(256, 256), 0.125f);
@@ -576,7 +587,6 @@ namespace WasteSeeker
                         case LevelState.LevelOne:
 
                             GraphicsDevice.Clear(Color.NavajoWhite);
-
                             // Calculate our offset vector 
 
                             float cameraCenterX = GraphicsDevice.Viewport.Width / 2 - 100;
@@ -584,7 +594,7 @@ namespace WasteSeeker
                             float offsetX = cameraCenterX - playerX;
 
                             Matrix transform;
-
+                            
                             transform = Matrix.CreateTranslation(offsetX * 0.100f, 0, 0);
                             _spriteBatch.Begin(transformMatrix: transform);
                             _spriteBatch.Draw(_worldBackGroundTexture, Vector2.Zero, Color.White);
@@ -711,6 +721,8 @@ namespace WasteSeeker
                 case GameState.GameOver:
                     _spriteBatch.Begin();
 
+                    _bulletModel.Draw(_camera);
+
                     _spriteBatch.DrawString(
                         _sedgwickAveDisplay,
                         "GAME OVER",
@@ -728,7 +740,7 @@ namespace WasteSeeker
                     _spriteBatch.DrawString(
                         _sedgwickAveDisplay,
                         "Press \"ENTER\" or \"SPACE\" to return to the main menu.",
-                        new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, 200),
+                        new Vector2(GraphicsDevice.Viewport.Width / 2 - 125, 150),
                         Color.Black,
                         0,
                         _sedgwickAveDisplay.MeasureString("Press \"ENTER\" or \"SPACE\" to return to the main menu.") / 3,
