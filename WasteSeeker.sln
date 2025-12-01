@@ -5,6 +5,8 @@ VisualStudioVersion = 17.14.36414.22
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WasteSeeker", "WasteSeeker\WasteSeeker.csproj", "{0CEC492F-872C-4128-A01F-2D9127CB0CCA}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BasicTilemapPipeline", "BasicTilemapPipeline\BasicTilemapPipeline.csproj", "{402F27FC-3773-A067-6200-F85301E115E7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{0CEC492F-872C-4128-A01F-2D9127CB0CCA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CEC492F-872C-4128-A01F-2D9127CB0CCA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CEC492F-872C-4128-A01F-2D9127CB0CCA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{402F27FC-3773-A067-6200-F85301E115E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{402F27FC-3773-A067-6200-F85301E115E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{402F27FC-3773-A067-6200-F85301E115E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{402F27FC-3773-A067-6200-F85301E115E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

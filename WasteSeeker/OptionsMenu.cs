@@ -24,6 +24,7 @@ namespace WasteSeeker
         private bool _isDragging = false;
 
         private Texture2D _volumePixelTexture;
+        private Texture2D _kuzuIllustration;
         private SpriteFont _sedgwickAveDisplay;
 
         // Sound effects for when the options menu pops up
@@ -73,6 +74,7 @@ namespace WasteSeeker
         public void LoadContent(ContentManager content)
         {
             _volumePixelTexture = content.Load<Texture2D>("RedPixel");
+            _kuzuIllustration = content.Load<Texture2D>("Kuzu_Options_Illustration");
             _sedgwickAveDisplay = content.Load<SpriteFont>("sedgwickAveDisplay");
             BackButton.LoadContent(content, "ButtonBack_OptionsMenu-Sheet");
             SaveButton.LoadContent(content, "ButtonSave_OptionsMenu-Sheet");
@@ -122,6 +124,7 @@ namespace WasteSeeker
         public void Draw(SpriteBatch spriteBatch, GameTime gameTime)
         {
             spriteBatch.Begin();
+            spriteBatch.Draw(_kuzuIllustration, new Vector2(0, 30), Color.Crimson); // Color.WhiteSmokeSet color for any other color on Kuzu Illustration Sprite
             BackButton.Draw(spriteBatch, gameTime);
             if (GameWasPaused) { ExitButton.Draw(spriteBatch, gameTime); SaveButton.Draw(spriteBatch, gameTime); }
             else { LoadButton.Draw(spriteBatch, gameTime); }

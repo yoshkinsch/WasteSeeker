@@ -396,11 +396,16 @@ namespace WasteSeeker
                     // Get Position from Keyboard - TODO: change "velocity" of sprites
                     if (_currentKeyboardState.IsKeyDown(Keys.Left) || _currentKeyboardState.IsKeyDown(Keys.A))
                     {
-                        _direction.X = -1;
+                        if (_currentKeyboardState.IsKeyDown(Keys.LeftShift)) { Running =  true; }
+                        else { Running = false; }
+                            _direction.X = -1;
                     }
                     if (_currentKeyboardState.IsKeyDown(Keys.Right) || _currentKeyboardState.IsKeyDown(Keys.D))
                     {
+                        if (_currentKeyboardState.IsKeyDown(Keys.LeftShift)) { Running = true; }
+                        else { Running = false; }
                         _direction.X = 1;
+                        
                     }
 
                     // Jumping
@@ -419,10 +424,10 @@ namespace WasteSeeker
 
                     #region RUNNING IDLE
 
-                    if (_currentKeyboardState.IsKeyDown(Keys.LeftShift)) { Running = true; }
-                    else { Running = false; }
+                    //if (_currentKeyboardState.IsKeyDown(Keys.LeftShift) && _currentKeyboardState.IsKeyDown(Keys.A)) { Running = true; }
+                    //else { Running = false; }
 
-                    if (_currentKeyboardState.GetPressedKeys().Length == 0 || (Direction.X == 0 && Direction.Y == 0)) { Idle = true; }
+                    if (_currentKeyboardState.GetPressedKeys().Length == 0 || (Direction.X == 0 && Direction.Y == 0)) { Idle = true; Running = false; }
                     else { Idle = false; }
 
                     #endregion

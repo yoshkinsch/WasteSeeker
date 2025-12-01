@@ -5,6 +5,7 @@ using SharpDX.Direct3D9;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using WasteSeeker.Animation_Classes;
@@ -140,7 +141,7 @@ namespace WasteSeeker.Classes_Assets
         private Button _backButton;
         #endregion
 
-        private Tilemap _tilemap;
+        private BasicTilemap _tilemap;
 
         #region Tilemap
 
@@ -148,10 +149,12 @@ namespace WasteSeeker.Classes_Assets
         /// - The tilemap here will have a size of 20x11 (to cover all facets of the screen
         /// The tiles present in "BattleTileset" are 13 tiles - meaning that tiles 14-16 are un-used(could be later)
         /// </summary>
-        public Tilemap Tilemap
+        /// 
+        public BasicTilemap Tilemap
         {
             set { _tilemap = value; }
         }
+        
         #endregion
 
         /// <summary>
@@ -159,12 +162,13 @@ namespace WasteSeeker.Classes_Assets
         /// </summary>
         public BattleSequence()
         {
-            _tilemap = new Tilemap("battle.txt");
+            //_tilemap = new Tilemap("battle.txt");
         }
 
         public void LoadContent(ContentManager content)
         {
-            _tilemap.LoadContent(content);
+            //_tilemap.LoadContent(content);
+            _tilemap = content.Load<BasicTilemap>("battle");
         }
 
         /// <summary>
