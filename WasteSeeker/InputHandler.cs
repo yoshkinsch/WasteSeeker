@@ -36,6 +36,8 @@ namespace WasteSeeker
 
         private float _maxJumpHoldTime = 1f;
 
+        private bool _startedPlaying = false;
+
         /// <summary>
         /// The current direction an object/sprite is facing
         /// </summary>
@@ -85,6 +87,16 @@ namespace WasteSeeker
         public bool Idle { get; private set; } = false;
 
         /// <summary>
+        /// Whether or not the player pressed the space bar to continue (through diaogue boxes)
+        /// </summary>
+        public bool ContinueDialogue { get; set; } = false;
+
+        /// <summary>
+        /// Is used by main game loop to set when the cutscene has ended
+        /// </summary>
+        public bool StopCutscene { get; set; } = false;
+
+        /// <summary>
         /// Input Handler initialization
         /// </summary>
         public InputHandler()
@@ -106,7 +118,7 @@ namespace WasteSeeker
             _buttonsDict[gameState] = buttons;
             if (gameState == GameState.MainMenu) { _buttonsDict[GameState.MainMenu][0].ButtonSelect = true; }
             else if (gameState == GameState.Options) { _buttonsDict[GameState.Options][0].ButtonSelect = true; }
-            else if (gameState == GameState.Cutscene) { _buttonsDict[GameState.Cutscene][0].ButtonSelect = true; }
+            //else if (gameState == GameState.Cutscene) { _buttonsDict[GameState.Cutscene][0].ButtonSelect = true; }
         }
 
         private GameState? HandleButtonClick(Button button, GameState currentGameState)
@@ -116,7 +128,15 @@ namespace WasteSeeker
             {
                 if (button.GameStateLocation == GameState.MainMenu && button == _buttonsDict[currentGameState][0]) // Play Button
                 {
-                    return GameState.Playing;
+                    if (!_startedPlaying)
+                    {
+                        _startedPlaying = true;
+                        return GameState.Cutscene;
+                    }
+                    else
+                    {
+                        return GameState.Playing;
+                    }
                 }
                 else if (button.GameStateLocation == GameState.MainMenu && button == _buttonsDict[currentGameState][1]) // Options Button
                 {
@@ -198,19 +218,6 @@ namespace WasteSeeker
             } while (!buttons[nextIndex].ButtonActivated);
 
             buttons[nextIndex].ButtonSelect = true;
-
-            /*
-            if (_selectedButtonIndex > 0)
-            {
-                buttons[_selectedButtonIndex].ButtonSelect = false; // Deselecting button
-                buttons[_selectedButtonIndex - 1].ButtonSelect = true; // Selecting new button
-            }
-            else
-            {
-                buttons[_selectedButtonIndex].ButtonSelect = false; // Deselecting button
-                buttons[buttons.Count - 1].ButtonSelect = true; // Loop back to bottom side of list of buttons
-            }
-            */
         }
 
         /// <summary>
@@ -248,18 +255,6 @@ namespace WasteSeeker
             } while (!buttons[nextIndex].ButtonActivated);
 
             buttons[nextIndex].ButtonSelect = true;
-            /*
-            if (_selectedButtonIndex < buttons.Count - 1)
-            {
-                buttons[_selectedButtonIndex].ButtonSelect = false; // Deselecting button
-                buttons[_selectedButtonIndex + 1].ButtonSelect = true; // Selecting new button
-            }
-            else
-            {
-                buttons[_selectedButtonIndex].ButtonSelect = false; // Deselecting button
-                buttons[0].ButtonSelect = true; // Loop back to top of list of buttons
-            }
-            */
         }
 
         /// <summary>
@@ -471,11 +466,23 @@ namespace WasteSeeker
                    break;
                 case GameState.Controls:
 
-                    if (Keyboard.GetState().IsKeyDown(Keys.Back)) { gameState = GameState.MainMenu; }
+                    if (_currentKeyboardState.IsKeyDown(Keys.Back)) { gameState = GameState.MainMenu; }
 
                     break;
                 case GameState.Cutscene:
 
+                    if (Keyboard.GetState().IsKeyDown(Keys.Escape)) { _previousGameState = GameState.Cutscene; gameState = GameState.Options; }
+
+                    if (StopCutscene)
+                    {
+                        gameState = GameState.Playing;
+                        StopCutscene = false;
+                    }
+
+                    if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
+                    {
+                        ContinueDialogue = true;
+                    }
 
                     break;
             }

@@ -17,5 +17,10 @@ namespace WasteSeeker.Data
         public float npc1X { get; set; }
         public float npc1Y { get; set; }
         public int npc1Health { get; set; }
+
+        // cutscene
+        public int groupIndex { get; set; }
+        public int groupMessageIndex { get; set; }
+        public bool cutsceneOver {  get; set; }
     }
 }

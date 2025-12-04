@@ -77,10 +77,8 @@ namespace WasteSeeker
         private Texture2D _worldFirstMidGroundTexture;
         private Texture2D _worldSecondMidGroundTexture;
         private Texture2D _worldForeGroundTexture;
-        //private Model _model;
         private _3DBullet _bulletModel;
         private CirclingCamera _camera;
-        //private Texture2D _rewardThumbsUp; // Will most likely definitely remove
 
         private Rectangle _worldGround;
 
@@ -123,17 +121,15 @@ namespace WasteSeeker
 
         #region songs
         private Song _gameOverMusic;
-        
+
         #endregion
         #endregion
 
         #region Cutscene
         // This region tailors to cutscenes in the game
-        private VideoPlayer _videoPlayer = new VideoPlayer();
-        private Texture2D _videoFrame;
-        private Video _videoOne;
-        private bool _videoOnePlayed;
-        
+        private Cutscene _cutsceneOne;
+
+        private Song _cutsceneOneMusic;
         #endregion
 
         // Want to add a global scalar value used in the game code - Dependent on the graphics screen size of the player (will be later implemented)
@@ -207,7 +203,11 @@ namespace WasteSeeker
             // In case there is anything needed to be added here.
             #endregion
 
+            #region Cutscene
 
+            _cutsceneOne = new Cutscene("S1.txt");
+
+            #endregion
 
             base.Initialize();
         }
@@ -223,7 +223,6 @@ namespace WasteSeeker
             _sedgwickAveDisplay = Content.Load<SpriteFont>("sedgwickAveDisplay");
             _schoolBell = Content.Load<SpriteFont>("schoolBell-");
 
-            //_model = Content.Load<Model>("3DBullet");
             _camera = new CirclingCamera(this);
             // Main Menu Texture2D Assets
             #region Main Menu
@@ -252,7 +251,6 @@ namespace WasteSeeker
             _tumbleweed.LoadContent(Content);
             _kuzuDeadTexture = Content.Load<Texture2D>("KuzuDead_Chibi");
             _rewardOne.LoadContent(Content, "ThumbsUP");
-            //_rewardThumbsUp = Content.Load<Texture2D>("ThumbsUP");
             #endregion
 
             #region Music
@@ -260,6 +258,7 @@ namespace WasteSeeker
             _backgroundPlayingMusic = Content.Load<Song>("TutorialMusic");
             _battleMusic = Content.Load<Song>("BattleMusic");
             _gameOverMusic = Content.Load<Song>("gameover");
+            _cutsceneOneMusic = Content.Load<Song>("Cutscene01Music");
 
             // Loading all songs into a dictionary to determine what to play
             // Will change "playing" music later in terms of the screen (or level) being played
@@ -270,12 +269,13 @@ namespace WasteSeeker
                 {GameState.Playing, _backgroundPlayingMusic},
                 {GameState.BattleSequence, _battleMusic},
                 {GameState.Controls, _backgroundMenuMusic},
-                {GameState.GameOver,  _gameOverMusic}
+                {GameState.GameOver,  _gameOverMusic},
+                {GameState.Cutscene, _cutsceneOneMusic}
             };
             #endregion
 
-            #region Videos
-            //_videoOne = Content.Load<Video>("WasteSeeker_OP");
+            #region Cutscene
+            _cutsceneOne.LoadContent(Content);
             #endregion
 
             #region Buttons
@@ -392,7 +392,7 @@ namespace WasteSeeker
                     break;
                 case GameState.Options:
 
-                    if (_previousGameState == GameState.Playing || _previousGameState == GameState.BattleSequence)
+                    if (_previousGameState == GameState.Playing || _previousGameState == GameState.BattleSequence || _previousGameState == GameState.Cutscene)
                     {
 
                         _optionsMenu.LoadButton.ButtonActivated = false;
@@ -505,12 +505,25 @@ namespace WasteSeeker
                     }
                     break;
                 case GameState.Cutscene:
-                    
-                    if (!_videoOnePlayed)
+
+                    if (_cutsceneOne.Finished)
                     {
-                        // Update the frames and get texture from video
-                        // Once video is ended, then we can go ahead and set _videoOnePlayed to true
+                        _inputHandler.StopCutscene = true;
                     }
+                    else
+                    {
+                        if (_inputHandler.ContinueDialogue)
+                        {
+                            if (_cutsceneOne.UpdateDialogue())
+                            {
+                                _inputHandler.StopCutscene = true;
+                                _cutsceneOne.Finished = true;
+                            }
+                            _inputHandler.ContinueDialogue = false;
+                        }
+                        _cutsceneOne.Update(gameTime);
+                    }
+                    
                     break;
             }
 
@@ -813,24 +826,12 @@ namespace WasteSeeker
                     _spriteBatch.End();
                     
                     break;
-                /*
+                
                 case GameState.Cutscene:
                     GraphicsDevice.Clear(Color.NavajoWhite);
-
-                    // Should probably get the _videoFrame in Update method
-                    if (_videoPlayer.State != MediaState.Stopped)
-                    {
-                        _videoFrame = _videoPlayer.GetTexture();
-                        if (_videoFrame != null)
-                        {
-                            _spriteBatch.Begin();
-                            _spriteBatch.Draw(_videoFrame, GraphicsDevice.Viewport.Bounds, Color.White);
-                            _spriteBatch.End();
-                        }
-                    }
-                    
+                    _cutsceneOne.Draw(_spriteBatch);
                     break;
-                */
+                
             } // END GameState
             
             base.Draw(gameTime);
@@ -882,7 +883,10 @@ namespace WasteSeeker
                 playerHealth = _player.Health,
                 npc1X = _soraNPC.Position.X,
                 npc1Y = _soraNPC.Position.Y,
-                npc1Health = _soraNPC.Health
+                npc1Health = _soraNPC.Health,
+                groupIndex = _cutsceneOne.GetDialogueGroupIndex(),
+                groupMessageIndex = _cutsceneOne.GetDialogueIndex(),
+                cutsceneOver = _cutsceneOne.Finished
             };
 
             string json = JsonSerializer.Serialize(gameData, new JsonSerializerOptions { WriteIndented = true });
@@ -908,6 +912,9 @@ namespace WasteSeeker
             //Npc1
             _soraNPC.Position = new Vector2(gameData.npc1X, gameData.npc1Y);
             _soraNPC.Health = gameData.npc1Health;
+
+            _cutsceneOne.UpdateDialogueIndex(gameData.groupIndex, gameData.groupMessageIndex);
+            _cutsceneOne.Finished = gameData.cutsceneOver;
             return true;
         }
     }

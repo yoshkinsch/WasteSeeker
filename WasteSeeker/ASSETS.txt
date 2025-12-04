@@ -39,6 +39,16 @@ Content/3DBullet.fbx - created by Carson Kinsch (me), released under the Creativ
 
 Content/BaseColor.png - created by Carson Kinsch (me), released under the Creative Commons License
 
+Content/WasteSeekerOS1.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/DialogueBox_Background.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/EarthS1.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/EarthScarceS1.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/MineralOS1.png - created by Carson Kinsch (me), released under the Creative Commons License
+
 [[Content used from the internet - modified by Carson Kinsch]]
 Content/Kuzu_Idle_Walk.png - created by Craftpix.net (https://craftpix.net). Free assets are provided under the Craftpix Free License (https://craftpix.net/file-licenses/).
 ^ [Modified by Carson Kinsch] ^
@@ -67,4 +77,6 @@ Content/BattleMusic.mp3 - created by Junipersona from Pixabay (https://pixabay.c
 
 Content/gunshot_sfx.wav - created by Universfield on pixabay (https://pixabay.com/sound-effects/gunshot-352466/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0.
 
-Content/gameover.mp3 - created by by Kuzu420 from Pixabay (https://pixabay.com/users/kuzu420-42489797/). Free assets are provided under the pixabay Free License (https://pixabay.com/service/license-summary/) and released under CC0.
+Content/gameover.mp3 - created by Kuzu420 from Pixabay (https://pixabay.com/users/kuzu420-42489797/). Free assets are provided under the pixabay Free License (https://pixabay.com/service/license-summary/) and released under CC0.
+
+Content/Cutscene01Music.mp3 - created by Hannah Pugel from Pixabay (https://pixabay.com/users/foggysunrise-45463935/). Free assets are provided under the pixabay Free License (https://pixabay.com/service/license-summary/) and released under CC0.
