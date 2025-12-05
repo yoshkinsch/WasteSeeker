@@ -25,6 +25,8 @@ namespace WasteSeeker.Classes_Assets
 
         private AnimatedSprite _animatedSprite;
 
+        private string _npcDialogue;
+
         /// <summary>
         /// The bounding volume of the sprite
         /// </summary>
@@ -216,6 +218,15 @@ namespace WasteSeeker.Classes_Assets
                 return -1;
             }
             return 0;
+        }
+
+        /// <summary>
+        /// Is used by a Dialogue object to create the NPC's dialogue 
+        /// </summary>
+        /// <returns></returns>
+        public string RetrieveDialogue()
+        {
+            return _npcDialogue;
         }
     }
 }

@@ -147,6 +147,12 @@
 /processorParam:TextureFormat=Color
 /build:DialogueBox_Background.png
 
+#begin dialogueSFX.wav
+/importer:WavImporter
+/processor:SoundEffectProcessor
+/processorParam:Quality=Best
+/build:dialogueSFX.wav
+
 #begin EarthS1.png
 /importer:TextureImporter
 /processor:TextureProcessor

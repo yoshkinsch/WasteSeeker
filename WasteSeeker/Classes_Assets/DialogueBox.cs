@@ -141,10 +141,65 @@ namespace WasteSeeker.Classes_Assets
             return _dialogueGroup;
         }
 
+        /// <summary>
+        /// Draw method for a normal dialogue box
+        /// - Will mainly cover voice-overs or narration (not dialogue between characters)
+        /// </summary>
+        /// <param name="spriteBatch">Sprite Batch</param>
         public void Draw(SpriteBatch spriteBatch)
         {
             //Background Texture
             spriteBatch.Draw(_backgroundTexture, _position, _source, Color.White);
+            _textDisplayed = _textDisplayed.Replace('@', '\n');
+
+            // Text to display
+            spriteBatch.DrawString(
+                        _schoolBell,
+                        _textDisplayed,
+                        _typingTextPosition,
+                        Color.White,
+                        0,
+                        Vector2.Zero,
+                        (float)1,
+                        SpriteEffects.None,
+                        1
+                    );
+
+            // Continue button at bottom
+            if (_currentStringIndex >= _dialogue[_dialogueGroup][_dialogueIndex].Length)
+            {
+
+                spriteBatch.DrawString(
+                        _schoolBell,
+                        "Press 'Space' to Continue...",
+                        _continueTextPosition,
+                        Color.White,
+                        0,
+                        Vector2.Zero,
+                        (float)0.75,
+                        SpriteEffects.None,
+                        1
+                    );
+            }
+        }
+
+        public void Draw(SpriteBatch spriteBatch, string characterName)
+        {
+            //Background Texture
+            spriteBatch.Draw(_backgroundTexture, _position, _source, Color.White);
+
+            spriteBatch.DrawString(
+                        _schoolBell,
+                        characterName,
+                        _typingTextPosition,
+                        Color.White,
+                        0,
+                        Vector2.Zero,
+                        (float)1,
+                        SpriteEffects.None,
+                        1
+                    );
+
             _textDisplayed = _textDisplayed.Replace('@', '\n');
 
             // Text to display

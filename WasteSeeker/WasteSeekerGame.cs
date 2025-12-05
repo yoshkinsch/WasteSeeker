@@ -103,6 +103,10 @@ namespace WasteSeeker
         private Song _battleMusic;
         #endregion
 
+        #region Dialogue
+        private Dialogue[] _dialogue; // Dialogue array to hold dialogues in the game
+        #endregion
+
         #endregion
 
         #region BattleSequence Objects
@@ -196,7 +200,17 @@ namespace WasteSeeker
             _soraNPC = new NPC("Sora", "TODO", 100, new Vector2(((GraphicsDevice.Viewport.Width/2) + 250), 470), false);
             #endregion
 
-            _battleSequence = new BattleSequence();
+            #region Dialogue
+
+            // Here we will load ALL the dialogues into the game in array format
+            // Depending on which character at what point 
+            _dialogue = new Dialogue[1]
+            {
+                _dialogue[0] = new Dialogue("filename.txt")
+            };
+            #endregion
+
+            _battleSequence = new BattleSequence(); // May change into an inverntory/crafting system?
             #endregion
 
             #region GameOver
@@ -319,6 +333,28 @@ namespace WasteSeeker
             _inputHandler.Update(gameTime, ref _gameState);
             _camera.Update(gameTime);
 
+            #region DetermineDialogue
+
+            if (_inputHandler.DialoguePlaying)
+            {
+                if (_gameState == GameState.Playing)
+                {
+                    switch (_levelState)
+                    {
+                        case LevelState.LevelOne:
+                            // Now we check ALL bounds of player and interactable character in the level
+                            if (!_player.Bounds.CollidesWith(_soraNPC.Bounds))
+                            {
+                                _inputHandler.StopDialogue = true;
+                                _inputHandler.DialoguePlaying = false;
+                            }
+                            break;
+                    }
+                }
+            }
+
+            #endregion
+            #region Saving_Loading
             if (_inputHandler.Exit == true) { Exit(); }
 
             if (_inputHandler.Save == true)
@@ -337,17 +373,9 @@ namespace WasteSeeker
                 
                 _inputHandler.Load = false;
             }
+            #endregion
 
-            
-
-            // Checking if the options menu has popped open
-            // opened => play noise in higher pitch
-            // closed => play noise in lower pitch
-            if (_previousGameState != GameState.Options && _gameState == GameState.Options || _previousGameState == GameState.MainMenu && _gameState == GameState.Playing)
-            {
-                _optionsMenu.PlayNoise(true);
-            }
-            
+            #region Button Selection
             // Selecting and De-Selecting Buttons
             if (_previousGameState == GameState.Options && _gameState != GameState.Options)
             {
@@ -355,6 +383,16 @@ namespace WasteSeeker
                 _optionsMenu.SaveButton.ButtonSelect = false;
                 _optionsMenu.GameWasPaused = false;
                 _optionsMenu.PlayNoise(false);
+            }
+            #endregion
+
+            #region Music_Sounds
+            // Checking if the options menu has popped open
+            // opened => play noise in higher pitch
+            // closed => play noise in lower pitch
+            if (_previousGameState != GameState.Options && _gameState == GameState.Options || _previousGameState == GameState.MainMenu && _gameState == GameState.Playing)
+            {
+                _optionsMenu.PlayNoise(true);
             }
 
             // Checking if previous game state was Playing and current is not
@@ -372,13 +410,16 @@ namespace WasteSeeker
                 MediaPlayer.Play(songToPlay);
                 MediaPlayer.IsRepeating = true;
             }
+            #endregion
 
+            #region Particles
             // Sand Particle System - "turn off switch"
             if (_sandParticleSystem != null && _gameState != GameState.Playing)
             {
                 //_sandParticleSystem.Enabled = false;
                 _sandParticleSystem.Visible = false;
             }
+            #endregion
 
             switch (_gameState)
             {
@@ -416,12 +457,6 @@ namespace WasteSeeker
                     {
                         case LevelState.LevelOne:
 
-                            if (_sandParticleSystem.Enabled == false || _sandParticleSystem.Visible == false)
-                            {
-                                _sandParticleSystem.Enabled = true;
-                                _sandParticleSystem.Visible = true;
-                            }
-
                             _player.Update(gameTime);
                             _soraNPC.TargetPlayer(_player.Position);
                             _soraNPC.Update(gameTime, _player.Position);
@@ -431,7 +466,30 @@ namespace WasteSeeker
                                 _soraNPC.IsFollowingPlayer = true;
                             }
 
-                            // TumbleWeed
+                            #region DialoguePlaying
+                            if (_inputHandler.DialoguePlaying)
+                            {
+                                if (_player.Bounds.CollidesWith(_soraNPC.Bounds))
+                                {
+                                    // Update dialogue[0]
+                                    break; // Break to avoid any further updates
+                                }
+                                else
+                                {
+                                    _inputHandler.StopDialogue = true;
+                                    _inputHandler.DialoguePlaying = false;
+                                }
+                                
+                            }
+                            #endregion
+
+                            if (_sandParticleSystem.Enabled == false || _sandParticleSystem.Visible == false)
+                            {
+                                _sandParticleSystem.Enabled = true;
+                                _sandParticleSystem.Visible = true;
+                            }
+
+                            #region Tumbleweed
                             if (_tumbleweed.IsEnabled)
                             {
                                 _tumbleweed.Update(gameTime);
@@ -474,6 +532,7 @@ namespace WasteSeeker
                             {
                                 _tumbleweed.IsEnabled = true;
                             }
+                            #endregion
 
                             if (_rewardOne.Bounds.CollidesWith(_player.Bounds))
                             {
@@ -598,9 +657,15 @@ namespace WasteSeeker
                     switch (_levelState)
                     {
                         case LevelState.LevelOne:
-
+                            
                             GraphicsDevice.Clear(Color.NavajoWhite);
                             // Calculate our offset vector 
+
+                            if (_inputHandler.DialoguePlaying && _player.Bounds.CollidesWith(_soraNPC.Bounds))
+                            {
+                                // Draw dialogue[0]
+                                // Do NOT break here, because everything needs to be drawn still
+                            }
 
                             float cameraCenterX = GraphicsDevice.Viewport.Width / 2 - 100;
                             float playerX = MathHelper.Clamp(_player.Position.X, cameraCenterX, 14000 - cameraCenterX);

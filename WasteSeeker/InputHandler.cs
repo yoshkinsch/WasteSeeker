@@ -97,6 +97,16 @@ namespace WasteSeeker
         public bool StopCutscene { get; set; } = false;
 
         /// <summary>
+        /// Whether or not the dialogue is playing while in the "Playing" GameState
+        /// </summary>
+        public bool DialoguePlaying { get; set; } = false;
+
+        /// <summary>
+        /// Used when the dialogue has ended from the main game loop
+        /// </summary>
+        public bool StopDialogue { get; set; } = false;
+
+        /// <summary>
         /// Input Handler initialization
         /// </summary>
         public InputHandler()
@@ -377,75 +387,98 @@ namespace WasteSeeker
                     break;
                 case GameState.Playing:
 
-                    #region Direction Input
-
-                    Vector2 direction = Vector2.Zero; // Making a zero vector to help with direction input on keyboard
-
-                    if (_currentKeyboardState.IsKeyDown(Keys.Left) || _currentKeyboardState.IsKeyDown(Keys.A)) { direction.X -= 1; }
-                    if (_currentKeyboardState.IsKeyDown(Keys.Right) || _currentKeyboardState.IsKeyDown(Keys.D)) { direction.X += 1; }
-
-                    //Direction = currentGamePadState.ThumbSticks.Right * 100 * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                    _direction = direction;
-
-
-                    // Get Position from Keyboard - TODO: change "velocity" of sprites
-                    if (_currentKeyboardState.IsKeyDown(Keys.Left) || _currentKeyboardState.IsKeyDown(Keys.A))
+                    if (!DialoguePlaying) // Dialogue is NOT playing, so the main playing loop should continue
                     {
-                        if (_currentKeyboardState.IsKeyDown(Keys.LeftShift)) { Running =  true; }
-                        else { Running = false; }
+                        if (_currentKeyboardState.IsKeyDown(Keys.F) && !_previousKeyboardState.IsKeyDown(Keys.F))
+                        {
+                            DialoguePlaying = true;
+                            break;
+                        }
+
+                        #region Direction Input
+
+                        Vector2 direction = Vector2.Zero; // Making a zero vector to help with direction input on keyboard
+
+                        if (_currentKeyboardState.IsKeyDown(Keys.Left) || _currentKeyboardState.IsKeyDown(Keys.A)) { direction.X -= 1; }
+                        if (_currentKeyboardState.IsKeyDown(Keys.Right) || _currentKeyboardState.IsKeyDown(Keys.D)) { direction.X += 1; }
+
+                        //Direction = currentGamePadState.ThumbSticks.Right * 100 * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                        _direction = direction;
+
+
+                        // Get Position from Keyboard - TODO: change "velocity" of sprites
+                        if (_currentKeyboardState.IsKeyDown(Keys.Left) || _currentKeyboardState.IsKeyDown(Keys.A))
+                        {
+                            if (_currentKeyboardState.IsKeyDown(Keys.LeftShift)) { Running = true; }
+                            else { Running = false; }
                             _direction.X = -1;
+                        }
+                        if (_currentKeyboardState.IsKeyDown(Keys.Right) || _currentKeyboardState.IsKeyDown(Keys.D))
+                        {
+                            if (_currentKeyboardState.IsKeyDown(Keys.LeftShift)) { Running = true; }
+                            else { Running = false; }
+                            _direction.X = 1;
+
+                        }
+
+                        // Jumping
+                        if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
+                        {
+                            _jumpHoldTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
+                            JumpPressed = true;
+                        }
+                        else if (_currentKeyboardState.IsKeyUp(Keys.Space))
+                        {
+                            JumpPressed = false;
+                            _jumpHoldTimer = 0f;
+                        }
+
+                        #endregion
+
+                        #region RUNNING IDLE
+
+                        //if (_currentKeyboardState.IsKeyDown(Keys.LeftShift) && _currentKeyboardState.IsKeyDown(Keys.A)) { Running = true; }
+                        //else { Running = false; }
+
+                        if (_currentKeyboardState.GetPressedKeys().Length == 0 || (Direction.X == 0 && Direction.Y == 0)) { Idle = true; Running = false; }
+                        else { Idle = false; }
+
+                        #endregion
+
+                        // Temporary for testing and showing off tilemap
+                        #region TO BATTLESEQUENCE
+                        if (Keyboard.GetState().IsKeyDown(Keys.T)) { _previousGameState = GameState.Playing; gameState = GameState.BattleSequence; }
+                        #endregion
+
+                        #region TO MAIN MENU
+
+                        if (Keyboard.GetState().IsKeyDown(Keys.Back)) { gameState = GameState.MainMenu; }
+
+                        #endregion
+
+                        #region TO OPTIONS
+
+                        if (Keyboard.GetState().IsKeyDown(Keys.Escape)) { _previousGameState = GameState.Playing; gameState = GameState.Options; }
+                        #endregion
+
+                        _previousGameState = GameState.Playing;
                     }
-                    if (_currentKeyboardState.IsKeyDown(Keys.Right) || _currentKeyboardState.IsKeyDown(Keys.D))
+                    else // Dialogue is now playing, limit the player's controls to just continuing through the dialogue
                     {
-                        if (_currentKeyboardState.IsKeyDown(Keys.LeftShift)) { Running = true; }
-                        else { Running = false; }
-                        _direction.X = 1;
-                        
+                        if (Keyboard.GetState().IsKeyDown(Keys.Escape)) { DialoguePlaying = false; }
+
+                        if (StopDialogue)
+                        {
+                            StopDialogue = false;
+                            DialoguePlaying = false;
+                        }
+
+                        if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
+                        {
+                            ContinueDialogue = true;
+                        }
                     }
-
-                    // Jumping
-                    if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
-                    {
-                        _jumpHoldTimer += (float)gameTime.ElapsedGameTime.TotalSeconds;
-                        JumpPressed = true;
-                    }
-                    else if (_currentKeyboardState.IsKeyUp(Keys.Space))
-                    {
-                        JumpPressed = false;
-                        _jumpHoldTimer = 0f;
-                    }
-
-                    #endregion
-
-                    #region RUNNING IDLE
-
-                    //if (_currentKeyboardState.IsKeyDown(Keys.LeftShift) && _currentKeyboardState.IsKeyDown(Keys.A)) { Running = true; }
-                    //else { Running = false; }
-
-                    if (_currentKeyboardState.GetPressedKeys().Length == 0 || (Direction.X == 0 && Direction.Y == 0)) { Idle = true; Running = false; }
-                    else { Idle = false; }
-
-                    #endregion
-
-                    // Temporary for testing and showing off tilemap
-                    #region TO BATTLESEQUENCE
-                    if (Keyboard.GetState().IsKeyDown(Keys.T)) { _previousGameState = GameState.Playing; gameState = GameState.BattleSequence; }
-                    #endregion
-
-                    #region TO MAIN MENU
-
-                    if (Keyboard.GetState().IsKeyDown(Keys.Back)) { gameState = GameState.MainMenu; }
-
-                    #endregion
-
-                    #region TO OPTIONS
-
-                    if (Keyboard.GetState().IsKeyDown(Keys.Escape)) { _previousGameState = GameState.Playing; gameState = GameState.Options; }
-                    #endregion
-
-                    _previousGameState = GameState.Playing;
-
-                    break;
+                        break;
 
                 case GameState.BattleSequence:
                     // Handles input on the "BattleSequence" Screen

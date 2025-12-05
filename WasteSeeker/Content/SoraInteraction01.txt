@@ -1,0 +1,5 @@
+﻿Kuzu, Sora
+playerIllustration.png, npcIllustration.png
+1, 2, 1
+Kuzu! You're finally here.\ Hey Sora, it's been a while . . .\ How are you doing in these rough times?\ I'm doing alright, let's just head to the hideout first.
+1.0, 1.1
