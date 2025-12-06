@@ -170,7 +170,7 @@ namespace WasteSeeker
             _controlsButton = new Button(new Vector2(_optionsButton.Position.X, _optionsButton.Position.Y + 75), 160) { GameStateLocation = GameState.MainMenu };
             _exitButton = new Button(new Vector2(_controlsButton.Position.X, _controlsButton.Position.Y + 65), 145) { Scale = 0.65f, GameStateLocation = GameState.MainMenu };
 
-            _sandParticleSystem = new SandParticleSystem(this, new Rectangle(GraphicsDevice.Viewport.Width + 20, 0, 10, GraphicsDevice.Viewport.Height - 100));
+            _sandParticleSystem = new SandParticleSystem(this, new Rectangle(GraphicsDevice.Viewport.Width + 20, 0, 10, GraphicsDevice.Viewport.Height - 200));
             Components.Add(_sandParticleSystem);
             _sandParticleSystem.Enabled = true;
             
@@ -206,8 +206,10 @@ namespace WasteSeeker
             // Depending on which character at what point 
             _dialogue = new Dialogue[1]
             {
-                _dialogue[0] = new Dialogue("filename.txt")
+                new Dialogue("SoraInteraction01.txt")
             };
+
+            _inputHandler.DialogueCompleted = new bool[_dialogue.Length];
             #endregion
 
             _battleSequence = new BattleSequence(); // May change into an inverntory/crafting system?
@@ -313,6 +315,13 @@ namespace WasteSeeker
 
             _inputHandler.LoadButtons(GameState.MainMenu, mainMenuButtons);
             _inputHandler.LoadButtons(GameState.Options, optionsMenuButtons);
+            #endregion
+
+            #region Dialogue
+            for (int i = 0; i < _dialogue.Length; i++)
+            {
+                _dialogue[0].LoadContent(Content);
+            }
             #endregion
 
             _battleSequence.LoadContent(Content);
@@ -456,6 +465,33 @@ namespace WasteSeeker
                     switch (_levelState)
                     {
                         case LevelState.LevelOne:
+                            #region DialoguePlaying
+                            if (_inputHandler.DialoguePlaying)
+                            {
+                                if (_player.Bounds.CollidesWith(_soraNPC.Bounds))
+                                {
+                                    if (_dialogue[0].Finished)
+                                    {
+                                        _inputHandler.StopDialogue = true;
+                                    }
+                                    else
+                                    {
+                                        if (_inputHandler.ContinueDialogue)
+                                        {
+                                            if (_dialogue[0].UpdateDialogue())
+                                            {
+                                                _inputHandler.StopDialogue = true;
+                                                _inputHandler.DialogueCompleted[0] = true;
+                                                _dialogue[0].Finished = true;
+                                            }
+                                            _inputHandler.ContinueDialogue = false;
+                                        }
+                                        _dialogue[0].Update(gameTime);
+                                    }
+                                    break; // Break to avoid any further updates
+                                }
+                            }
+                            #endregion
 
                             _player.Update(gameTime);
                             _soraNPC.TargetPlayer(_player.Position);
@@ -465,23 +501,6 @@ namespace WasteSeeker
                             {
                                 _soraNPC.IsFollowingPlayer = true;
                             }
-
-                            #region DialoguePlaying
-                            if (_inputHandler.DialoguePlaying)
-                            {
-                                if (_player.Bounds.CollidesWith(_soraNPC.Bounds))
-                                {
-                                    // Update dialogue[0]
-                                    break; // Break to avoid any further updates
-                                }
-                                else
-                                {
-                                    _inputHandler.StopDialogue = true;
-                                    _inputHandler.DialoguePlaying = false;
-                                }
-                                
-                            }
-                            #endregion
 
                             if (_sandParticleSystem.Enabled == false || _sandParticleSystem.Visible == false)
                             {
@@ -661,12 +680,6 @@ namespace WasteSeeker
                             GraphicsDevice.Clear(Color.NavajoWhite);
                             // Calculate our offset vector 
 
-                            if (_inputHandler.DialoguePlaying && _player.Bounds.CollidesWith(_soraNPC.Bounds))
-                            {
-                                // Draw dialogue[0]
-                                // Do NOT break here, because everything needs to be drawn still
-                            }
-
                             float cameraCenterX = GraphicsDevice.Viewport.Width / 2 - 100;
                             float playerX = MathHelper.Clamp(_player.Position.X, cameraCenterX, 14000 - cameraCenterX);
                             float offsetX = cameraCenterX - playerX;
@@ -695,6 +708,7 @@ namespace WasteSeeker
                             _spriteBatch.End();
 
                             _spriteBatch.Begin();
+                            _sandParticleSystem.Draw(gameTime);
                             _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Backspace' on the keyboard, to return to the Menu.", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 700), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Backspace' on the keyboard, to return to the Menu.") / 2, 0.35f, SpriteEffects.None, 1);
 
                             // Tutorial
@@ -716,11 +730,11 @@ namespace WasteSeeker
                             {
                                 _spriteBatch.DrawString(
                                     _sedgwickAveDisplay, 
-                                    "Certain NPCs may follow you\n after crossing paths with them!", 
+                                    "Talk to an NPC by pressing 'F' while on top of them!", 
                                     new Vector2(GraphicsDevice.Viewport.Width / 2, 300), 
                                     Color.Black, 
                                     0, 
-                                    _sedgwickAveDisplay.MeasureString("Certain NPCs may follow you\n after crossing paths with them!") / 2, 
+                                    _sedgwickAveDisplay.MeasureString("Talk to an NPC by pressing 'F' while on top of them!") / 2, 
                                     (float)0.5, 
                                     SpriteEffects.None, 
                                     1
@@ -793,6 +807,16 @@ namespace WasteSeeker
                             }
 
                             _spriteBatch.End();
+
+                            _spriteBatch.Begin();
+                            if (_inputHandler.DialoguePlaying && _player.Bounds.CollidesWith(_soraNPC.Bounds))
+                            {
+                                // Draw dialogue[0]
+                                _dialogue[0].Draw(_spriteBatch);
+                                // Do NOT break here, because everything needs to be drawn still
+                            }
+                            _spriteBatch.End();
+
                             break;
                     } // END LevelState
                     break;

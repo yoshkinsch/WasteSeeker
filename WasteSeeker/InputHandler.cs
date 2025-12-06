@@ -38,12 +38,25 @@ namespace WasteSeeker
 
         private bool _startedPlaying = false;
 
+        private bool[] _dialogueCompleted;
+
+        private int _dialogueCompletedIterator = 0;
+
         /// <summary>
         /// The current direction an object/sprite is facing
         /// </summary>
         public Vector2 Direction
         {
             get { return _direction; }
+        }
+
+        /// <summary>
+        /// Sets the _dialogueCompleted field
+        /// </summary>
+        public bool[] DialogueCompleted
+        {
+            get { return _dialogueCompleted; }
+            set { _dialogueCompleted = value; }
         }
 
         /// <summary>
@@ -389,7 +402,7 @@ namespace WasteSeeker
 
                     if (!DialoguePlaying) // Dialogue is NOT playing, so the main playing loop should continue
                     {
-                        if (_currentKeyboardState.IsKeyDown(Keys.F) && !_previousKeyboardState.IsKeyDown(Keys.F))
+                        if (_currentKeyboardState.IsKeyDown(Keys.F) && !_previousKeyboardState.IsKeyDown(Keys.F) && _dialogueCompletedIterator < _dialogueCompleted.Length)
                         {
                             DialoguePlaying = true;
                             break;
@@ -465,17 +478,25 @@ namespace WasteSeeker
                     }
                     else // Dialogue is now playing, limit the player's controls to just continuing through the dialogue
                     {
-                        if (Keyboard.GetState().IsKeyDown(Keys.Escape)) { DialoguePlaying = false; }
-
-                        if (StopDialogue)
+                        if (!_dialogueCompleted[_dialogueCompletedIterator])
                         {
-                            StopDialogue = false;
-                            DialoguePlaying = false;
+                            if (Keyboard.GetState().IsKeyDown(Keys.Escape)) { DialoguePlaying = false; }
+
+                            if (StopDialogue)
+                            {
+                                StopDialogue = false;
+                                DialoguePlaying = false;
+                            }
+
+                            if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
+                            {
+                                ContinueDialogue = true;
+                            }
                         }
-
-                        if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
+                        else
                         {
-                            ContinueDialogue = true;
+                            DialoguePlaying = false;
+                            _dialogueCompletedIterator++;
                         }
                     }
                         break;

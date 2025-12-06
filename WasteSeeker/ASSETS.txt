@@ -49,6 +49,12 @@ Content/EarthScarceS1.png - created by Carson Kinsch (me), released under the Cr
 
 Content/MineralOS1.png - created by Carson Kinsch (me), released under the Creative Commons License
 
+Content/KuzuInteraction.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/SoraInteraction.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+
+
 [[Content used from the internet - modified by Carson Kinsch]]
 Content/Kuzu_Idle_Walk.png - created by Craftpix.net (https://craftpix.net). Free assets are provided under the Craftpix Free License (https://craftpix.net/file-licenses/).
 ^ [Modified by Carson Kinsch] ^
@@ -60,6 +66,8 @@ Content/sand-walk.mp3 - created by freesound_community on pixabay (https://pixab
 ^ [Modified by Carson Kinsch] ^
 
 Conte/dialogueSFX.mp3 - created by CreatorsHome from Pixabay (https://pixabay.com/users/creatorshome-49707711/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0. 
+
+
 
 [[Content used from the internet - not modified]]
 Content/Bullet.png - created by Pictogrammers Team on iconarchive.com (https://www.iconarchive.com/show/material-icons-by-pictogrammers/bullet-icon.html). Is released under the Apache 2.0 License and the Pictogrammers Free License

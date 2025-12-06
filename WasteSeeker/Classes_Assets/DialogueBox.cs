@@ -38,7 +38,7 @@ namespace WasteSeeker.Classes_Assets
 
         private float _timer = 0f;
 
-        private float _timerStep = 0.065f;
+        private float _timerStep = 0.025f;
 
         private Rectangle _source = new Rectangle(0, 0, 1180, 200);
 
@@ -142,6 +142,29 @@ namespace WasteSeeker.Classes_Assets
         }
 
         /// <summary>
+        /// Method to return whether or not the dialogue box is still writing
+        /// </summary>
+        /// <returns>True if dialogue is still being written, false otherwise</returns>
+        public bool RequestIfWriting()
+        {
+            if (_currentStringIndex < _dialogue[_dialogueGroup][_dialogueIndex].Length)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public bool RequestIfFinished()
+        {
+            int nextGroup = _dialogueGroup + 1;
+            if (_currentStringIndex >= _dialogue[_dialogueGroup][_dialogueIndex].Length && nextGroup >= _dialogue.Length)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        /// <summary>
         /// Draw method for a normal dialogue box
         /// - Will mainly cover voice-overs or narration (not dialogue between characters)
         /// </summary>
@@ -183,15 +206,32 @@ namespace WasteSeeker.Classes_Assets
             }
         }
 
-        public void Draw(SpriteBatch spriteBatch, string characterName)
+        public void Draw(SpriteBatch spriteBatch, string characterName, Color characterNameColor)
         {
-            //Background Texture
-            spriteBatch.Draw(_backgroundTexture, _position, _source, Color.White);
+            //Background Texture (altered)
+            Rectangle alteredSource = new Rectangle(0, 0, 980, 200);
+            Vector2 alteredPosition = _position + new Vector2(200, 0);
+            spriteBatch.Draw(_backgroundTexture, alteredPosition, alteredSource, Color.White);
 
+            Vector2 namePosition = _typingTextPosition + new Vector2(200, 0);
             spriteBatch.DrawString(
                         _schoolBell,
                         characterName,
-                        _typingTextPosition,
+                        namePosition,
+                        characterNameColor,
+                        0,
+                        Vector2.Zero,
+                        (float)1,
+                        SpriteEffects.None,
+                        1
+                    );
+            
+            Vector2 colonPosition = namePosition;
+            colonPosition.X += _schoolBell.MeasureString(characterName).X;
+            spriteBatch.DrawString(
+                        _schoolBell,
+                        ":",
+                        colonPosition,
                         Color.White,
                         0,
                         Vector2.Zero,
@@ -202,11 +242,12 @@ namespace WasteSeeker.Classes_Assets
 
             _textDisplayed = _textDisplayed.Replace('@', '\n');
 
+            Vector2 textPosition = namePosition + new Vector2(120, 0);
             // Text to display
             spriteBatch.DrawString(
                         _schoolBell,
                         _textDisplayed,
-                        _typingTextPosition,
+                        textPosition,
                         Color.White,
                         0,
                         Vector2.Zero,
