@@ -100,6 +100,11 @@ namespace WasteSeeker
         public bool Idle { get; private set; } = false;
 
         /// <summary>
+        /// Whether or not the player is inputting an attack command
+        /// </summary>
+        public bool Attacking { get; set; } = false;
+
+        /// <summary>
         /// Whether or not the player pressed the space bar to continue (through diaogue boxes)
         /// </summary>
         public bool ContinueDialogue { get; set; } = false;
@@ -434,6 +439,14 @@ namespace WasteSeeker
 
                         }
 
+                        // Attacking
+                        if (_currentKeyboardState.IsKeyDown(Keys.J) && !_previousKeyboardState.IsKeyDown(Keys.J))
+                        {
+                            Attacking = true;
+                            Running = false;
+                            Idle = false;
+                        }
+
                         // Jumping
                         if (_currentKeyboardState.IsKeyDown(Keys.Space) && !_previousKeyboardState.IsKeyDown(Keys.Space))
                         {
@@ -449,9 +462,6 @@ namespace WasteSeeker
                         #endregion
 
                         #region RUNNING IDLE
-
-                        //if (_currentKeyboardState.IsKeyDown(Keys.LeftShift) && _currentKeyboardState.IsKeyDown(Keys.A)) { Running = true; }
-                        //else { Running = false; }
 
                         if (_currentKeyboardState.GetPressedKeys().Length == 0 || (Direction.X == 0 && Direction.Y == 0)) { Idle = true; Running = false; }
                         else { Idle = false; }

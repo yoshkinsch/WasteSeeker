@@ -20,6 +20,8 @@ namespace WasteSeeker.Animation_Classes
 
         private int _walkMaxFrames;
 
+        private int _attackMaxFrames;
+
         private int _spriteWidth;
 
         private int _spriteHeight;
@@ -29,6 +31,8 @@ namespace WasteSeeker.Animation_Classes
         private float _walkFrameStep;
 
         //private float _runFrameStep;
+
+        private float _attackFrameStep;
 
         private float _scaleFactor;
 
@@ -67,8 +71,8 @@ namespace WasteSeeker.Animation_Classes
         }
 
         public AnimatedSprite(
-            Texture2D spriteSheet, 
-            Vector2 Position, 
+            Texture2D spriteSheet,
+            Vector2 Position,
             int individualSpriteWidth,
             int individualSpriteHeight,
             SpriteEffects directionFacing,
@@ -77,7 +81,9 @@ namespace WasteSeeker.Animation_Classes
             float walkFrameStep,
             float runFrameStep,
             int idleMaxFrames,
-            int walkMaxFrames
+            int walkMaxFrames,
+            float attackFrameStep,
+            int attackMaxFrames
             )
         {
             _spriteSheet = spriteSheet;
@@ -90,6 +96,8 @@ namespace WasteSeeker.Animation_Classes
             _walkFrameStep = walkFrameStep;
             _idleMaxFrames = idleMaxFrames;
             _walkMaxFrames = walkMaxFrames;
+            _attackFrameStep = attackFrameStep;
+            _attackMaxFrames = attackMaxFrames;
         }
 
         /// <summary>
@@ -110,6 +118,11 @@ namespace WasteSeeker.Animation_Classes
             _position = position;
         }
 
+        public short GetCurrentFrame()
+        {
+            return _animationFrame;
+        }
+
         /// <summary>
         /// Draws the character's sprite on screen
         /// </summary>
@@ -123,6 +136,27 @@ namespace WasteSeeker.Animation_Classes
             switch (_spriteState)
             {
                 case CharacterState.Attacking:
+                    int tempOrigin = 40;
+
+                    if (_animationTimer > _attackFrameStep) // usually 0.10
+                    {
+                        _animationFrame++;
+                        if (_animationFrame > _attackMaxFrames) { _animationFrame = 1; } // if _animationFrame > 6
+                        _animationTimer -= _attackFrameStep;
+                        
+                    }
+
+                    if (_directionFacing == SpriteEffects.None)
+                    {
+                        tempOrigin -= 16;
+                    }
+                    else if (_directionFacing == SpriteEffects.FlipHorizontally)
+                    {
+                        tempOrigin += 16;
+                    }
+                        source = new Rectangle(_animationFrame * 80, 161, 80, 112); // 80px x 112px
+                    spriteBatch.Draw(_spriteSheet, _position, source, Color.White, 0, new Vector2(tempOrigin, 112 / 1.5f), _scaleFactor, _directionFacing, 1);
+
 
                     break;
                 case CharacterState.Idle:
@@ -159,6 +193,11 @@ namespace WasteSeeker.Animation_Classes
                     }
                     source = new Rectangle(_animationFrame * _spriteWidth, 2, _spriteWidth, _spriteHeight);
                     spriteBatch.Draw(_spriteSheet, _position, source, Color.White, 0, new Vector2(_spriteWidth / 2, _spriteHeight / 2), _scaleFactor, _directionFacing, 1);
+
+                    break;
+                case CharacterState.Jumping:
+                    source = new Rectangle(0, 273, 48, 80);
+                    spriteBatch.Draw(_spriteSheet, _position, source, Color.White, 0, new Vector2(48 / 2, 96 / 2), _scaleFactor, _directionFacing, 1);
 
                     break;
             }

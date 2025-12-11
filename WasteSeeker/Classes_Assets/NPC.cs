@@ -123,7 +123,7 @@ namespace WasteSeeker.Classes_Assets
             //Load content of the texture here "Texture = texture"
             Texture = content.Load<Texture2D>(texture);
 
-            _animatedSprite = new AnimatedSprite(Texture, Position, 48, 80, SpriteEffects.None, _scaleFactor, 0.15f, 0.1f, 0.05f, 5, 11);
+            _animatedSprite = new AnimatedSprite(Texture, Position, 48, 80, SpriteEffects.None, _scaleFactor, 0.15f, 0.1f, 0.05f, 5, 11, 0f, 0);
             _animatedSprite.CharacterState = _npcState;
         }
 

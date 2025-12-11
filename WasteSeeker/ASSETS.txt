@@ -59,6 +59,9 @@ Content/SoraInteraction.png - created by Carson Kinsch (me), released under the 
 Content/Kuzu_Idle_Walk.png - created by Craftpix.net (https://craftpix.net). Free assets are provided under the Craftpix Free License (https://craftpix.net/file-licenses/).
 ^ [Modified by Carson Kinsch] ^
 
+Content/Kuzu_Idle_Walk_Attack.png - created by Craftpix.net (https://craftpix.net). Free assets are provided under the Craftpix Free License (https://craftpix.net/file-licenses/).
+^ [Modified by Carson Kinsch] ^
+
 Content/Sora_Idle_Walk.png - created by Craftpix.net (https://craftpix.net). Free assets are provided under the Craftpix Free License (https://craftpix.net/file-licenses/).
 ^ [Modified by Carson Kinsch] ^
 

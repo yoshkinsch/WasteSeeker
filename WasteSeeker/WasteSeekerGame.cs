@@ -880,11 +880,11 @@ namespace WasteSeeker
                     #region controls
                     _spriteBatch.DrawString(
                         _schoolBell,
-                        "A / D (Left Arrow / Right Arrow) - Move character left / right",
-                        new Vector2(GraphicsDevice.Viewport.Width - 200, 250),
+                        "A / D - Move character left / right",
+                        new Vector2(GraphicsDevice.Viewport.Width / 2 - 40, 250),
                         Color.Black,
                         0,
-                        _schoolBell.MeasureString("A / D (Left Arrow / Right Arrow) - Move character left / right") * (float)1,
+                        _schoolBell.MeasureString("A / D - Move character left / right") * (float)1,
                         (float)1,
                         SpriteEffects.None,
                         1
@@ -907,6 +907,17 @@ namespace WasteSeeker
                         Color.Black,
                         0,
                         _schoolBell.MeasureString("SHIFT - Make character 'speedup' (run)") * (float)1,
+                        (float)1,
+                        SpriteEffects.None,
+                        1
+                    );
+                    _spriteBatch.DrawString(
+                        _schoolBell,
+                        "J - Make character attack",
+                        new Vector2(GraphicsDevice.Viewport.Width / 2 - 175, 550),
+                        Color.Black,
+                        0,
+                        _schoolBell.MeasureString("J - Make character attack") * (float)1,
                         (float)1,
                         SpriteEffects.None,
                         1

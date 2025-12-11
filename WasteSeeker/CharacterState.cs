@@ -11,6 +11,7 @@ namespace WasteSeeker
         Attacking,
         Idle,
         Walking,
-        Running
+        Running,
+        Jumping
     }
 }
