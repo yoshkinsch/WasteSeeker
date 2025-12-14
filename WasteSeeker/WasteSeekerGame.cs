@@ -86,7 +86,7 @@ namespace WasteSeeker
 
         private Reward _rewardOne;
 
-        private Tumbleweed _tumbleweed;
+        private RollingHazard _tumbleweed;
 
         private bool _playerWasHit = false;
 
@@ -191,7 +191,7 @@ namespace WasteSeeker
 
             #region Objects
             _worldGround = new Rectangle(0, 540, 14000, GraphicsDevice.Viewport.Height - 540);
-            _tumbleweed = new Tumbleweed(new Vector2(GraphicsDevice.Viewport.Width + 500, 540));
+            _tumbleweed = new RollingHazard(new Vector2(GraphicsDevice.Viewport.Width + 500, 540));
             _rewardOne = new Reward(new Vector2(14000, 300));
             #endregion 
 
@@ -239,8 +239,13 @@ namespace WasteSeeker
             _sedgwickAveDisplay = Content.Load<SpriteFont>("sedgwickAveDisplay");
             _schoolBell = Content.Load<SpriteFont>("schoolBell-");
 
+            // 3D object's camera
             _camera = new CirclingCamera(this);
-            // Main Menu Texture2D Assets
+
+            #region IntroSequence
+
+            #endregion
+
             #region Main Menu
             _mainMenuEyes = Content.Load<Texture2D>("Eyes_WasteSeeker_MainMenu");
             _bulletIcon.LoadContent(Content);
@@ -280,6 +285,7 @@ namespace WasteSeeker
             // Will change "playing" music later in terms of the screen (or level) being played
             _songs = new Dictionary<GameState, Song>()
             {
+                {GameState.IntroSequence, _cutsceneOneMusic},
                 {GameState.MainMenu,  _backgroundMenuMusic},
                 {GameState.Options,  _backgroundMenuMusic},
                 {GameState.Playing, _backgroundPlayingMusic},
@@ -432,6 +438,9 @@ namespace WasteSeeker
 
             switch (_gameState)
             {
+                case GameState.IntroSequence:
+
+                    break;
                 case GameState.MainMenu:
                     _leftGearSprite.Update(gameTime);
                     _rightGearSprite.Update(gameTime);
@@ -476,7 +485,7 @@ namespace WasteSeeker
                                     }
                                     else
                                     {
-                                        if (_inputHandler.ContinueDialogue)
+                                        if (_inputHandler.ContinueDialogue) // Player has pressed space (to skip the dialogue loading)
                                         {
                                             if (_dialogue[0].UpdateDialogue())
                                             {
@@ -795,6 +804,7 @@ namespace WasteSeeker
                                     );
                             */
                             _spriteBatch.End();
+
                             transform = Matrix.CreateTranslation(offsetX, 0, 0);
                             _spriteBatch.Begin(transformMatrix: transform);
                             _soraNPC.Draw(_spriteBatch, gameTime);
@@ -805,20 +815,21 @@ namespace WasteSeeker
                             {
                                 _rewardOne.Draw(_spriteBatch);
                             }
-
                             _spriteBatch.End();
 
                             _spriteBatch.Begin();
                             if (_inputHandler.DialoguePlaying && _player.Bounds.CollidesWith(_soraNPC.Bounds))
                             {
                                 // Draw dialogue[0]
-                                _dialogue[0].Draw(_spriteBatch);
-                                // Do NOT break here, because everything needs to be drawn still
+                                if (!_dialogue[0].Finished)
+                                {
+                                    _dialogue[0].Draw(_spriteBatch);
+                                }
                             }
                             _spriteBatch.End();
 
                             break;
-                    } // END LevelState
+                    } // END LevelState 1
                     break;
                 case GameState.GameOver:
                     _spriteBatch.Begin();
@@ -928,8 +939,13 @@ namespace WasteSeeker
                     break;
                 
                 case GameState.Cutscene:
-                    GraphicsDevice.Clear(Color.NavajoWhite);
-                    _cutsceneOne.Draw(_spriteBatch);
+                    switch (_levelState)
+                    {
+                        case LevelState.LevelOne:
+                            GraphicsDevice.Clear(Color.NavajoWhite);
+                            _cutsceneOne.Draw(_spriteBatch);
+                            break;
+                    }
                     break;
                 
             } // END GameState

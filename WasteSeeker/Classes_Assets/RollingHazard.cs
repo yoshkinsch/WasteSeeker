@@ -13,7 +13,7 @@ namespace WasteSeeker.Classes_Assets
     /// <summary>
     /// Tubmelweed class to hold a tumbleweed sprite (and apply physics)
     /// </summary>
-    public class Tumbleweed
+    public class RollingHazard
     {
         private Texture2D _tumbleweedTexture;
 
@@ -53,7 +53,7 @@ namespace WasteSeeker.Classes_Assets
         /// </summary>
         public BoundingCircle Bounds => _bounds;
 
-        public Tumbleweed(Vector2 position)
+        public RollingHazard(Vector2 position)
         {
             Position = position;
             _bounds = new BoundingCircle(position, 20);

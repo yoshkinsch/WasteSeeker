@@ -152,14 +152,13 @@ namespace WasteSeeker.Classes_Assets
 
         public void Update(GameTime gameTime)
         {
-            
             // Sees if the current player state is not equal to the previous one
             // If true, then sets animation frame and timer to their default values
             if (_playerState == CharacterState.Idle && _previousPlayerState != CharacterState.Idle)
             {
                 _animatedSprite.UpdateAnimationVariables(0, 1); // 0 = animation timer & 1 = animation frame
             }
-
+            #region Groung_Jumping
             if (_position.Y >= 480) // Assuming _groundLevel is the y-coordinate of the ground
             {
                 _position.Y = 480;
@@ -169,6 +168,7 @@ namespace WasteSeeker.Classes_Assets
 
             if (_onGround)
             {
+                _inputHandler.AttackDisabled = false;
                 if (_inputHandler.JumpPressed)
                 {
                     _velocity.Y = _jumpPower;
@@ -177,72 +177,102 @@ namespace WasteSeeker.Classes_Assets
             }
             else
             {
-                _velocity.Y += _gravity * (float)gameTime.ElapsedGameTime.TotalSeconds;
-                _walkingSfxInstance.Stop();
+
+                if (!_inputHandler.QuickFall)
+                {
+                    _velocity.Y += _gravity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                }
+                else
+                {
+                    if (_position.Y <= 400)
+                    {
+                        _velocity.Y += _gravity * 8 * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    }
+                    else
+                    {
+                        _velocity.Y += _gravity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+                    }
+                }
+
+                    _walkingSfxInstance.Stop();
                 _runningSfxInstance.Stop();
             }
+            #endregion
 
             _position += _velocity * (float)gameTime.ElapsedGameTime.TotalSeconds;
+            CharacterState desiredState;
 
+            #region Handling PlayerState
             // Handle exiting the Attack state
             if (_playerState == CharacterState.Attacking)
             {
-                // Check if the animation has reached frame 5 (as requested by user prompt)
-                // You'll need a way to get the current frame index from your AnimatedSprite
-                if (_animatedSprite.GetCurrentFrame() >= 5) // Use 5 for the 6th frame in 0-based indexing (0, 1, 2, 3, 4, 5) or adjust the logic
+                if (_animatedSprite.GetCurrentFrame() >= 5)
                 {
-                    // The attack is done. Determine the next state based on current input.
-                    _inputHandler.Attacking = false; // Consume the input flag
-                    if (_inputHandler.Running) { _playerState = CharacterState.Running; }
-                    else if (_inputHandler.Direction != Vector2.Zero) { _playerState = CharacterState.Walking; }
-                    else { _playerState = CharacterState.Idle; }
+                    // The attack is done. Now we determine the next state based on current input.
+                    _inputHandler.Attacking = false; 
+                    if (_inputHandler.Running) { desiredState = CharacterState.Running; }
+                    else if (_inputHandler.Direction != Vector2.Zero) { desiredState = CharacterState.Walking; }
+                    else { desiredState = CharacterState.Idle; }
                 }
-                // If still attacking, we skip the rest of the input processing this frame.
+                else
+                {
+                    desiredState = CharacterState.Attacking;
+                }
             }
             else
             {
+                
                 if (!_onGround)
                 {
-                    _playerState = CharacterState.Jumping;
+                    _inputHandler.AttackDisabled = true;
+                    desiredState = CharacterState.Jumping;
                     _animatedSprite.UpdateAnimationVariables(0, 0);
                 }
                 else if (_inputHandler.Attacking)
                 {
-                    _playerState = CharacterState.Attacking;
+                    desiredState = CharacterState.Attacking;
                     _animatedSprite.UpdateAnimationVariables(0, 0); // Reset animation timer and frame index to 0
                 }
                 else if (_inputHandler.JumpPressed)
                 {
-                    // Handle jump setup
-                    _velocity.Y = _jumpPower;
-                    _onGround = false;
+                    desiredState = CharacterState.Jumping;
                 }
                 else if (_inputHandler.Running)
                 {
-                    _playerState = CharacterState.Running;
+                    desiredState = CharacterState.Running;
                 }
                 else if (_inputHandler.Direction != Vector2.Zero)
                 {
-                    _playerState = CharacterState.Walking;
+                    desiredState = CharacterState.Walking;
                 }
                 else
                 {
-                    _playerState = CharacterState.Idle;
+                    desiredState = CharacterState.Idle;
                 }
             }
+            #endregion
 
-            if (_playerState == CharacterState.Running)
+            if (desiredState != _playerState)
             {
-                _currentSpeed = RunSpeed;
-            }
-            else if (_playerState == CharacterState.Walking)
-            {
-                _currentSpeed = WalkSpeed;
+                // When the state changes, reset the animation *once*
+                _playerState = desiredState;
+
+                // Apply specific animation resets where needed (like for 'Attacking' or 'Jumping')
+                if (_playerState == CharacterState.Attacking || _playerState == CharacterState.Jumping)
+                {
+                    // This code runs ONLY on the very first frame of the new state.
+                    _animatedSprite.UpdateAnimationVariables(0, 0); // Reset timer and frame index to 0
+                }
+                else if (_playerState == CharacterState.Idle)
+                {
+                    _animatedSprite.UpdateAnimationVariables(0, 1); // Or whatever your idle start frame is
+                }
             }
 
             // Stop movement during attack unless specifically designed otherwise
             if (_playerState == CharacterState.Walking)
             {
+                _currentSpeed = WalkSpeed;
                 _position.X += _inputHandler.Direction.X * WalkSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if (_walkingSfxInstance.State != SoundState.Playing && _onGround)
                 {
@@ -252,6 +282,7 @@ namespace WasteSeeker.Classes_Assets
             }
             else if (_playerState == CharacterState.Running)
             {
+                _currentSpeed = RunSpeed;
                 _position.X += _inputHandler.Direction.X * RunSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds;
                 if (_runningSfxInstance.State != SoundState.Playing && _onGround)
                 {
@@ -268,7 +299,6 @@ namespace WasteSeeker.Classes_Assets
                 _walkingSfxInstance.Stop();
                 _runningSfxInstance.Stop();
             }
-
 
             _animatedSprite.Position = Position; // Update the sprite component's position
             _animatedSprite.CharacterState = _playerState; // Inform the sprite component which animation to use

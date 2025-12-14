@@ -95,6 +95,17 @@ namespace WasteSeeker
         public bool JumpPressed { get; private set; }
 
         /// <summary>
+        /// Whether or not the player is currently able to attack 
+        /// - Shouldn't be able to when in air
+        /// </summary>
+        public bool AttackDisabled { get; set; } = false;
+
+        /// <summary>
+        /// Whether or not the player is holding down the key 'S' while in air to quickly fall to the ground
+        /// </summary>
+        public bool QuickFall { get; set; } = false;
+
+        /// <summary>
         /// Whether or not the player is inputting nothing into the game (player presses nothing)
         /// </summary>
         public bool Idle { get; private set; } = false;
@@ -407,7 +418,7 @@ namespace WasteSeeker
 
                     if (!DialoguePlaying) // Dialogue is NOT playing, so the main playing loop should continue
                     {
-                        if (_currentKeyboardState.IsKeyDown(Keys.F) && !_previousKeyboardState.IsKeyDown(Keys.F) && _dialogueCompletedIterator < _dialogueCompleted.Length)
+                        if (_currentKeyboardState.IsKeyDown(Keys.F) && !_previousKeyboardState.IsKeyDown(Keys.F) && _dialogueCompletedIterator < _dialogueCompleted.Length) // Add "&& (npc.InitialDialogueFinished != true || npc.HasRepeatableDialogue)"
                         {
                             DialoguePlaying = true;
                             break;
@@ -440,7 +451,8 @@ namespace WasteSeeker
                         }
 
                         // Attacking
-                        if (_currentKeyboardState.IsKeyDown(Keys.J) && !_previousKeyboardState.IsKeyDown(Keys.J))
+                        
+                        if (_currentKeyboardState.IsKeyDown(Keys.J) && !_previousKeyboardState.IsKeyDown(Keys.J) && !AttackDisabled)
                         {
                             Attacking = true;
                             Running = false;
@@ -457,6 +469,16 @@ namespace WasteSeeker
                         {
                             JumpPressed = false;
                             _jumpHoldTimer = 0f;
+                        }
+
+                        if (_currentKeyboardState.IsKeyDown(Keys.S) && AttackDisabled)
+                        {
+                            // AttackDisabled is only true when the player is in the air, so here we can see if they hold S which should send them down
+                            QuickFall = true;
+                        }
+                        else if (!_currentKeyboardState.IsKeyDown(Keys.S))
+                        {
+                            QuickFall = false;
                         }
 
                         #endregion

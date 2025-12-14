@@ -18,6 +18,7 @@ namespace WasteSeeker
         Cutscene,
         Transition,
         BattleSequence,
-        Controls
+        Controls,
+        IntroSequence
     }
 }

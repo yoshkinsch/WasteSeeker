@@ -25,8 +25,6 @@ namespace WasteSeeker.Classes_Assets
 
         private AnimatedSprite _animatedSprite;
 
-        private string _npcDialogue;
-
         /// <summary>
         /// The bounding volume of the sprite
         /// </summary>
@@ -74,7 +72,7 @@ namespace WasteSeeker.Classes_Assets
         /// <summary>
         /// The NPC's Run Speed
         /// </summary>
-        public float RunSpeed { get; set; }
+        public float RunSpeed { get; set; } = 450f;
 
         /// <summary>
         /// The NPC's position on the screen
@@ -157,6 +155,12 @@ namespace WasteSeeker.Classes_Assets
                     _animatedSprite.Position = Position;
 
                     break;
+                case CharacterState.Running:
+
+                    Position += new Vector2(movementDirection * RunSpeed * (float)gameTime.ElapsedGameTime.TotalSeconds, 0);
+                    _animatedSprite.Position = Position;
+
+                    break;
             }
 
             _bounds.X = Position.X;
@@ -198,35 +202,65 @@ namespace WasteSeeker.Classes_Assets
         /// <param name="playerPosition"></param>
         public int FollowPlayer(Vector2 playerPosition)
         {
-            if (Position.X <= playerPosition.X && Position.X <= playerPosition.X - 150) // NPC is moving right towards player
-            {
-                _npcState = CharacterState.Walking;
-                _animatedSprite.CharacterState = CharacterState.Walking;
-                return 1;
+            float idleZone = 150f;
+            float walkingZone = 250f;
 
-            }
-            if (Position.X >= playerPosition.X - 150 && Position.X <= playerPosition.X + 150) // NPC is within "150" pixels of player, so we switch to idle
+            float distanceX = Position.X - playerPosition.X;
+
+            if (Math.Abs(distanceX) <= idleZone) // NPC is in the radius of the player
             {
                 _npcState = CharacterState.Idle;
-                _animatedSprite.CharacterState = CharacterState.Idle;
+                _animatedSprite.CharacterState = _npcState;
                 return 0;
             }
-            if (Position.X >= playerPosition.X && Position.X >= playerPosition.X + 150) // NPC is moving left towards the player
+            else if (Position.X < playerPosition.X) // NPC is moving right towards player
             {
-                _npcState = CharacterState.Walking;
-                _animatedSprite.CharacterState = CharacterState.Walking;
+                if (_npcState == CharacterState.Running)
+                {
+                    if (Position.X >= playerPosition.X - walkingZone + 25)
+                    {
+                        _npcState = CharacterState.Walking;
+                    }
+                }
+                else
+                {
+                    if (Position.X >= playerPosition.X - walkingZone)
+                    {
+                        _npcState = CharacterState.Walking;
+                    }
+                    else
+                    {
+                        _npcState = CharacterState.Running;
+                    }
+                }
+
+                _animatedSprite.CharacterState = _npcState;
+                return 1;
+            }
+            else // NPC is moving left towards player
+            {
+                if (_npcState == CharacterState.Running)
+                {
+                    if (Position.X <= playerPosition.X + walkingZone - 25)
+                    {
+                        _npcState = CharacterState.Running;
+                    }
+                }
+                else
+                {
+                    if (Position.X <= playerPosition.X + walkingZone)
+                    {
+                        _npcState = CharacterState.Walking;
+                    }
+                    else
+                    {
+                        _npcState = CharacterState.Running;
+                    }
+                }
+
+                _animatedSprite.CharacterState = _npcState;
                 return -1;
             }
-            return 0;
-        }
-
-        /// <summary>
-        /// Is used by a Dialogue object to create the NPC's dialogue 
-        /// </summary>
-        /// <returns></returns>
-        public string RetrieveDialogue()
-        {
-            return _npcDialogue;
         }
     }
 }
