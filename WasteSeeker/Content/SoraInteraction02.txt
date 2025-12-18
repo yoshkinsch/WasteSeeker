@@ -1,0 +1,6 @@
+﻿S, K, S, K, S
+KuzuInteraction, SoraInteraction
+2, 2, 1, 4, 1
+It's been so long since I've been here . . .\ Kuzu . . . . how are my parents? Have you been @keeping up with everyone in the village?\ You're parents are doing okay but Sora . . . @they're getting old . . .\ You need to see them sooner than later. \ I know but . . . I just don't think I can face @them after what happened.\ Sora, I've spent all my life mad at my parents @for leaving me on Earth. \ After they were gone, the silence when they @weren't around was deafening . . . \ You have the chance to break that silence Sora. \ It doesn't need to be perfect, @it just needs to happen. \ Okay . . . I'll think about it.
+0.65, 0.80
+Kuzu, Sora

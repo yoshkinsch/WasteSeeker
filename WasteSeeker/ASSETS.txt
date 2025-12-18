@@ -7,11 +7,17 @@ Content/SandGround.png - created by Carson Kinsch (me), released under the Creat
 
 Content/SandBackground_BackGround.png - created by Carson Kinsch (me), released under the Creative Commons License
 
-Content/SandBackground_FirstMidGround.png - created by Carson Kinsch (me), released under the Creative Commons License
+Content/LevelOneFirstMidGround.png - created by Carson Kinsch (me), released under the Creative Commons License
 
-Content/SandBackground_SecondMidGround.png - created by Carson Kinsch (me), released under the Creative Commons License
+Content/LevelOneSecondMidGround.png - created by Carson Kinsch (me), released under the Creative Commons License
 
-Content/SandBackground_ForegroundGround.png - created by Carson Kinsch (me), released under the Creative Commons License
+Content/LevelOneForeground.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/LevelTwoFirstMidGround.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/LevelTwoSecondMidGround.png - created by Carson Kinsch (me), released under the Creative Commons License
+
+Content/LevelTwoForeground.png - created by Carson Kinsch (me), released under the Creative Commons License
 
 Content/PlayButton_MainMenu-Sheet.png - created by Carson Kinsch (me), released under the Creative Commons License
 
@@ -85,10 +91,12 @@ Content/MainMenuMusic.mp3 - created by Maksym_Dudchyk on pixabay (https://pixaba
 
 Content/TutorialMusic.mp3 - created by nojisume on pixabay (https://pixabay.com/users/nojisuma-23737290/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0.
 
-Content/BattleMusic.mp3 - created by Junipersona from Pixabay (https://pixabay.com/users/junipersona-35113928/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0.
-
 Content/gunshot_sfx.wav - created by Universfield on pixabay (https://pixabay.com/sound-effects/gunshot-352466/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0.
 
 Content/gameover.mp3 - created by Kuzu420 from Pixabay (https://pixabay.com/users/kuzu420-42489797/). Free assets are provided under the pixabay Free License (https://pixabay.com/service/license-summary/) and released under CC0.
+
+Content/gamewon.mp3 - created by by Junipersona from Pixabay (https://pixabay.com/users/junipersona-35113928/). Free assets are provided under the pixabay Free License (https://pixabay.com/service/license-summary/) and released under CC0.
+
+Content/BattleMusic.mp3 - created by Junipersona from Pixabay (https://pixabay.com/users/junipersona-35113928/). Free assets are provided under the pixabay Free Licene (https://pixabay.com/service/license-summary/) and released under CC0.
 
 Content/Cutscene01Music.mp3 - created by Hannah Pugel from Pixabay (https://pixabay.com/users/foggysunrise-45463935/). Free assets are provided under the pixabay Free License (https://pixabay.com/service/license-summary/) and released under CC0.

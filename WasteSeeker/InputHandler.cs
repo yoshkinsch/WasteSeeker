@@ -40,7 +40,15 @@ namespace WasteSeeker
 
         private bool[] _dialogueCompleted;
 
-        private int _dialogueCompletedIterator = 0;
+        /// <summary>
+        /// Used to set the Started Playing flag in case player loaded a save file 
+        /// (and cutscene one should be skipped)
+        /// </summary>
+        public bool StartedPlaying
+        {
+            get { return _startedPlaying; }
+            set { _startedPlaying = value; }
+        }
 
         /// <summary>
         /// The current direction an object/sprite is facing
@@ -300,7 +308,7 @@ namespace WasteSeeker
         /// Used to update the previous and current input from the keyboard/mouse
         /// </summary>
         /// <param name="gameTime"></param>
-        public void Update(GameTime gameTime, ref GameState gameState)
+        public void Update(GameTime gameTime, ref GameState gameState, ref LevelState levelState)
         {
             #region Updating Input State
             _previousKeyboardState = _currentKeyboardState;
@@ -313,6 +321,7 @@ namespace WasteSeeker
 
             // Get Position from Mouse
             Vector2 _mousePosition = _currentMouseState.Position.ToVector2();
+            int level = Convert.ToInt32(levelState);
 
             #endregion
             
@@ -418,7 +427,7 @@ namespace WasteSeeker
 
                     if (!DialoguePlaying) // Dialogue is NOT playing, so the main playing loop should continue
                     {
-                        if (_currentKeyboardState.IsKeyDown(Keys.F) && !_previousKeyboardState.IsKeyDown(Keys.F) && _dialogueCompletedIterator < _dialogueCompleted.Length) // Add "&& (npc.InitialDialogueFinished != true || npc.HasRepeatableDialogue)"
+                        if (_currentKeyboardState.IsKeyDown(Keys.F) && !_previousKeyboardState.IsKeyDown(Keys.F) && !_dialogueCompleted[level]) // Add "&& (npc.InitialDialogueFinished != true || npc.HasRepeatableDialogue)"
                         {
                             DialoguePlaying = true;
                             break;
@@ -510,7 +519,7 @@ namespace WasteSeeker
                     }
                     else // Dialogue is now playing, limit the player's controls to just continuing through the dialogue
                     {
-                        if (!_dialogueCompleted[_dialogueCompletedIterator])
+                        if (!_dialogueCompleted[level])
                         {
                             if (Keyboard.GetState().IsKeyDown(Keys.Escape)) { DialoguePlaying = false; }
 
@@ -528,7 +537,6 @@ namespace WasteSeeker
                         else
                         {
                             DialoguePlaying = false;
-                            _dialogueCompletedIterator++;
                         }
                     }
                         break;

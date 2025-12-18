@@ -27,6 +27,9 @@ namespace WasteSeeker.Classes_Assets
     ///     1.0, 1.1, ...                           (the pitch of the different characters)
     ///     player_name, npc_name, ...              (player/npc names)
     /// 
+    /// - Example text using the @ symbol to indicate a new line in the dialogue (43 characters until a new line each time):
+    ///     I'm doing alright, let's just head to the hideout@first.
+    /// 
     /// - For the illustrations of the characters talking; the player will be on the side in which they are positioned relative to the 
     ///     NPC. They also will be hand drawn by me and talk through this dialogue class.
     /// 

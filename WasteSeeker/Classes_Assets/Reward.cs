@@ -18,6 +18,12 @@ namespace WasteSeeker.Classes_Assets
 
         private BoundingCircle _bounds;
 
+        public bool RewardGot
+        {
+            get;
+            set;
+        }
+
         public Texture2D Texture
         {
             get { return _texture; }

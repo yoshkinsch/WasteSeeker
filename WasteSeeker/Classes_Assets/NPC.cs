@@ -5,8 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using WasteSeeker.Collisions;
 using WasteSeeker.Animation_Classes;
+using WasteSeeker.Collisions;
 
 namespace WasteSeeker.Classes_Assets
 {
@@ -23,6 +23,8 @@ namespace WasteSeeker.Classes_Assets
 
         private bool _isFollowingPlayer = false;
 
+        private bool _hasDialogue = true;
+
         private AnimatedSprite _animatedSprite;
 
         /// <summary>
@@ -37,6 +39,12 @@ namespace WasteSeeker.Classes_Assets
         {
             get { return _isFollowingPlayer; }
             set { _isFollowingPlayer = value; }
+        }
+
+        public bool HasDialogue
+        {
+            get { return _hasDialogue; }
+            set { _hasDialogue = value; }
         }
 
         /// <summary>

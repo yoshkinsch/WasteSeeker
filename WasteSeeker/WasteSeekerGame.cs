@@ -72,11 +72,22 @@ namespace WasteSeeker
         #region Playing Objects
 
         #region Objects
-        private Texture2D _worldGroundTexture;
+
         private Texture2D _worldBackGroundTexture;
-        private Texture2D _worldFirstMidGroundTexture;
-        private Texture2D _worldSecondMidGroundTexture;
-        private Texture2D _worldForeGroundTexture;
+
+        #region LevelOneTextures
+        private Texture2D _worldOneGroundTexture;
+        private Texture2D _worldOneFirstMidGroundTexture;
+        private Texture2D _worldOneSecondMidGroundTexture;
+        private Texture2D _worldOneForeGroundTexture;
+        #endregion
+        #region LevelTwoTextures
+        private Texture2D _worldTwoGroundTexture;
+        private Texture2D _worldTwoFirstMidGroundTexture;
+        private Texture2D _worldTwoSecondMidGroundTexture;
+        private Texture2D _worldTwoForeGroundTexture;
+        #endregion
+
         private _3DBullet _bulletModel;
         private CirclingCamera _camera;
 
@@ -85,12 +96,11 @@ namespace WasteSeeker
         private SandParticleSystem _sandParticleSystem;
 
         private Reward _rewardOne;
+        private Reward _rewardTwo;
 
         private RollingHazard _tumbleweed;
 
         private bool _playerWasHit = false;
-
-        private bool _rewardGot;
         #endregion
 
         #region Characters
@@ -118,6 +128,7 @@ namespace WasteSeeker
         #region GameOver
 
         private bool _gameOver = false;
+        private bool _gameWon = false;
 
         #region Textures
         private Texture2D _kuzuDeadTexture;
@@ -125,15 +136,17 @@ namespace WasteSeeker
 
         #region songs
         private Song _gameOverMusic;
-
+        private Song _gameWonMusic;
         #endregion
+
         #endregion
 
         #region Cutscene
         // This region tailors to cutscenes in the game
-        private Cutscene _cutsceneOne;
+        //private Cutscene _cutsceneOne;
+        private Cutscene[] _cutscenes;
 
-        private Song _cutsceneOneMusic;
+        private Song _cutsceneMusic;
         #endregion
 
         // Want to add a global scalar value used in the game code - Dependent on the graphics screen size of the player (will be later implemented)
@@ -173,7 +186,7 @@ namespace WasteSeeker
             _sandParticleSystem = new SandParticleSystem(this, new Rectangle(GraphicsDevice.Viewport.Width + 20, 0, 10, GraphicsDevice.Viewport.Height - 200));
             Components.Add(_sandParticleSystem);
             _sandParticleSystem.Enabled = true;
-            
+
 
             #endregion
 
@@ -186,27 +199,29 @@ namespace WasteSeeker
 
             // Here will initial and create the input handler
             _inputHandler = new InputHandler();
-            
+
             #region Playing
 
             #region Objects
             _worldGround = new Rectangle(0, 540, 14000, GraphicsDevice.Viewport.Height - 540);
             _tumbleweed = new RollingHazard(new Vector2(GraphicsDevice.Viewport.Width + 500, 540));
             _rewardOne = new Reward(new Vector2(14000, 300));
+            _rewardTwo = new Reward(new Vector2(14000, 300));
             #endregion 
 
             #region Characters
             _player = new Player("Kuzu", "TODO", 100, new Vector2(100, 480), _inputHandler);
-            _soraNPC = new NPC("Sora", "TODO", 100, new Vector2(((GraphicsDevice.Viewport.Width/2) + 250), 470), false);
+            _soraNPC = new NPC("Sora", "TODO", 100, new Vector2(((GraphicsDevice.Viewport.Width / 2) + 250), 470), false);
             #endregion
 
             #region Dialogue
 
             // Here we will load ALL the dialogues into the game in array format
             // Depending on which character at what point 
-            _dialogue = new Dialogue[1]
+            _dialogue = new Dialogue[2]
             {
-                new Dialogue("SoraInteraction01.txt")
+                new Dialogue("SoraInteraction01.txt"),
+                new Dialogue("SoraInteraction02.txt")
             };
 
             _inputHandler.DialogueCompleted = new bool[_dialogue.Length];
@@ -221,8 +236,11 @@ namespace WasteSeeker
 
             #region Cutscene
 
-            _cutsceneOne = new Cutscene("S1.txt");
-
+            _cutscenes = new Cutscene[]
+            {
+                new Cutscene("S1.txt"),
+                new Cutscene("S1.txt")
+            };
             #endregion
 
             base.Initialize();
@@ -264,14 +282,30 @@ namespace WasteSeeker
             #region Characters/Objects
             _player.LoadContent(Content);
             _soraNPC.LoadContent(Content, "Sora_Idle_Walk");
-            _worldGroundTexture = Content.Load<Texture2D>("SandGround");
-            _worldBackGroundTexture = Content.Load <Texture2D>("SandBackground_BackGround");
-            _worldFirstMidGroundTexture = Content.Load<Texture2D>("SandBackground_FirstMidGround");
-            _worldSecondMidGroundTexture = Content.Load<Texture2D>("SandBackground_SecondMidGround");
-            _worldForeGroundTexture = Content.Load<Texture2D>("SandBackground_ForegroundGround");
+
+            _worldBackGroundTexture = Content.Load<Texture2D>("SandBackground_BackGround");
+
+            #region LevelOneTextures
+            _worldOneGroundTexture = Content.Load<Texture2D>("LevelOneGround");
+            _worldOneFirstMidGroundTexture = Content.Load<Texture2D>("LevelOneFirstMidGround");
+            _worldOneSecondMidGroundTexture = Content.Load<Texture2D>("LevelOneSecondMidGround");
+            _worldOneForeGroundTexture = Content.Load<Texture2D>("LevelOneForeground");
+            #endregion
+
+            #region LevelTwoTextures
+
+            _worldTwoGroundTexture = Content.Load<Texture2D>("LevelTwoGround");
+            _worldTwoFirstMidGroundTexture = Content.Load<Texture2D>("LevelTwoFirstMidGround");
+            _worldTwoSecondMidGroundTexture = Content.Load<Texture2D>("LevelTwoSecondMidGround");
+            _worldTwoForeGroundTexture = Content.Load<Texture2D>("LevelTwoForeground");
+
+            #endregion
+
             _tumbleweed.LoadContent(Content);
             _kuzuDeadTexture = Content.Load<Texture2D>("KuzuDead_Chibi");
             _rewardOne.LoadContent(Content, "ThumbsUP");
+            _rewardTwo.LoadContent(Content, "ThumbsUP");
+            
             #endregion
 
             #region Music
@@ -279,25 +313,30 @@ namespace WasteSeeker
             _backgroundPlayingMusic = Content.Load<Song>("TutorialMusic");
             _battleMusic = Content.Load<Song>("BattleMusic");
             _gameOverMusic = Content.Load<Song>("gameover");
-            _cutsceneOneMusic = Content.Load<Song>("Cutscene01Music");
+            _gameWonMusic = Content.Load<Song>("gamewon");  // will update game over music if player beat 2nd level
+            _cutsceneMusic = Content.Load<Song>("Cutscene01Music");
 
             // Loading all songs into a dictionary to determine what to play
             // Will change "playing" music later in terms of the screen (or level) being played
             _songs = new Dictionary<GameState, Song>()
             {
-                {GameState.IntroSequence, _cutsceneOneMusic},
+                {GameState.IntroSequence, _cutsceneMusic},
                 {GameState.MainMenu,  _backgroundMenuMusic},
                 {GameState.Options,  _backgroundMenuMusic},
                 {GameState.Playing, _backgroundPlayingMusic},
                 {GameState.BattleSequence, _battleMusic},
                 {GameState.Controls, _backgroundMenuMusic},
                 {GameState.GameOver,  _gameOverMusic},
-                {GameState.Cutscene, _cutsceneOneMusic}
+                {GameState.Cutscene, _cutsceneMusic}
             };
             #endregion
 
             #region Cutscene
-            _cutsceneOne.LoadContent(Content);
+            //_cutsceneOne.LoadContent(Content);
+            foreach(Cutscene cutscene in _cutscenes)
+            {
+                cutscene.LoadContent(Content);
+            }
             #endregion
 
             #region Buttons
@@ -326,7 +365,7 @@ namespace WasteSeeker
             #region Dialogue
             for (int i = 0; i < _dialogue.Length; i++)
             {
-                _dialogue[0].LoadContent(Content);
+                _dialogue[i].LoadContent(Content);
             }
             #endregion
 
@@ -344,31 +383,20 @@ namespace WasteSeeker
              * Input-Handler will handle which input is sent and will communicate that back here - can determine the game state
             */
             var previousSongPlayed = _songs[_gameState];
-            var _previousGameState = _gameState;
-            _inputHandler.Update(gameTime, ref _gameState);
+            var previousGameState = _gameState;
+            var previousLevelState = _levelState;
+            _inputHandler.Update(gameTime, ref _gameState, ref _levelState);
             _camera.Update(gameTime);
 
-            #region DetermineDialogue
+            #region NPC?
 
-            if (_inputHandler.DialoguePlaying)
+            if (_inputHandler.DialoguePlaying && _soraNPC.HasDialogue)
             {
-                if (_gameState == GameState.Playing)
-                {
-                    switch (_levelState)
-                    {
-                        case LevelState.LevelOne:
-                            // Now we check ALL bounds of player and interactable character in the level
-                            if (!_player.Bounds.CollidesWith(_soraNPC.Bounds))
-                            {
-                                _inputHandler.StopDialogue = true;
-                                _inputHandler.DialoguePlaying = false;
-                            }
-                            break;
-                    }
-                }
+                _soraNPC.HasDialogue = false;
             }
 
             #endregion
+
             #region Saving_Loading
             if (_inputHandler.Exit == true) { Exit(); }
 
@@ -383,7 +411,7 @@ namespace WasteSeeker
             {
                 bool successfullyLoaded = LoadGame("savegame.json");
 
-                if (successfullyLoaded) { _gameLoaded = true; _gameFailedToLoad = false; }
+                if (successfullyLoaded) { _gameLoaded = true; _gameFailedToLoad = false; _inputHandler.StartedPlaying = true; }
                 else { _gameLoaded = false; _gameFailedToLoad = true; }
                 
                 _inputHandler.Load = false;
@@ -391,8 +419,8 @@ namespace WasteSeeker
             #endregion
 
             #region Button Selection
-            // Selecting and De-Selecting Buttons
-            if (_previousGameState == GameState.Options && _gameState != GameState.Options)
+            // Selecting and De-Selecting Buttons - Options
+            if (previousGameState == GameState.Options && _gameState != GameState.Options)
             {
                 _optionsMenu.ExitButton.ButtonSelect = false;
                 _optionsMenu.SaveButton.ButtonSelect = false;
@@ -405,13 +433,13 @@ namespace WasteSeeker
             // Checking if the options menu has popped open
             // opened => play noise in higher pitch
             // closed => play noise in lower pitch
-            if (_previousGameState != GameState.Options && _gameState == GameState.Options || _previousGameState == GameState.MainMenu && _gameState == GameState.Playing)
+            if (previousGameState != GameState.Options && _gameState == GameState.Options || previousGameState == GameState.MainMenu && _gameState == GameState.Playing)
             {
                 _optionsMenu.PlayNoise(true);
             }
 
             // Checking if previous game state was Playing and current is not
-            if (_previousGameState == GameState.Playing && _gameState != GameState.Playing)
+            if (previousGameState == GameState.Playing && _gameState != GameState.Playing)
             {
                 _player.StopSFX();
             }
@@ -451,7 +479,7 @@ namespace WasteSeeker
                     break;
                 case GameState.Options:
 
-                    if (_previousGameState == GameState.Playing || _previousGameState == GameState.BattleSequence || _previousGameState == GameState.Cutscene)
+                    if (previousGameState == GameState.Playing || previousGameState == GameState.BattleSequence || previousGameState == GameState.Cutscene)
                     {
 
                         _optionsMenu.LoadButton.ButtonActivated = false;
@@ -459,7 +487,7 @@ namespace WasteSeeker
                         _optionsMenu.ExitButton.ButtonActivated = true;
                         _optionsMenu.GameWasPaused = true;
                     }
-                    else if (_previousGameState == GameState.MainMenu)
+                    else if (previousGameState == GameState.MainMenu)
                     {
                         _optionsMenu.LoadButton.ButtonActivated = true;
                         _optionsMenu.SaveButton.ButtonActivated = false;
@@ -529,6 +557,7 @@ namespace WasteSeeker
                                     if (_player.Health <= 0)
                                     {
                                         _gameOver = true;
+                                        _songs[GameState.GameOver] = _gameOverMusic;
                                         _gameState = GameState.GameOver;
                                     }
                                 }
@@ -562,11 +591,121 @@ namespace WasteSeeker
                             }
                             #endregion
 
+                            // This collision will indicate that the player has reached the end of the level
+                            // and now is going to go onto level 2
                             if (_rewardOne.Bounds.CollidesWith(_player.Bounds))
                             {
-                                _rewardGot = true;
-                                _gameState = GameState.MainMenu;
-                                ResetVariables(gameTime);
+                                _rewardOne.RewardGot = true;
+                                NewLevelReset(gameTime);
+                                //_gameState = GameState.Cutscene;
+                                _levelState = LevelState.LevelTwo;
+                            }
+
+                            // Player bounds on screen
+                            if (_player.Position.X <= -10) { _player.Position = new Vector2(GraphicsDevice.Viewport.X - 10, _player.Position.Y); }
+                            else if (_player.Position.X > 14000) { _player.Position = new Vector2(14000, _player.Position.Y); }
+
+                            break;
+
+                        case LevelState.LevelTwo:
+
+                            #region DialoguePlaying
+                            if (_inputHandler.DialoguePlaying)
+                            {
+                                if (_player.Bounds.CollidesWith(_soraNPC.Bounds))
+                                {
+                                    if (_dialogue[1].Finished)
+                                    {
+                                        _inputHandler.StopDialogue = true;
+                                    }
+                                    else
+                                    {
+                                        if (_inputHandler.ContinueDialogue) // Player has pressed space (to skip the dialogue loading)
+                                        {
+                                            if (_dialogue[1].UpdateDialogue())
+                                            {
+                                                _inputHandler.StopDialogue = true;
+                                                _inputHandler.DialogueCompleted[0] = true;
+                                                _dialogue[1].Finished = true;
+                                            }
+                                            _inputHandler.ContinueDialogue = false;
+                                        }
+                                        _dialogue[1].Update(gameTime);
+                                    }
+                                    break; // Break to avoid any further updates
+                                }
+                            }
+                            #endregion
+
+                            _player.Update(gameTime);
+                            _soraNPC.TargetPlayer(_player.Position);
+                            _soraNPC.Update(gameTime, _player.Position);
+
+                            if (_player.Position.X >= _soraNPC.Position.X && !_soraNPC.IsFollowingPlayer)
+                            {
+                                _soraNPC.IsFollowingPlayer = true;
+                            }
+
+                            if (_sandParticleSystem.Enabled == false || _sandParticleSystem.Visible == false)
+                            {
+                                _sandParticleSystem.Enabled = true;
+                                _sandParticleSystem.Visible = true;
+                            }
+
+                            #region Tumbleweed
+                            if (_tumbleweed.IsEnabled)
+                            {
+                                _tumbleweed.Update(gameTime);
+
+                                if (_tumbleweed.Bounds.CollidesWith(_player.Bounds) && !_playerWasHit)
+                                {
+                                    _playerWasHit = true;
+                                    _player.Health -= 25;
+                                    if (_player.Health <= 0)
+                                    {
+                                        _gameOver = true;
+                                        _gameState = GameState.GameOver;
+                                    }
+                                }
+
+                                if (!_tumbleweed.Bounds.CollidesWith(_player.Bounds) && _playerWasHit)
+                                {
+                                    _playerWasHit = false;
+                                }
+
+                                if (_tumbleweed.Position.X < _player.Position.X - 750)
+                                {
+                                    _tumbleweed.UpdateSpeed();
+                                    _tumbleweed.UpdateScale();
+                                    _tumbleweed.Position = new Vector2(_player.Position.X + GraphicsDevice.Viewport.Width + 200, 540);
+                                    _tumbleweed.TumbleweedPassings++;
+                                }
+                            }
+
+                            // Player has reached end of level
+                            if (_player.Position.X >= 12500)
+                            {
+                                if (_tumbleweed.Position.X <= _player.Position.X - 600)
+                                {
+                                    _tumbleweed.IsEnabled = false;
+                                    _tumbleweed.Position = new Vector2(_player.Position.X + GraphicsDevice.Viewport.Width + 200, 540);
+                                }
+                            }
+                            else
+                            {
+                                _tumbleweed.IsEnabled = true;
+                            }
+                            #endregion
+
+                            // This collision will indicate that the player has reached the end of the level
+                            // and now should be sent to the GameOver GameState but with a won condition
+                            if (_rewardTwo.Bounds.CollidesWith(_player.Bounds))
+                            {
+                                _rewardTwo.RewardGot = true;
+                                _gameWon = true;
+                                _songs[GameState.GameOver] = _gameWonMusic;
+                                _gameState = GameState.GameOver;
+                                ResetVariables(gameTime);   // reset game variables for when the player wants to play the game again
                             }
 
                             // Player bounds on screen
@@ -592,8 +731,9 @@ namespace WasteSeeker
                     }
                     break;
                 case GameState.Cutscene:
+                    int level = Convert.ToInt32(_levelState);
 
-                    if (_cutsceneOne.Finished)
+                    if (_cutscenes[level].Finished)
                     {
                         _inputHandler.StopCutscene = true;
                     }
@@ -601,14 +741,14 @@ namespace WasteSeeker
                     {
                         if (_inputHandler.ContinueDialogue)
                         {
-                            if (_cutsceneOne.UpdateDialogue())
+                            if (_cutscenes[level].UpdateDialogue())
                             {
                                 _inputHandler.StopCutscene = true;
-                                _cutsceneOne.Finished = true;
+                                _cutscenes[level].Finished = true;
                             }
                             _inputHandler.ContinueDialogue = false;
                         }
-                        _cutsceneOne.Update(gameTime);
+                        _cutscenes[level].Update(gameTime);
                     }
                     
                     break;
@@ -647,9 +787,24 @@ namespace WasteSeeker
                     _spriteBatch.DrawString(_sedgwickAveDisplay, "Waste Seeker", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 100), Color.White, 0, _sedgwickAveDisplay.MeasureString("Waste Seeker") / 2, 1, SpriteEffects.None, 1);
                     //_spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Space' to Play!", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 280), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Space' to Play!") / 2, 0.35f, SpriteEffects.None, 1);
                     
-                    if (_rewardGot)
+                    if (_rewardOne.RewardGot)
                     {
                         _spriteBatch.Draw(_rewardOne.Texture, new Vector2(GraphicsDevice.Viewport.Width / 2 + 200, 175), Color.White);
+                    }
+
+                    if (_rewardTwo.RewardGot)
+                    {
+                        _spriteBatch.Draw(
+                            _rewardOne.Texture,                                     // Texture
+                            new Vector2(GraphicsDevice.Viewport.Width / 2 - 450, 175), // Position
+                            null,                                                   // Source (null = whole texture)
+                            Color.White,                                            // Tint
+                            0f,                                                     // Rotation (none)
+                            Vector2.Zero,                                           // Origin (center)
+                            1f,                                                     // Scale (normal size)
+                            SpriteEffects.FlipHorizontally,                         // The Flip
+                            0f                                                      // Layer Depth
+                        );
                     }
 
                     _spriteBatch.End();
@@ -682,54 +837,52 @@ namespace WasteSeeker
                     break;
                 case GameState.Playing:
 
+                    float cameraCenterX = GraphicsDevice.Viewport.Width / 2 - 100;
+                    float playerX = MathHelper.Clamp(_player.Position.X, cameraCenterX, 14000 - cameraCenterX);
+                    float offsetX = cameraCenterX - playerX;
+
+                    Matrix transform;
+
+                    transform = Matrix.CreateTranslation(offsetX * 0.025f - 1750f, 0, 0);
+                    _spriteBatch.Begin(transformMatrix: transform);
+                    _spriteBatch.Draw(_worldBackGroundTexture, Vector2.Zero, Color.White);
+                    _spriteBatch.End();
+
                     switch (_levelState)
                     {
                         case LevelState.LevelOne:
-                            
-                            GraphicsDevice.Clear(Color.NavajoWhite);
+
                             // Calculate our offset vector 
-
-                            float cameraCenterX = GraphicsDevice.Viewport.Width / 2 - 100;
-                            float playerX = MathHelper.Clamp(_player.Position.X, cameraCenterX, 14000 - cameraCenterX);
-                            float offsetX = cameraCenterX - playerX;
-
-                            Matrix transform;
-                            
-                            transform = Matrix.CreateTranslation(offsetX * 0.100f, 0, 0);
-                            _spriteBatch.Begin(transformMatrix: transform);
-                            _spriteBatch.Draw(_worldBackGroundTexture, Vector2.Zero, Color.White);
-                            _spriteBatch.End();
-
                             transform = Matrix.CreateTranslation(offsetX * 0.150f, 0, 0);
                             _spriteBatch.Begin(transformMatrix: transform);
-                            _spriteBatch.Draw(_worldFirstMidGroundTexture, Vector2.Zero, Color.White);
+                            _spriteBatch.Draw(_worldOneFirstMidGroundTexture, Vector2.Zero, Color.White);
                             _spriteBatch.End();
 
                             transform = Matrix.CreateTranslation(offsetX * 0.250f, 0, 0);
                             _spriteBatch.Begin(transformMatrix: transform);
-                            _spriteBatch.Draw(_worldSecondMidGroundTexture, Vector2.Zero, Color.White);
+                            _spriteBatch.Draw(_worldOneSecondMidGroundTexture, Vector2.Zero, Color.White);
                             _spriteBatch.End();
 
                             transform = Matrix.CreateTranslation(offsetX * 0.600f, 0, 0);
                             _spriteBatch.Begin(transformMatrix: transform);
-                            _spriteBatch.Draw(_worldForeGroundTexture, Vector2.Zero, Color.White);
-                            _spriteBatch.Draw(_worldGroundTexture, _worldGround, Color.White);
+                            _spriteBatch.Draw(_worldOneForeGroundTexture, Vector2.Zero, Color.White);
+                            _spriteBatch.Draw(_worldOneGroundTexture, _worldGround, Color.White);
                             _spriteBatch.End();
 
                             _spriteBatch.Begin();
                             _sandParticleSystem.Draw(gameTime);
-                            _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Backspace' on the keyboard, to return to the Menu.", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 700), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Backspace' on the keyboard, to return to the Menu.") / 2, 0.35f, SpriteEffects.None, 1);
+                            _spriteBatch.DrawString(_sedgwickAveDisplay, "Press 'Backspace' on the keyboard, to return to the Menu.", new Vector2((GraphicsDevice.Viewport.Width / 2) + 10, 700), Color.White, 0, _sedgwickAveDisplay.MeasureString("Press 'Backspace' on the keyboard, to return to the Menu.") / 2, 0.25f, SpriteEffects.None, 1);
 
                             // Tutorial
                             if (_player.Position.X <= 1280)
                             {
                                 _spriteBatch.DrawString(
                                     _sedgwickAveDisplay,
-                                    "Dodge the tumbleweeds! \n(Press 'T' to view the Tilemap)",
+                                    "Dodge the tumbleweeds!",
                                     new Vector2(GraphicsDevice.Viewport.Width / 2, 300),
                                     Color.Black,
                                     0,
-                                    _sedgwickAveDisplay.MeasureString("Dodge the tumbleweeds! \n(Press 'T' to view the Tilemap)") / 2,
+                                    _sedgwickAveDisplay.MeasureString("Dodge the tumbleweeds!") / 2,
                                     (float)0.5,
                                     SpriteEffects.None,
                                     1
@@ -738,14 +891,14 @@ namespace WasteSeeker
                             else if (_player.Position.X >= 1000 && _player.Position.X <= 2280)
                             {
                                 _spriteBatch.DrawString(
-                                    _sedgwickAveDisplay, 
-                                    "Talk to an NPC by pressing 'F' while on top of them!", 
-                                    new Vector2(GraphicsDevice.Viewport.Width / 2, 300), 
-                                    Color.Black, 
-                                    0, 
-                                    _sedgwickAveDisplay.MeasureString("Talk to an NPC by pressing 'F' while on top of them!") / 2, 
-                                    (float)0.5, 
-                                    SpriteEffects.None, 
+                                    _sedgwickAveDisplay,
+                                    "Talk to an NPC by pressing 'F' while on top of them!",
+                                    new Vector2(GraphicsDevice.Viewport.Width / 2, 300),
+                                    Color.Black,
+                                    0,
+                                    _sedgwickAveDisplay.MeasureString("Talk to an NPC by pressing 'F' while on top of them!") / 2,
+                                    (float)0.5,
+                                    SpriteEffects.None,
                                     1
                                 );
                             }
@@ -753,11 +906,11 @@ namespace WasteSeeker
                             {
                                 _spriteBatch.DrawString(
                                     _sedgwickAveDisplay,
-                                    "(Reach the end of level one for a reward)",
+                                    "(Reach the end of each level for a different reward)",
                                     new Vector2(GraphicsDevice.Viewport.Width / 2, 300),
                                     Color.Black,
                                     0,
-                                    _sedgwickAveDisplay.MeasureString("(Reach the end of level one for a reward)") / 2,
+                                    _sedgwickAveDisplay.MeasureString("(Reach the end of each level for a different reward)") / 2,
                                     (float)0.5,
                                     SpriteEffects.None,
                                     1
@@ -767,11 +920,11 @@ namespace WasteSeeker
                             {
                                 _spriteBatch.DrawString(
                                     _sedgwickAveDisplay,
-                                    "REWARD",
+                                    "REWARD!",
                                     new Vector2((GraphicsDevice.Viewport.Width / 2) + 200, 300),
                                     Color.Black,
                                     0,
-                                    _sedgwickAveDisplay.MeasureString("REWARD") / 2,
+                                    _sedgwickAveDisplay.MeasureString("REWARD!") / 2,
                                     (float)0.5,
                                     SpriteEffects.None,
                                     1
@@ -808,6 +961,22 @@ namespace WasteSeeker
                             transform = Matrix.CreateTranslation(offsetX, 0, 0);
                             _spriteBatch.Begin(transformMatrix: transform);
                             _soraNPC.Draw(_spriteBatch, gameTime);
+
+                            if (_soraNPC.HasDialogue)
+                            {
+                                _spriteBatch.DrawString(
+                                    _sedgwickAveDisplay,
+                                    "?",
+                                    _soraNPC.Position - new Vector2(0, 100),
+                                    Color.Yellow,
+                                    0,
+                                    _sedgwickAveDisplay.MeasureString("?") / 2,
+                                    (float)1,
+                                    SpriteEffects.None,
+                                    1
+                                );
+                            }
+
                             _player.Draw(_spriteBatch, gameTime);
                             _tumbleweed.Draw(_spriteBatch);
 
@@ -829,12 +998,104 @@ namespace WasteSeeker
                             _spriteBatch.End();
 
                             break;
+
+                        case LevelState.LevelTwo:
+
+                            transform = Matrix.CreateTranslation(offsetX * 0.150f - 2250f, 0, 0);
+                            _spriteBatch.Begin(transformMatrix: transform);
+                            _spriteBatch.Draw(_worldTwoFirstMidGroundTexture, Vector2.Zero, Color.White);
+                            _spriteBatch.End();
+
+                            transform = Matrix.CreateTranslation(offsetX * 0.250f - 2000f, 0, 0);
+                            _spriteBatch.Begin(transformMatrix: transform);
+                            _spriteBatch.Draw(_worldTwoSecondMidGroundTexture, Vector2.Zero, Color.White);
+                            _spriteBatch.End();
+
+                            transform = Matrix.CreateTranslation(offsetX * 0.600f, 0, 0);
+                            _spriteBatch.Begin(transformMatrix: transform);
+                            _spriteBatch.Draw(_worldTwoForeGroundTexture, Vector2.Zero, Color.White);
+                            _spriteBatch.Draw(_worldTwoGroundTexture, _worldGround, Color.White);
+                            _spriteBatch.End();
+
+                            _spriteBatch.Begin();
+                            _sandParticleSystem.Draw(gameTime);
+
+                            _spriteBatch.DrawString(
+                                    _sedgwickAveDisplay,
+                                    "Health: " + _player.Health,
+                                    new Vector2(GraphicsDevice.Viewport.Width / 7 - 50, 650),
+                                    Color.Black,
+                                    0,
+                                    _sedgwickAveDisplay.MeasureString("Health: " + _player.Health) / 2,
+                                    (float)0.5,
+                                    SpriteEffects.None,
+                                    1
+                                );
+
+                            if (_player.Position.X >= 13500)
+                            {
+                                _spriteBatch.DrawString(
+                                    _sedgwickAveDisplay,
+                                    "REWARD!",
+                                    new Vector2((GraphicsDevice.Viewport.Width / 2) + 200, 300),
+                                    Color.Black,
+                                    0,
+                                    _sedgwickAveDisplay.MeasureString("REWARD!") / 2,
+                                    (float)0.5,
+                                    SpriteEffects.None,
+                                    1
+                                );
+
+                                //_rewardOne.Draw(_spriteBatch);
+                            }
+                            _spriteBatch.End();
+
+                            transform = Matrix.CreateTranslation(offsetX, 0, 0);
+                            _spriteBatch.Begin(transformMatrix: transform);
+                            _soraNPC.Draw(_spriteBatch, gameTime);
+
+                            if (_soraNPC.HasDialogue)
+                            {
+                                _spriteBatch.DrawString(
+                                    _sedgwickAveDisplay,
+                                    "?",
+                                    _soraNPC.Position - new Vector2(0, 100),
+                                    Color.Yellow,
+                                    0,
+                                    _sedgwickAveDisplay.MeasureString("?") / 2,
+                                    (float)1,
+                                    SpriteEffects.None,
+                                    1
+                                );
+                            }
+
+                            _player.Draw(_spriteBatch, gameTime);
+                            _tumbleweed.Draw(_spriteBatch);
+
+                            if (_player.Position.X >= 13500)
+                            {
+                                _rewardTwo.Draw(_spriteBatch);
+                            }
+                            _spriteBatch.End();
+
+                            _spriteBatch.Begin();
+                            if (_inputHandler.DialoguePlaying && _player.Bounds.CollidesWith(_soraNPC.Bounds))
+                            {
+                                // Draw dialogue[0]
+                                if (!_dialogue[1].Finished)
+                                {
+                                    _dialogue[1].Draw(_spriteBatch);
+                                }
+                            }
+                            _spriteBatch.End();
+
+                            break;
+
                     } // END LevelState 1
+
                     break;
                 case GameState.GameOver:
                     _spriteBatch.Begin();
-
-                    _bulletModel.Draw(_camera);
 
                     _spriteBatch.DrawString(
                         _sedgwickAveDisplay,
@@ -848,8 +1109,6 @@ namespace WasteSeeker
                         1
                     );
 
-                    _spriteBatch.Draw(_kuzuDeadTexture, new Vector2(500, 200), Color.White);
-
                     _spriteBatch.DrawString(
                         _sedgwickAveDisplay,
                         "Press \"ENTER\" or \"SPACE\" to return to the main menu.",
@@ -862,6 +1121,12 @@ namespace WasteSeeker
                         1
                     );
 
+                    if (!_gameWon)
+                    {
+                        _bulletModel.Draw(_camera);
+                        _spriteBatch.Draw(_kuzuDeadTexture, new Vector2(500, 200), Color.White);
+                    }
+                    
                     _spriteBatch.End();
 
                     break;
@@ -939,18 +1204,44 @@ namespace WasteSeeker
                     break;
                 
                 case GameState.Cutscene:
-                    switch (_levelState)
-                    {
-                        case LevelState.LevelOne:
-                            GraphicsDevice.Clear(Color.NavajoWhite);
-                            _cutsceneOne.Draw(_spriteBatch);
-                            break;
-                    }
+                    int level = Convert.ToInt32(_levelState);
+
+                    GraphicsDevice.Clear(Color.NavajoWhite);
+                    _cutscenes[level].Draw(_spriteBatch);
                     break;
                 
             } // END GameState
             
             base.Draw(gameTime);
+        }
+
+        /// <summary>
+        /// Used to reset the character and other variables to their initial states
+        /// when a new level begins
+        /// </summary>
+        /// <param name="gameTime">Game Time</param>
+        public void NewLevelReset(GameTime gameTime)
+        {
+            // Player
+            _player.Position = new Vector2(100, 480);
+            _inputHandler.UpdateDirection(1);
+            _playerWasHit = false;
+            _player.StopSFX();
+
+            // NPC Sora
+            _soraNPC.Position = new Vector2(50, 470);
+            _soraNPC.NPCState = CharacterState.Idle;
+            _soraNPC.Health = 100;
+            _soraNPC.IsFollowingPlayer = false;
+            _soraNPC.HasDialogue = true;
+
+            _soraNPC.ResetAnimation();
+
+            // Tumbleweed / Objects
+            _tumbleweed.Position = new Vector2(GraphicsDevice.Viewport.Width + 500, 540);
+            _tumbleweed.IsEnabled = true;
+            _sandParticleSystem.Enabled = true;
+            _sandParticleSystem.Visible = true;
         }
 
         /// <summary>
@@ -992,17 +1283,37 @@ namespace WasteSeeker
         /// <param name="filePath">File Path</param>
         public void SaveGame(string filePath)
         {
+            bool cutsceneOneFinish = false;
+            bool cutsceneTwoFinish = false;
+
+            for (int i = 0; i < _cutscenes.Length; i++)
+            {
+                if (_cutscenes[i].Finished)
+                {
+                    if (i == 0) { cutsceneOneFinish = true; }
+                    else if (i == 1) { cutsceneTwoFinish = true; }
+                }
+            }
+
             var gameData = new GameSaveData()
             {
                 playerX = _player.Position.X,
-                playerY = _player.Position.Y,
+                playerY = 480f,
                 playerHealth = _player.Health,
                 npc1X = _soraNPC.Position.X,
                 npc1Y = _soraNPC.Position.Y,
                 npc1Health = _soraNPC.Health,
-                groupIndex = _cutsceneOne.GetDialogueGroupIndex(),
-                groupMessageIndex = _cutsceneOne.GetDialogueIndex(),
-                cutsceneOver = _cutsceneOne.Finished
+                groupOneIndex = _cutscenes[0].GetDialogueGroupIndex(),
+                groupOneMessageIndex = _cutscenes[0].GetDialogueIndex(),
+                cutsceneOneOver = cutsceneOneFinish,
+                groupTwoIndex = _cutscenes[1].GetDialogueGroupIndex(),
+                groupTwoMessageIndex = _cutscenes[1].GetDialogueIndex(),
+                cutsceneTwoOver = cutsceneTwoFinish,
+                rewardOne = _rewardOne.RewardGot,
+                rewardTwo = _rewardTwo.RewardGot,
+                dialogueOneFinish = _dialogue[0].Finished,
+                dialogueTwoFinish = _dialogue[1].Finished,
+                levelState = Convert.ToInt32(_levelState)
             };
 
             string json = JsonSerializer.Serialize(gameData, new JsonSerializerOptions { WriteIndented = true });
@@ -1029,8 +1340,23 @@ namespace WasteSeeker
             _soraNPC.Position = new Vector2(gameData.npc1X, gameData.npc1Y);
             _soraNPC.Health = gameData.npc1Health;
 
-            _cutsceneOne.UpdateDialogueIndex(gameData.groupIndex, gameData.groupMessageIndex);
-            _cutsceneOne.Finished = gameData.cutsceneOver;
+            //Cutscenes
+            _cutscenes[0].UpdateDialogueIndex(gameData.groupOneIndex, gameData.groupOneMessageIndex);
+            _cutscenes[0].Finished = gameData.cutsceneOneOver;
+
+            _cutscenes[1].UpdateDialogueIndex(gameData.groupTwoIndex, gameData.groupTwoMessageIndex);
+            _cutscenes[1].Finished = gameData.cutsceneTwoOver;
+
+            //Rewards
+            _rewardOne.RewardGot = gameData.rewardOne;
+            _rewardTwo.RewardGot = gameData.rewardTwo;
+
+            //Dialogue
+            _dialogue[0].Finished = gameData.dialogueOneFinish;
+            _dialogue[1].Finished = gameData.dialogueTwoFinish;
+
+            //LevelState
+            _levelState = (LevelState)gameData.levelState;
             return true;
         }
     }
